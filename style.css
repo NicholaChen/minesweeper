@@ -6,5 +6,21 @@ html, body {
     font-family: monospace, monospace;
     color: #E0E0E0;
 
-    background: #000000;
+    background: #121212;
+}
+
+
+button {
+    border: 0;
+    padding: 8px;
+    margin: 0;
+    background: #cccccc22;
+    font: 26px monospace, monospace;
+    color: #f0f0f0;
+    border-radius: 0;
+
+}
+
+button:hover {
+    background: #cccccc33;
 }
