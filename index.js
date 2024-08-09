@@ -5,48 +5,42 @@ const margin = 0.03; // percentage of each grid square
 
 const canvasMargin = 16; // pixels
 
-const size = 10.; // number on side
+const size_x = 10.; // number on side
+const size_y = 10.; // number on side
 
 var map = []; // -1 represents a bomb
 
 var first = true;
 
-for (let i = 0; i < size; i++) {
+for (let i = 0; i < size_y; i++) {
     map[i] = [];
-    for (let j = 0; j < size; j++) {
+    for (let j = 0; j < size_x; j++) {
         map[i][j] = {value: NaN, opened: false, flagged: false};
     }
 }
 
 function generate(bombs, firstx, firsty) {
-    for (let i=0;i<bombs;i++) {
-        let x= Math.floor(Math.random() * size);
+    let bombTiles = [];
 
-        if (x == firstx) { // stops immediately hitting a bomb
-            let y= Math.floor(Math.random() * (size - 1));
-
-            let a = []
-            for (let j=0;j<size;j++) {
-                if (j != firsty) {
-                    a.push(j);
-                }
+    for (let x=0;x<size_x;x++) { // force first tile to not have a number on it
+        for (let y=0;y<size_y;y++) {
+            if (Math.abs(firstx -x ) > 1 || Math.abs(firsty - y) > 1) {
+                bombTiles.push([x,y]);
             }
-
-            console.log(x, a[y]);
-
-            map[a[y]][x].value = -1;
-        }
-        else {
-            let y = Math.floor(Math.random() * size);
-
-            console.log(x,y);
-
-            map[y][x].value = -1;
         }
     }
 
-    for (let x=0;x<size;x++) {
-        for (let y=0;y<size;y++) {
+    for (let i=0;i<bombs;i++) {
+        let b= Math.floor(Math.random() * bombTiles.length);
+
+        map[bombTiles[b][1]][bombTiles[b][0]].value = -1;
+        bombTiles.splice(b,1);
+    }
+
+
+
+    for (let x=0;x<size_x;x++) {
+        for (let y=0;y<size_y;y++) {
             if (map[y][x].value != -1) {
                 map[y][x].value = adjacentBombs(x,y);
             }
@@ -59,7 +53,7 @@ function adjacentBombs(x,y) {
     for (let i=-1;i<=1;i++) {
         for (let j=-1;j<=1;j++) {
             if (i != 0 || j != 0) {
-                if (x+i >= 0 && x+i < size && y+j >= 0 && y+j < size) {
+                if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
                     if (map[y+j][x+i].value == -1) {
                         b += 1;
                     }
@@ -71,26 +65,40 @@ function adjacentBombs(x,y) {
     return b;
 }
 
+function exposeTile(x,y, done=[]) {
+
+    if (x < 0 || x >= size_x || y < 0 || y >= size_y || done.includes(y*size_y + x)) {
+        return
+    }
+    if (map[y][x].value == 0) {
+        map[y][x].opened = true;
+        done.push(y*size_y + x);
+
+        exposeTile(x+1,y,done);
+        exposeTile(x-1,y,done);
+        exposeTile(x,y+1,done);
+        exposeTile(x,y-1,done);
+    }
+
+    return
+}
 
 function draw(clear=false) {
     if (clear) {
         ctx.clearRect(0,0,canvas.width,canvas.height);
     }
     ctx.fillStyle = "rgba(120,120,120,0.5)";
-    let w=canvas.width;
-    let h=canvas.height;
-    
-    let squareSize = Math.min(w,h) / size;
-    let startx = w/2 - squareSize * size / 2;
-    let starty = h/2 - squareSize * size / 2;
+    let squareSize = Math.min(canvas.width/size_x,canvas.height/size_y);
+    let startx = canvas.width/2 - squareSize * size_x / 2;
+    let starty = canvas.height/2 - squareSize * size_y / 2;
 
 
-    ctx.font = (squareSize / 1.7).toString() + "px monospace, monospace";
+    ctx.font = (squareSize / 1.5).toString() + "px monospace, monospace";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
 
-    for (let x=0;x<size;x++) {
-        for (let y=0;y<size;y++) {
+    for (let x=0;x<size_x;x++) {
+        for (let y=0;y<size_y;y++) {
             if (!map[y][x].opened) {
                 ctx.fillStyle = "rgba(50,50,50,0.5)";
             } else {
@@ -151,12 +159,12 @@ resizeObserver.observe(canvas, {box: 'content-box'});
 
 
 function overSquare(canvasX,canvasY) { // gets the square under the canvas at position (x,y)
-    let squareSize = Math.min(canvas.width,canvas.height) / size;
-    let startx = canvas.width/2 - squareSize * size / 2;
-    let starty = canvas.height/2 - squareSize * size / 2;
+    let squareSize = Math.min(canvas.width/size_x,canvas.height/size_y);
+    let startx = canvas.width/2 - squareSize * size_x / 2;
+    let starty = canvas.height/2 - squareSize * size_y / 2;
 
-    for (let x=0;x<size;x++) {
-        for (let y=0;y<size;y++) {
+    for (let x=0;x<size_x;x++) {
+        for (let y=0;y<size_y;y++) {
             if (!map[y][x].opened) {
                 ctx.fillStyle = "rgba(50,50,50,0.5)";
             }
@@ -195,7 +203,7 @@ document.addEventListener("mouseup", (e) => {
 
                     first = false;
                 }
-                map[square.y][square.x].opened = true;
+                exposeTile(square.x, square.y);
                 draw(true);
             }
         }
