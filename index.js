@@ -5,21 +5,24 @@ const margin = 0.03; // percentage of each grid square
 
 const canvasMargin = 10; // pixels
 
-const size_x = 30;
-const size_y = 20;
-const numBombs = 80;
-
+const size_x = 10;
+const size_y = 10;
+const numBombs = 5;
 
 var map = []; // -1 represents a bomb
 
 var first = true;
-
-for (let i = 0; i < size_y; i++) {
-    map[i] = [];
-    for (let j = 0; j < size_x; j++) {
-        map[i][j] = {value: NaN, opened: false, flagged: false};
+function refreshMap() {
+    first = true;
+    map = [];
+    for (let i = 0; i < size_y; i++) {
+        map[i] = [];
+        for (let j = 0; j < size_x; j++) {
+            map[i][j] = {value: NaN, opened: false, flagged: false};
+        }
     }
 }
+refreshMap();
 
 function generate(bombs, firstx, firsty) {
     let bombTiles = [];
@@ -103,6 +106,24 @@ function exposeTile(x,y) {
             n = n_;
         }
 
+        let opened = false;
+
+        for (let x=0;x<size_x;x++) {
+            for (let y=0;y<size_y;y++) {
+                if (map[y][x].opened && map[y][x].value != -1) {
+                    opened = true;
+                    console.log("a");
+                    break;
+                }
+            }
+        }
+
+        if (!opened) { // WIN (all tiles opened)
+            document.getElementById("gameEndText").innerText = "You Win!";
+            document.getElementById("gameEnd").style.display = "block";
+        }
+
+
     } else if (map[y][x].value == -1) {
         map[y][x].opened = true; // LOSE
 
@@ -113,6 +134,9 @@ function exposeTile(x,y) {
                 }
             }
         }
+
+        document.getElementById("gameEndText").innerText = "Game Over!";
+        document.getElementById("gameEnd").style.display = "block";
     } else {
         map[y][x].opened = true;
     }
@@ -257,6 +281,13 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
     return null
 }
 
+document.getElementById("playAgainButton").addEventListener("click", (e) => {
+    refreshMap()
+    draw();
+
+    document.getElementById("gameEnd").style.display = "none";
+});
+
 
 document.addEventListener("mousemove", (e) => {
     let canvasX = e.clientX - canvasMargin;
@@ -268,10 +299,11 @@ document.addEventListener("mousemove", (e) => {
         canvas.style.cursor = "default";
     }
 
+    sessionStorage.setItem("pointer", overSquare(canvasX,canvasY) != null);
 });
 
 
-document.addEventListener("mouseup", (e) => {
+canvas.addEventListener("mouseup", (e) => {
     let canvasX = e.clientX - canvasMargin;
     let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
     let square = overSquare(canvasX, canvasY);
@@ -307,8 +339,4 @@ document.addEventListener("mouseup", (e) => {
 
 if (sessionStorage.getItem("pointer") == "true") {
     canvas.style.cursor = "pointer"; 
-}
-
-window.onunload = function () {
-    sessionStorage.setItem("pointer", canvas.style.cursor == "pointer");
 }

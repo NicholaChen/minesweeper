@@ -16,10 +16,12 @@
             <div style="flex-grow: 1; position: relative; margin: 10px;">
                 <canvas id="canvas" style="position:absolute; left:0; top:0; width:100%; height:100%;">
                 </canvas>
-                <div style="position:absolute; left:30%; top:30%; right: 30%; bottom: 30%; background-color: rgba(0,0,0,0.2); display: none;">
-
+                <div style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; pointer-events: none;">
+                    <div style="background-color: rgba(0,0,0,0.2); padding: 16px; pointer-events: all; text-align:center; display: none" id="gameEnd">
+                        <h1 style="text-align: center; margin: 0" id="gameEndText">Game Over!</h1>
+                        <button id="playAgainButton">Play again</button>
+                    </div>
                 </div>
-
             </div>
         </div>
         
