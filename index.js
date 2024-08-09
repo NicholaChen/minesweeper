@@ -3,11 +3,11 @@ const ctx = canvas.getContext("2d");
 
 const margin = 0.03; // percentage of each grid square
 
-const canvasMargin = 16; // pixels
+const canvasMargin = 10; // pixels
 
-const size_x = 10.; // number on side
-const size_y = 10.; // number on side
-
+const size_x = 30.;
+const size_y = 20.;
+const numBombs = 70;
 var map = []; // -1 represents a bomb
 
 var first = true;
@@ -65,19 +65,45 @@ function adjacentBombs(x,y) {
     return b;
 }
 
-function exposeTile(x,y, done=[]) {
+function idToTile(n) {
+    return {x: n%size_x, y: Math.floor(n/size_x)}
+}
 
-    if (x < 0 || x >= size_x || y < 0 || y >= size_y || done.includes(y*size_y + x)) {
+function exposeTile(x,y) {
+
+    if (x < 0 || x >= size_x || y < 0 || y >= size_y) {
         return
     }
     if (map[y][x].value == 0) {
-        map[y][x].opened = true;
-        done.push(y*size_y + x);
+        let n = [y*size_x + x];
+        let done = [y*size_x + x];
 
-        exposeTile(x+1,y,done);
-        exposeTile(x-1,y,done);
-        exposeTile(x,y+1,done);
-        exposeTile(x,y-1,done);
+        while (true) {
+            let n_ = [];
+            for (let a=0;a<n.length;a++) {
+                map[idToTile(n[a]).y][idToTile(n[a]).x].opened = true;
+                if (map[idToTile(n[a]).y][idToTile(n[a]).x].value == 0) {
+                    for (let i=-1;i<=1;i++) {
+                        for (let j=-1;j<=1;j++) {
+                            if (idToTile(n[a]).x+i>=0 && idToTile(n[a]).x+i<size_x && idToTile(n[a]).y+j>=0 && idToTile(n[a]).y+j<size_y && !done.includes((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i)) {
+                                n_.push((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i);
+                                done.push((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i);
+                            }
+                        }
+                    }
+                }
+            }
+            if (n_.length == 0) {
+                break
+            }
+
+            n = n_;
+        }
+
+    } else if (map[y][x].value == -1) {
+        map[y][x].opened = true; // LOSE
+    } else {
+        map[y][x].opened = true;
     }
 
     return
@@ -103,7 +129,7 @@ function draw(clear=false) {
                 ctx.fillStyle = "rgba(50,50,50,0.5)";
             } else {
                 if (map[y][x].value == -1) {
-                    ctx.fillStyle = "rgba(120,0,0,0.5)";
+                    ctx.fillStyle = "rgba(200,0,0,0.5)";
                 } else if (map[y][x].value != 0) {
                     ctx.fillStyle = "rgba(255,255,255,1)";
                     
@@ -179,6 +205,7 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
     return null
 }
 
+
 document.addEventListener("mousemove", (e) => {
     let canvasX = e.clientX - canvasMargin;
     let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
@@ -188,6 +215,7 @@ document.addEventListener("mousemove", (e) => {
     } else {
         canvas.style.cursor = "default";
     }
+
 });
 
 
@@ -199,7 +227,7 @@ document.addEventListener("mouseup", (e) => {
         if (square) {
             if (!map[square.y][square.x].opened) {
                 if (first) {
-                    generate(18,square.x, square.y);
+                    generate(numBombs,square.x, square.y);
 
                     first = false;
                 }
@@ -212,3 +240,11 @@ document.addEventListener("mouseup", (e) => {
 
     }
 });
+
+if (sessionStorage.getItem("pointer") == "true") {
+    canvas.style.cursor = "pointer"; 
+}
+
+window.onunload = function () {
+    sessionStorage.setItem("pointer", canvas.style.cursor == "pointer");
+}
