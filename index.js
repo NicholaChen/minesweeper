@@ -26,7 +26,7 @@ function generate(bombs, firstx, firsty) {
 
     for (let x=0;x<size_x;x++) { // force first tile to not have a number on it
         for (let y=0;y<size_y;y++) {
-            if (Math.abs(firstx -x ) > 1 || Math.abs(firsty - y) > 1) {
+            if (Math.abs(firstx - x) > 1 || Math.abs(firsty - y) > 1) {
                 bombTiles.push([x,y]);
             }
         }
@@ -105,6 +105,14 @@ function exposeTile(x,y) {
 
     } else if (map[y][x].value == -1) {
         map[y][x].opened = true; // LOSE
+
+        for (let x=0;x<size_x;x++) {
+            for (let y=0;y<size_y;y++) {
+                if (map[y][x].value == -1) {
+                    map[y][x].opened = true;
+                }
+            }
+        }
     } else {
         map[y][x].opened = true;
     }
@@ -133,31 +141,18 @@ function draw(clear=false) {
             } else {
                 if (map[y][x].value == -1) {
                     ctx.fillStyle = "rgba(200,0,0,0.6)";
+
+                    if (map[y][x].flagged) {
+                        ctx.fillStyle = "rgba(200,0,0,0.3)";
+                    }
                 } else {
                     ctx.fillStyle = "#3F3F3F";
                 }
             }
 
             ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
-        
+            
             if (!map[y][x].opened) {
-                if (map[y][x].flagged) {
-                    ctx.strokeStyle = "rgba(200,0,0,1)";
-                    ctx.fillStyle = "rgba(200,0,0,1)";
-                    ctx.lineWidth = squareSize / 15;
-
-                    ctx.beginPath();
-                    ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.8*squareSize);
-                    ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
-                    ctx.lineTo(startx+x*squareSize + 0.7*squareSize, starty+y*squareSize + 0.35*squareSize);
-                    ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.5*squareSize);
-                    ctx.closePath();
-                    ctx.stroke();
-                    ctx.fill();
-                }
             } else {
                 if (map[y][x].value == -1) {
                     ctx.fillStyle = "#111";
@@ -167,10 +162,10 @@ function draw(clear=false) {
                     ctx.arc(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize, squareSize/4.5, 0, 2 * Math.PI);
                     ctx.fill();
 
-                    for (let i=0;i<6;i++) {
+                    for (let i=0;i<8;i++) {
                         ctx.beginPath();
                         ctx.moveTo(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize)
-                        ctx.lineTo(startx+x*squareSize + 0.5*squareSize + Math.cos(Math.PI * 2 / 6 * i) * squareSize/3, starty+y*squareSize + 0.5*squareSize + Math.sin(Math.PI * 2 / 6 * i) * squareSize/3);
+                        ctx.lineTo(startx+x*squareSize + 0.5*squareSize + Math.cos(Math.PI * 2 / 8 * i) * squareSize/3.3, starty+y*squareSize + 0.5*squareSize + Math.sin(Math.PI * 2 / 8 * i) * squareSize/3.3);
                         ctx.stroke();
                     }
 
@@ -180,6 +175,23 @@ function draw(clear=false) {
                     
                     ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                 }
+            }
+            if (map[y][x].flagged) {
+                ctx.strokeStyle = "rgba(200,0,0,1)";
+                ctx.fillStyle = "rgba(200,0,0,1)";
+                ctx.lineWidth = squareSize / 15;
+
+                ctx.beginPath();
+                ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.8*squareSize);
+                ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
+                ctx.lineTo(startx+x*squareSize + 0.7*squareSize, starty+y*squareSize + 0.35*squareSize);
+                ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.5*squareSize);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.fill();
             }
         }
     }
@@ -250,7 +262,7 @@ document.addEventListener("mousemove", (e) => {
     let canvasX = e.clientX - canvasMargin;
     let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
     
-    if (overSquare(canvasX,canvasY)) {
+    if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
         canvas.style.cursor = "pointer";
     } else {
         canvas.style.cursor = "default";
@@ -283,6 +295,13 @@ document.addEventListener("mouseup", (e) => {
                 draw(true);
             }
         }
+    }
+
+    // update cursor
+    if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+        canvas.style.cursor = "pointer";
+    } else {
+        canvas.style.cursor = "default";
     }
 });
 
