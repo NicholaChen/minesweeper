@@ -5,9 +5,11 @@ const margin = 0.03; // percentage of each grid square
 
 const canvasMargin = 10; // pixels
 
-const size_x = 30.;
-const size_y = 20.;
-const numBombs = 70;
+const size_x = 30;
+const size_y = 20;
+const numBombs = 80;
+
+
 var map = []; // -1 represents a bomb
 
 var first = true;
@@ -82,6 +84,7 @@ function exposeTile(x,y) {
             let n_ = [];
             for (let a=0;a<n.length;a++) {
                 map[idToTile(n[a]).y][idToTile(n[a]).x].opened = true;
+                map[idToTile(n[a]).y][idToTile(n[a]).x].flagged = false;
                 if (map[idToTile(n[a]).y][idToTile(n[a]).x].value == 0) {
                     for (let i=-1;i<=1;i++) {
                         for (let j=-1;j<=1;j++) {
@@ -126,21 +129,58 @@ function draw(clear=false) {
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
             if (!map[y][x].opened) {
-                ctx.fillStyle = "rgba(50,50,50,0.5)";
+                ctx.fillStyle = "#222";
             } else {
                 if (map[y][x].value == -1) {
-                    ctx.fillStyle = "rgba(200,0,0,0.5)";
-                } else if (map[y][x].value != 0) {
-                    ctx.fillStyle = "rgba(255,255,255,1)";
-                    
-                    ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
-                    ctx.fillStyle = "rgba(120,120,120,0.5)";
-                }  else {
-                    ctx.fillStyle = "rgba(120,120,120,0.5)";
+                    ctx.fillStyle = "rgba(200,0,0,0.6)";
+                } else {
+                    ctx.fillStyle = "#3F3F3F";
                 }
             }
 
             ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
+        
+            if (!map[y][x].opened) {
+                if (map[y][x].flagged) {
+                    ctx.strokeStyle = "rgba(200,0,0,1)";
+                    ctx.fillStyle = "rgba(200,0,0,1)";
+                    ctx.lineWidth = squareSize / 15;
+
+                    ctx.beginPath();
+                    ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.8*squareSize);
+                    ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
+                    ctx.lineTo(startx+x*squareSize + 0.7*squareSize, starty+y*squareSize + 0.35*squareSize);
+                    ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.5*squareSize);
+                    ctx.closePath();
+                    ctx.stroke();
+                    ctx.fill();
+                }
+            } else {
+                if (map[y][x].value == -1) {
+                    ctx.fillStyle = "#111";
+                    ctx.strokeStyle = "#111";
+                    ctx.lineWidth = squareSize / 15;
+                    ctx.beginPath();
+                    ctx.arc(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize, squareSize/4.5, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    for (let i=0;i<6;i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize)
+                        ctx.lineTo(startx+x*squareSize + 0.5*squareSize + Math.cos(Math.PI * 2 / 6 * i) * squareSize/3, starty+y*squareSize + 0.5*squareSize + Math.sin(Math.PI * 2 / 6 * i) * squareSize/3);
+                        ctx.stroke();
+                    }
+
+
+                } else if (map[y][x].value != 0) {
+                    ctx.fillStyle = "rgba(190,190,190,1)";
+                    
+                    ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                }
+            }
         }
     }
 }
@@ -195,8 +235,8 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
                 ctx.fillStyle = "rgba(50,50,50,0.5)";
             }
 
-            if (canvasX >= startx+x*squareSize + squareSize*margin && canvasX <= startx+x*squareSize + squareSize*margin + squareSize - squareSize*margin &&
-                canvasY >= starty+y*squareSize + squareSize*margin && canvasY <= starty+y*squareSize + squareSize*margin + squareSize - squareSize*margin) {
+            if (canvasX >= startx+x*squareSize && canvasX <= startx+x*squareSize + squareSize*margin + squareSize &&
+                canvasY >= starty+y*squareSize && canvasY <= starty+y*squareSize + squareSize*margin + squareSize) {
                 return {x: x, y: y}
             }
         }
@@ -225,7 +265,7 @@ document.addEventListener("mouseup", (e) => {
     let square = overSquare(canvasX, canvasY);
     if (e.button === 0) {
         if (square) {
-            if (!map[square.y][square.x].opened) {
+            if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
                 if (first) {
                     generate(numBombs,square.x, square.y);
 
@@ -237,7 +277,12 @@ document.addEventListener("mouseup", (e) => {
         }
     }
     if (e.button === 2) {
-
+        if (square) {
+            if (!map[square.y][square.x].opened) {
+                map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
+                draw(true);
+            }
+        }
     }
 });
 
