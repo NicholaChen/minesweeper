@@ -7,13 +7,31 @@ const canvasMargin = 10; // pixels
 
 const size_x = 10;
 const size_y = 10;
-const numBombs = 5;
+const numBombs = 20;
 
 var map = []; // -1 represents a bomb
 
+var flags = 0;
+
+var startTime;
+
+var interval;
 var first = true;
+
+function timeToText(t) {
+    if (t < 60) {
+        return t.toFixed(1) + "s"
+    } else {
+        return Math.floor(t / 60).toString() + ":" + Math.floor(t % 60).toString().padStart(2, "0")
+    }
+}
+
 function refreshMap() {
+    document.getElementById("flags").innerText = "0/" + numBombs.toString();
+    document.getElementById("timer").innerText = "0.0s";
+
     first = true;
+    flags = 0;
     map = [];
     for (let i = 0; i < size_y; i++) {
         map[i] = [];
@@ -106,26 +124,13 @@ function exposeTile(x,y) {
             n = n_;
         }
 
-        let opened = false;
-
-        for (let x=0;x<size_x;x++) {
-            for (let y=0;y<size_y;y++) {
-                if (map[y][x].opened && map[y][x].value != -1) {
-                    opened = true;
-                    console.log("a");
-                    break;
-                }
-            }
-        }
-
-        if (!opened) { // WIN (all tiles opened)
-            document.getElementById("gameEndText").innerText = "You Win!";
-            document.getElementById("gameEnd").style.display = "block";
-        }
-
 
     } else if (map[y][x].value == -1) {
         map[y][x].opened = true; // LOSE
+
+        clearInterval(interval);
+        let elapsedTime = Date.now() - startTime;
+        document.getElementById("timer").innerText = timeToText(elapsedTime / 1000);
 
         for (let x=0;x<size_x;x++) {
             for (let y=0;y<size_y;y++) {
@@ -139,6 +144,27 @@ function exposeTile(x,y) {
         document.getElementById("gameEnd").style.display = "block";
     } else {
         map[y][x].opened = true;
+    }
+
+    let opened = true;
+
+    for (let x=0;x<size_x;x++) {
+        for (let y=0;y<size_y;y++) {
+            if (!map[y][x].opened && map[y][x].value != -1) {
+                opened = false;
+                console.log("a");
+                break;
+            }
+        }
+    }
+
+    if (opened) { // WIN (all tiles opened)
+        clearInterval(interval);
+        let elapsedTime = Date.now() - startTime;
+        document.getElementById("timer").innerText = timeToText(elapsedTime / 1000);
+
+        document.getElementById("gameEndText").innerText = "You Win!";
+        document.getElementById("gameEnd").style.display = "block";
     }
 
     return
@@ -288,7 +314,6 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
     document.getElementById("gameEnd").style.display = "none";
 });
 
-
 document.addEventListener("mousemove", (e) => {
     let canvasX = e.clientX - canvasMargin;
     let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
@@ -314,6 +339,13 @@ canvas.addEventListener("mouseup", (e) => {
                     generate(numBombs,square.x, square.y);
 
                     first = false;
+
+                    startTime = Date.now();
+                    interval = setInterval(function() {
+                        let elapsedTime = Date.now() - startTime;
+                        document.getElementById("timer").innerText = timeToText(elapsedTime / 1000);
+                    }, 1);
+
                 }
                 exposeTile(square.x, square.y);
                 draw(true);
@@ -325,6 +357,19 @@ canvas.addEventListener("mouseup", (e) => {
             if (!map[square.y][square.x].opened) {
                 map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
                 draw(true);
+
+                let f = 0;
+
+                for (let x=0;x<size_x;x++) { // force first tile to not have a number on it
+                    for (let y=0;y<size_y;y++) {
+                        if (map[y][x].flagged) {
+                            f++;
+                        }
+                    }
+                }
+
+                flags = f;
+                document.getElementById("flags").innerText = flags + "/" + numBombs.toString();
             }
         }
     }
