@@ -14,7 +14,7 @@ button {
     border: 0;
     padding: 8px;
     margin: 0;
-    background: #00cc0044;
+    background: #00cc0066;
     font: 26px monospace, monospace;
     color: #f0f0f0;
     border-radius: 0;
@@ -22,5 +22,11 @@ button {
 }
 
 button:hover {
-    background: #00cc0055;
+    background: #00cc0077;
+}
+
+#pause {
+    padding: 4px;
+    font-size: 22px;
+    background: #00000000;
 }

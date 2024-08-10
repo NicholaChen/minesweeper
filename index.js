@@ -7,13 +7,17 @@ const canvasMargin = 10; // pixels
 
 const size_x = 10;
 const size_y = 10;
-const numBombs = 20;
+const numBombs = 15;
+
+var inGame = false;
+var paused = false;
 
 var map = []; // -1 represents a bomb
 
 var flags = 0;
 
 var startTime;
+var pausedTime = 0;
 
 var interval;
 var first = true;
@@ -94,7 +98,7 @@ function idToTile(n) {
 
 function exposeTile(x,y) {
 
-    if (x < 0 || x >= size_x || y < 0 || y >= size_y) {
+    if (!inGame || paused || x < 0 || x >= size_x || y < 0 || y >= size_y) {
         return
     }
     if (map[y][x].value == 0) {
@@ -128,9 +132,11 @@ function exposeTile(x,y) {
     } else if (map[y][x].value == -1) {
         map[y][x].opened = true; // LOSE
 
+        inGame = false;
+
         clearInterval(interval);
         let elapsedTime = Date.now() - startTime;
-        document.getElementById("timer").innerText = timeToText(elapsedTime / 1000);
+        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
 
         for (let x=0;x<size_x;x++) {
             for (let y=0;y<size_y;y++) {
@@ -146,6 +152,20 @@ function exposeTile(x,y) {
         map[y][x].opened = true;
     }
 
+
+    let f = 0;
+
+    for (let x=0;x<size_x;x++) {
+        for (let y=0;y<size_y;y++) {
+            if (map[y][x].flagged) {
+                f++;
+            }
+        }
+    }
+
+    flags = f;
+    document.getElementById("flags").innerText = flags + "/" + numBombs.toString();
+
     let opened = true;
 
     for (let x=0;x<size_x;x++) {
@@ -159,9 +179,10 @@ function exposeTile(x,y) {
     }
 
     if (opened) { // WIN (all tiles opened)
+        inGame = false;
         clearInterval(interval);
         let elapsedTime = Date.now() - startTime;
-        document.getElementById("timer").innerText = timeToText(elapsedTime / 1000);
+        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
 
         document.getElementById("gameEndText").innerText = "You Win!";
         document.getElementById("gameEnd").style.display = "block";
@@ -186,62 +207,67 @@ function draw(clear=false) {
 
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (!map[y][x].opened) {
-                ctx.fillStyle = "#222";
-            } else {
-                if (map[y][x].value == -1) {
-                    ctx.fillStyle = "rgba(200,0,0,0.6)";
-
-                    if (map[y][x].flagged) {
-                        ctx.fillStyle = "rgba(200,0,0,0.3)";
-                    }
+            if (!paused) {
+                if (!map[y][x].opened) {
+                    ctx.fillStyle = "#222";
                 } else {
-                    ctx.fillStyle = "#3F3F3F";
-                }
-            }
+                    if (map[y][x].value == -1) {
+                        ctx.fillStyle = "rgba(200,0,0,0.6)";
 
-            ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
-            
-            if (!map[y][x].opened) {
-            } else {
-                if (map[y][x].value == -1) {
-                    ctx.fillStyle = "#111";
-                    ctx.strokeStyle = "#111";
-                    ctx.lineWidth = squareSize / 15;
-                    ctx.beginPath();
-                    ctx.arc(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize, squareSize/4.5, 0, 2 * Math.PI);
-                    ctx.fill();
-
-                    for (let i=0;i<8;i++) {
-                        ctx.beginPath();
-                        ctx.moveTo(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize)
-                        ctx.lineTo(startx+x*squareSize + 0.5*squareSize + Math.cos(Math.PI * 2 / 8 * i) * squareSize/3.3, starty+y*squareSize + 0.5*squareSize + Math.sin(Math.PI * 2 / 8 * i) * squareSize/3.3);
-                        ctx.stroke();
+                        if (map[y][x].flagged) {
+                            ctx.fillStyle = "rgba(200,0,0,0.3)";
+                        }
+                    } else {
+                        ctx.fillStyle = "#3F3F3F";
                     }
-
-
-                } else if (map[y][x].value != 0) {
-                    ctx.fillStyle = "rgba(190,190,190,1)";
-                    
-                    ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                 }
-            }
-            if (map[y][x].flagged) {
-                ctx.strokeStyle = "rgba(200,0,0,1)";
-                ctx.fillStyle = "rgba(200,0,0,1)";
-                ctx.lineWidth = squareSize / 15;
 
-                ctx.beginPath();
-                ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.8*squareSize);
-                ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
-                ctx.lineTo(startx+x*squareSize + 0.7*squareSize, starty+y*squareSize + 0.35*squareSize);
-                ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.5*squareSize);
-                ctx.closePath();
-                ctx.stroke();
-                ctx.fill();
+                ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
+                
+                if (!map[y][x].opened) {
+                } else {
+                    if (map[y][x].value == -1) {
+                        // ctx.fillStyle = "#111";
+                        // ctx.strokeStyle = "#222";
+                        // ctx.lineWidth = squareSize / 15;
+
+                        // for (let i=0;i<8;i++) {
+                        //     ctx.beginPath();
+                        //     ctx.moveTo(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize)
+                        //     ctx.lineTo(startx+x*squareSize + 0.5*squareSize + Math.cos(Math.PI * 2 / 8 * i) * squareSize/3.6, starty+y*squareSize + 0.5*squareSize + Math.sin(Math.PI * 2 / 8 * i) * squareSize/3.6);
+                        //     ctx.stroke();
+                        // }
+
+                        // ctx.beginPath();
+                        // ctx.arc(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize, squareSize/4.5, 0, 2 * Math.PI);
+                        // ctx.fill();
+
+
+                    } else if (map[y][x].value != 0) {
+                        ctx.fillStyle = "rgba(190,190,190,1)";
+                        
+                        ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                    }
+                }
+                if (map[y][x].flagged) {
+                    ctx.strokeStyle = "rgba(170,0,0,1)";
+                    ctx.fillStyle = "rgba(200,0,0,1)";
+                    ctx.lineWidth = squareSize / 15;
+
+                    ctx.beginPath();
+                    ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.8*squareSize);
+                    ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
+                    ctx.stroke();
+
+                    ctx.strokeStyle = "rgba(200,0,0,1)";
+                    ctx.beginPath();
+                    ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
+                    ctx.lineTo(startx+x*squareSize + 0.7*squareSize, starty+y*squareSize + 0.35*squareSize);
+                    ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.5*squareSize);
+                    ctx.closePath();
+                    ctx.stroke();
+                    ctx.fill();
+                }
             }
         }
     }
@@ -309,7 +335,7 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
 
 document.getElementById("playAgainButton").addEventListener("click", (e) => {
     refreshMap()
-    draw();
+    draw(true);
 
     document.getElementById("gameEnd").style.display = "none";
 });
@@ -336,14 +362,18 @@ canvas.addEventListener("mouseup", (e) => {
         if (square) {
             if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
                 if (first) {
+                    pausedTime = 0;
                     generate(numBombs,square.x, square.y);
 
                     first = false;
+                    inGame = true;
 
                     startTime = Date.now();
                     interval = setInterval(function() {
-                        let elapsedTime = Date.now() - startTime;
-                        document.getElementById("timer").innerText = timeToText(elapsedTime / 1000);
+                        if (!paused) {
+                            let elapsedTime = Date.now() - startTime;
+                            document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+                        }
                     }, 1);
 
                 }
@@ -360,7 +390,7 @@ canvas.addEventListener("mouseup", (e) => {
 
                 let f = 0;
 
-                for (let x=0;x<size_x;x++) { // force first tile to not have a number on it
+                for (let x=0;x<size_x;x++) {
                     for (let y=0;y<size_y;y++) {
                         if (map[y][x].flagged) {
                             f++;
@@ -379,6 +409,34 @@ canvas.addEventListener("mouseup", (e) => {
         canvas.style.cursor = "pointer";
     } else {
         canvas.style.cursor = "default";
+    }
+});
+
+let pauseStart;
+
+document.getElementById("pause").addEventListener("click", (e) => {
+    if (inGame) {
+        paused = !paused;
+
+        if (paused) {
+            pauseStart = Date.now();
+
+            document.getElementById("pauseButton").classList.remove("fa-circle-pause");
+            document.getElementById("pauseButton").classList.add("fa-circle-play");
+
+            canvas.style.display = "none"
+            document.getElementById("pausedScreen").style.display = "flex";
+        } else {
+        
+            pausedTime += Date.now() - pauseStart;
+            document.getElementById("pauseButton").classList.remove("fa-circle-play");
+            document.getElementById("pauseButton").classList.add("fa-circle-pause");
+
+            canvas.style.display = "block";
+            document.getElementById("pausedScreen").style.display = "none";
+        }
+
+        draw(true);
     }
 });
 

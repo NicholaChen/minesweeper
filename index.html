@@ -19,6 +19,8 @@
                         <i class="fa-solid fa-flag"></i>
                         <span id="flags"></span>
                     </h2>
+                    <h2 style="margin: 0; display: inline; cursor: pointer;" id="pause"><i class="fa-solid fa-circle-pause" id="pauseButton"></i></h2>
+                    <h2 style="margin: 0; display: none; cursor: pointer" id="settings"><i class="fa-solid fa-gear"></i></h2>
                 </div>
             </div>
 
@@ -30,6 +32,10 @@
                         <h1 style="text-align: center; margin: 0" id="gameEndText">Game Over!</h1>
                         <button id="playAgainButton">Play again</button>
                     </div>
+                </div>
+                <div style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; pointer-events: none; display: none;" id="pausedScreen">
+                    
+                    <h1 style="text-align: center; margin: 0; vertical-align: middle;">Paused</h1>
                 </div>
             </div>
         </div>
