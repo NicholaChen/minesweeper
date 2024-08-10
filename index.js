@@ -7,12 +7,12 @@ const canvasMargin = 10; // pixels
 
 const size_x = 10;
 const size_y = 10;
-const numBombs = 15;
+const numMines = 15;
 
 var inGame = false;
 var paused = false;
 
-var map = []; // -1 represents a bomb
+var map = []; // -1 represents a mine
 
 var flags = 0;
 
@@ -31,7 +31,7 @@ function timeToText(t) {
 }
 
 function refreshMap() {
-    document.getElementById("flags").innerText = "0/" + numBombs.toString();
+    document.getElementById("flags").innerText = "0/" + numMines.toString();
     document.getElementById("timer").innerText = "0.0s";
 
     first = true;
@@ -46,22 +46,22 @@ function refreshMap() {
 }
 refreshMap();
 
-function generate(bombs, firstx, firsty) {
-    let bombTiles = [];
+function generate(mines, firstx, firsty) {
+    let mineTiles = [];
 
     for (let x=0;x<size_x;x++) { // force first tile to not have a number on it
         for (let y=0;y<size_y;y++) {
             if (Math.abs(firstx - x) > 1 || Math.abs(firsty - y) > 1) {
-                bombTiles.push([x,y]);
+                mineTiles.push([x,y]);
             }
         }
     }
 
-    for (let i=0;i<bombs;i++) {
-        let b= Math.floor(Math.random() * bombTiles.length);
+    for (let i=0;i<mines;i++) {
+        let b= Math.floor(Math.random() * mineTiles.length);
 
-        map[bombTiles[b][1]][bombTiles[b][0]].value = -1;
-        bombTiles.splice(b,1);
+        map[mineTiles[b][1]][mineTiles[b][0]].value = -1;
+        mineTiles.splice(b,1);
     }
 
 
@@ -69,13 +69,13 @@ function generate(bombs, firstx, firsty) {
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
             if (map[y][x].value != -1) {
-                map[y][x].value = adjacentBombs(x,y);
+                map[y][x].value = adjacentMines(x,y);
             }
         }
     }
 }
 
-function adjacentBombs(x,y) {
+function adjacentMines(x,y) {
     let b = 0;
     for (let i=-1;i<=1;i++) {
         for (let j=-1;j<=1;j++) {
@@ -164,7 +164,7 @@ function exposeTile(x,y) {
     }
 
     flags = f;
-    document.getElementById("flags").innerText = flags + "/" + numBombs.toString();
+    document.getElementById("flags").innerText = flags + "/" + numMines.toString();
 
     let opened = true;
 
@@ -363,7 +363,7 @@ canvas.addEventListener("mouseup", (e) => {
             if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
                 if (first) {
                     pausedTime = 0;
-                    generate(numBombs,square.x, square.y);
+                    generate(numMines,square.x, square.y);
 
                     first = false;
                     inGame = true;
@@ -399,7 +399,7 @@ canvas.addEventListener("mouseup", (e) => {
                 }
 
                 flags = f;
-                document.getElementById("flags").innerText = flags + "/" + numBombs.toString();
+                document.getElementById("flags").innerText = flags + "/" + numMines.toString();
             }
         }
     }
