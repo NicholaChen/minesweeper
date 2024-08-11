@@ -33,6 +33,7 @@ function timeToText(t) {
 function refreshMap() {
     document.getElementById("flags").innerText = "0/" + numMines.toString();
     document.getElementById("timer").innerText = "0.0s";
+    document.getElementById("clickAnywhere").style.display = "flex";
 
     first = true;
     flags = 0;
@@ -76,21 +77,39 @@ function generate(mines, firstx, firsty) {
 }
 
 function adjacentMines(x,y) {
-    let b = 0;
+    let m = 0;
     for (let i=-1;i<=1;i++) {
         for (let j=-1;j<=1;j++) {
             if (i != 0 || j != 0) {
                 if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
                     if (map[y+j][x+i].value == -1) {
-                        b += 1;
+                        m += 1;
                     }
                 }
             }
         }
     }
 
-    return b;
+    return m;
 }
+
+function adjacentFlags(x,y) {
+    let f = 0;
+    for (let i=-1;i<=1;i++) {
+        for (let j=-1;j<=1;j++) {
+            if (i != 0 || j != 0) {
+                if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
+                    if (map[y+j][x+i].flagged) {
+                        f += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return f;
+}
+
 
 function idToTile(n) {
     return {x: n%size_x, y: Math.floor(n/size_x)}
@@ -145,9 +164,11 @@ function exposeTile(x,y) {
                 }
             }
         }
-
+        document.getElementById("time").style.display = "none";
+        document.getElementById("bestTime").style.display = "none";
         document.getElementById("gameEndText").innerText = "Game Over!";
         document.getElementById("gameEnd").style.display = "block";
+        
     } else {
         map[y][x].opened = true;
     }
@@ -184,6 +205,14 @@ function exposeTile(x,y) {
         let elapsedTime = Date.now() - startTime;
         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
 
+        document.getElementById("time").style.display = "block";
+        document.getElementById("bestTime").style.display = "none";
+        if ((elapsedTime - pausedTime) / 1000 < 60) {
+            document.getElementById("time").innerText = "Time: " + timeToText((elapsedTime - pausedTime) / 1000);
+        } else {
+            document.getElementById("time").innerText = "Time: " + ((elapsedTime - pausedTime) / 1000).toFixed(1) + "s" + " (" + timeToText((elapsedTime - pausedTime) / 1000) + ")";
+        }
+        
         document.getElementById("gameEndText").innerText = "You Win!";
         document.getElementById("gameEnd").style.display = "block";
     }
@@ -354,61 +383,111 @@ document.addEventListener("mousemove", (e) => {
 });
 
 
+var leftButtonDown = false;
+var rightButtonDown = false;
+
+document.addEventListener("mousedown", function (e) {
+    if (e.button == 0) {
+        leftButtonDown = true;
+    } else if (e.button == 2) {
+        rightButtonDown = true;
+    }
+});
+
+document.addEventListener("mouseup", function (e) {
+    if (e.button == 0) {
+        leftButtonDown = false;
+    } else if (e.button == 2) {
+        rightButtonDown = false;
+    }
+});
+
+var double = false
 canvas.addEventListener("mouseup", (e) => {
+    if (double) {
+        double = false;
+        return
+    };
     let canvasX = e.clientX - canvasMargin;
     let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
     let square = overSquare(canvasX, canvasY);
-    if (e.button === 0) {
-        if (square) {
-            if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
-                if (first) {
-                    pausedTime = 0;
-                    generate(numMines,square.x, square.y);
 
-                    first = false;
-                    inGame = true;
 
-                    startTime = Date.now();
-                    interval = setInterval(function() {
-                        if (!paused) {
-                            let elapsedTime = Date.now() - startTime;
-                            document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-                        }
-                    }, 1);
+    if (!(leftButtonDown && rightButtonDown)) {
+        if (e.button === 0) {
+            if (square) {
+                if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
+                    if (first) {
+                        document.getElementById("clickAnywhere").style.display = "none";
+                        pausedTime = 0;
+                        generate(numMines,square.x, square.y);
 
+                        first = false;
+                        inGame = true;
+
+                        startTime = Date.now();
+                        interval = setInterval(function() {
+                            if (!paused) {
+                                let elapsedTime = Date.now() - startTime;
+                                document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+                            }
+                        }, 1);
+
+                    }
+                    exposeTile(square.x, square.y);
+                    draw(true);
                 }
-                exposeTile(square.x, square.y);
-                draw(true);
             }
         }
-    }
-    if (e.button === 2) {
-        if (square) {
-            if (!map[square.y][square.x].opened) {
-                map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
-                draw(true);
+        if (e.button === 2) {
+            if (square) {
+                if (!map[square.y][square.x].opened) {
+                    map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
+                    draw(true);
 
-                let f = 0;
+                    let f = 0;
 
-                for (let x=0;x<size_x;x++) {
-                    for (let y=0;y<size_y;y++) {
-                        if (map[y][x].flagged) {
-                            f++;
+                    for (let x=0;x<size_x;x++) {
+                        for (let y=0;y<size_y;y++) {
+                            if (map[y][x].flagged) {
+                                f++;
+                            }
+                        }
+                    }
+
+                    flags = f;
+                    document.getElementById("flags").innerText = flags + "/" + numMines.toString();
+                }
+            }
+        }
+
+        // update cursor
+        if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+            canvas.style.cursor = "pointer";
+        } else {
+            canvas.style.cursor = "default";
+        }
+    } else {
+        // chording
+        double = true; // fixes a bug where right + left together does two events
+        console.log("both");
+
+        if (map[square.y][square.x].opened && map[square.y][square.x].value != 0) {
+            let f = adjacentFlags(square.x, square.y);
+
+            if (f == map[square.y][square.x].value) {
+                for (let i=-1;i<=1;i++) {
+                    for (let j=-1;j<=1;j++) {
+                        if (i != 0 || j != 0) {
+                            if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y && !map[square.y+j][square.x+i].flagged) {
+                                exposeTile(square.x+i, square.y+j);
+                            }
                         }
                     }
                 }
-
-                flags = f;
-                document.getElementById("flags").innerText = flags + "/" + numMines.toString();
             }
+            draw(true);
         }
-    }
-
-    // update cursor
-    if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
-        canvas.style.cursor = "pointer";
-    } else {
-        canvas.style.cursor = "default";
     }
 });
 

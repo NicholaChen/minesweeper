@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/> 
         <link rel="stylesheet" href="style.css"/>
         <title>minesweeper v1.0</title>
         <script src="https://kit.fontawesome.com/760c95d571.js" crossorigin="anonymous"></script>    
@@ -8,11 +9,11 @@
     <body oncontextmenu="return false;">
         <div style="display: flex; width: 100vw; height: 100vh; flex-direction: column;">
             <div id="top">
-                <h1 style="margin: 8px 0 8px 8px; display: inline; font-size: 3em;">minesweeper</h1>
-                <p style="display: inline;">v1.0</p>
+                <h1 style="margin: 8px 0 8px 8px; display: inline; font-size: 33px;">minesweeper</h1>
+                <p style="display: inline;">v1.1</p>
 
                 <a href="https://github.com/NicholaChen/minesweeper" style="color: white;">
-                    <h1 style="display: inline; float: right; margin: 8px;">
+                    <h1 style="display: inline; float: right; margin: 8px; font-size: 25px;">
                         <i class="fa-brands fa-github"></i>
                     </h1>
                 </a>
@@ -36,14 +37,18 @@
                 <canvas id="canvas" style="position:absolute; left:0; top:0; width:100%; height:100%;">
                 </canvas>
                 <div style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; pointer-events: none;">
-                    <div style="background-color: rgba(0,0,0,0.2); padding: 16px; pointer-events: all; text-align:center; display: none" id="gameEnd">
-                        <h1 style="text-align: center; margin: 0" id="gameEndText">Game Over!</h1>
+                    <div style="background-color: rgba(0,0,0,0.4); padding: 16px; pointer-events: all; text-align:center; display: none; min-width: 15%;" id="gameEnd">
+                        <h1 style="text-align: center; margin: 0; font-size: 38px;" id="gameEndText">Game Over!</h1>
+                        <p id="time" style="font-size: 18px; margin: 4px;">Time: </p>
+                        <p id="bestTime" style="font-size: 18px; margin: 4px;">Best: </p>
                         <button id="playAgainButton">Play again</button>
                     </div>
                 </div>
                 <div style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; pointer-events: none; display: none;" id="pausedScreen">
-                    
                     <h1 style="text-align: center; margin: 0; vertical-align: middle;">Paused</h1>
+                </div>
+                <div style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; pointer-events: none;" id="clickAnywhere">
+                    <h1 style="text-align: center; margin: 0; vertical-align: middle;">Click anywhere to begin</h1>
                 </div>
             </div>
         </div>

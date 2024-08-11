@@ -8,16 +8,20 @@ Click anywhere to begin. Numbers indicate the number of mines adjacent (includin
 
 [https://nicholachen.github.io/minesweeper/](https://nicholachen.github.io/minesweeper/)
 
-## v1.0
+## v1.1
+ - Added chording (left and right click together)
+ - Displays your time on the "You Win!" screen
+ - Added text that says "Click anywhere to begin"
 
+## v1.0
  - First release
  - Includes a simple timer
  - Maps are all 10x10 with 15 mines
 
 ## To-Do
-
- - [ ] Chording
+ - [x] Chording
  - [ ] Customizable map sizes
  - [ ] Customizable colour scheme
  - [ ] Settings page
  - [ ] No-guess maps
+ - [ ] Mobile support
