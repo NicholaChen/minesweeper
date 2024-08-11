@@ -5,9 +5,9 @@ const margin = 0.03; // percentage of each grid square
 
 const canvasMargin = 16; // pixels
 
-const size_x = 10;
-const size_y = 10;
-const numMines = 15;
+var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) <= 0 ?  10 : Number(localStorage.getItem("mapX"));
+var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) <= 0  ?  10 : Number(localStorage.getItem("mapY"));
+var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 ?  15 : Number(localStorage.getItem("mines"));;
 
 var inGame = false;
 var paused = false;
@@ -31,6 +31,8 @@ function timeToText(t) {
 }
 
 function refreshMap() {
+    document.getElementById("gameEnd").style.display = "none";
+
     paused = false;
     document.getElementById("pause").classList.remove("fa-circle-play");
     document.getElementById("pause").classList.add("fa-circle-pause");
@@ -373,7 +375,7 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
 }
 
 document.getElementById("playAgainButton").addEventListener("click", (e) => {
-    refreshMap()
+    refreshMap();
 
     document.getElementById("gameEnd").style.display = "none";
 });
@@ -533,6 +535,7 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
         document.getElementById("game").style.display = "block";
         document.getElementById("settings").style.display = "none";
 
+        refreshMap();
         draw(true);
     } else {
         document.getElementById("game").style.display = "none";
@@ -549,3 +552,60 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
 if (sessionStorage.getItem("pointer") == "true") {
     canvas.style.cursor = "pointer"; 
 }
+
+
+
+
+// SETTINGS
+
+
+document.getElementById("width").value = size_x;
+document.getElementById("height").value = size_y;
+
+document.getElementById("numMines").value = numMines;
+
+document.getElementById("saveMapSize").addEventListener("click", (e) => {
+    let width_issue = "";
+    let height_issue = "";
+
+
+    if (isNaN(Number(document.getElementById("width").value))) {
+        width_issue = "Invalid width " + "('" + document.getElementById("width").value + "').";
+    } else if (Number(document.getElementById("width").value) < 5) {
+        width_issue = "Invalid width " + "('" + document.getElementById("width").value + "'). Must be at least 5.";
+    } else if (Number(document.getElementById("width").value) >= 100) {
+        width_issue = "Invalid width " + "('" + document.getElementById("width").value + "'). Must be less than 100.";
+    }
+
+    if (isNaN(Number(document.getElementById("height").value))) {
+        height_issue = "Invalid height " + "('" + document.getElementById("height").value + "').";
+    } else if (Number(document.getElementById("height").value) < 5) {
+        height_issue = "Invalid height " + "('" + document.getElementById("height").value + "'). Must be at least 5.";
+    } else if (Number(document.getElementById("height").value) >= 100) {
+        height_issue = "Invalid height " + "('" + document.getElementById("height").value + "'). Must be less than 100.";
+    }
+
+    if (width_issue != "" && height_issue != "") {
+        height_issue = " " + height_issue;
+    }
+
+    if (width_issue != "" || height_issue != "") {
+        document.getElementById("invalidGameplay").style.display = "block";
+        document.getElementById("invalidGameplay").innerText = "Could not save 'Map size'. " + width_issue + height_issue;
+
+        document.getElementById("width").value = size_x;
+        document.getElementById("height").value = size_y;
+
+        setTimeout(function() {
+            document.getElementById("invalidGameplay").style.display = "none";
+        }, 5000);
+    } else {
+        document.getElementById("invalidGameplay").style.display = "none";
+
+        size_x = Number(document.getElementById("width").value)
+        size_y = Number(document.getElementById("height").value)
+
+        document.getElementById("width").value = size_x;
+        document.getElementById("height").value = size_y;
+    }
+})

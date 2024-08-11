@@ -35,13 +35,18 @@ button:hover {
     font-family: monospace, monospace;
 }
 
+.saveSettings {
+    font-size: 20px;
+    padding: 4px 6px 4px 6px;
+    margin: 0 0 0 4px;
+}
 
 input[type=text] {
     background: #88888844;
     border: 0;
     color: #f0f0f0;
-    font-size: 15px;
-    padding: 2px;
+    font-size: 20px;
+    padding: 4px;
 }
 
 input[type=text]:hover {
@@ -51,4 +56,17 @@ input[type=text]:hover {
 input[type=text]:focus {
     outline: 1px solid rgba(200, 200, 200, 90%);
     background: #88888855;
+}
+#settings {
+    font-size: 24px;
+}
+#settings h2 {
+    font-size: 29px;
+}
+#settings h3 {
+    font-size: 24px;
+    font-weight: normal;
+}
+#settings p {
+    font-size: 18px;
 }

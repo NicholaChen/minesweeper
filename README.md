@@ -5,7 +5,7 @@ Welcome to this simple minesweeper game. Right now all maps are 10x10 with 15 mi
 
 ## How to play?
 Click anywhere to begin. Numbers indicate the number of mines adjacent (including corners) to the square.  Empty squares indicate no mines adjacent to it. Right click to flag squares that you believe have mines. Left click to open squares. Open a square with a mine and game over! Flag all squares with mines to win!
-
+Supports chording (revealing all 8 adjacent squares when the number of adjacent mines equals the number of adjacent flags) by simultaneously right and left clicking.
 [https://nicholachen.github.io/minesweeper/](https://nicholachen.github.io/minesweeper/)
 
 ## v1.1
