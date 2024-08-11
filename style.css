@@ -9,6 +9,9 @@ html, body {
     background: #121212;
 }
 
+h3 {
+    font-size: 18px;
+}
 
 button {
     border: 0;
@@ -25,8 +28,27 @@ button:hover {
     background: #00cc0077;
 }
 
-#pause {
-    padding: 4px;
-    font-size: 22px;
-    background: #00000000;
+.none {
+    margin: 0;
+    padding: 0;
+    background-color: #00000000 !important;
+    font-family: monospace, monospace;
+}
+
+
+input[type=text] {
+    background: #88888844;
+    border: 0;
+    color: #f0f0f0;
+    font-size: 15px;
+    padding: 2px;
+}
+
+input[type=text]:hover {
+    background: #88888855;
+}
+
+input[type=text]:focus {
+    outline: 1px solid rgba(200, 200, 200, 90%);
+    background: #88888855;
 }

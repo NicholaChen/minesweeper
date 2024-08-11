@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 
 const margin = 0.03; // percentage of each grid square
 
-const canvasMargin = 10; // pixels
+const canvasMargin = 16; // pixels
 
 const size_x = 10;
 const size_y = 10;
@@ -31,6 +31,14 @@ function timeToText(t) {
 }
 
 function refreshMap() {
+    paused = false;
+    document.getElementById("pause").classList.remove("fa-circle-play");
+    document.getElementById("pause").classList.add("fa-circle-pause");
+
+    canvas.style.display = "block";
+    document.getElementById("pausedScreen").style.display = "none";
+
+
     document.getElementById("flags").innerText = "0/" + numMines.toString();
     document.getElementById("timer").innerText = "0.0s";
     document.getElementById("clickAnywhere").style.display = "flex";
@@ -44,6 +52,8 @@ function refreshMap() {
             map[i][j] = {value: NaN, opened: false, flagged: false};
         }
     }
+
+    draw(true);
 }
 refreshMap();
 
@@ -364,7 +374,6 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
 
 document.getElementById("playAgainButton").addEventListener("click", (e) => {
     refreshMap()
-    draw(true);
 
     document.getElementById("gameEnd").style.display = "none";
 });
@@ -493,29 +502,47 @@ canvas.addEventListener("mouseup", (e) => {
 
 let pauseStart;
 
-document.getElementById("pause").addEventListener("click", (e) => {
+document.getElementById("pauseButton").addEventListener("click", (e) => {
     if (inGame) {
         paused = !paused;
 
         if (paused) {
             pauseStart = Date.now();
 
-            document.getElementById("pauseButton").classList.remove("fa-circle-pause");
-            document.getElementById("pauseButton").classList.add("fa-circle-play");
+            document.getElementById("pause").classList.remove("fa-circle-pause");
+            document.getElementById("pause").classList.add("fa-circle-play");
 
             canvas.style.display = "none"
             document.getElementById("pausedScreen").style.display = "flex";
         } else {
         
             pausedTime += Date.now() - pauseStart;
-            document.getElementById("pauseButton").classList.remove("fa-circle-play");
-            document.getElementById("pauseButton").classList.add("fa-circle-pause");
+            document.getElementById("pause").classList.remove("fa-circle-play");
+            document.getElementById("pause").classList.add("fa-circle-pause");
 
             canvas.style.display = "block";
             document.getElementById("pausedScreen").style.display = "none";
         }
 
         draw(true);
+    }
+});
+
+document.getElementById("settingsButton").addEventListener("click", (e) => {
+    if (document.getElementById("game").style.display == "none") {
+        document.getElementById("game").style.display = "block";
+        document.getElementById("settings").style.display = "none";
+
+        draw(true);
+    } else {
+        document.getElementById("game").style.display = "none";
+        document.getElementById("settings").style.display = "block";
+
+        inGame = false;
+
+        clearInterval(interval);
+
+        refreshMap();
     }
 });
 
