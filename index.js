@@ -552,7 +552,7 @@ document.addEventListener("touchmove", (e) => {
 })
 
 canvas.addEventListener("touchend", (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     if (e.touches.length == 0) {
         let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
           
@@ -563,7 +563,6 @@ canvas.addEventListener("touchend", (e) => {
         clearTimeout(touchTimeout);
         
         if (!touchHeld) {
-            //console.log("touch");
             open(square);
         }
     }
@@ -672,7 +671,10 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
 
         size_x = Number(document.getElementById("width").value)
         size_y = Number(document.getElementById("height").value)
-
+        
+        localStorage.setItem("mapX", size_x);
+        localStorage.setItem("mapY", size_y);
+        
         document.getElementById("width").value = size_x;
         document.getElementById("height").value = size_y;
         
