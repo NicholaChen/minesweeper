@@ -414,6 +414,57 @@ document.addEventListener("mouseup", function (e) {
 });
 
 var double = false
+
+
+function open(square) {
+   if (square) {
+     console.log("open",square);
+   if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
+     if (first) {
+       document.getElementById("clickAnywhere").style.display = "none";
+       pausedTime = 0;
+       generate(numMines, square.x, square.y);
+
+       first = false;
+       inGame = true;
+
+       startTime = Date.now();
+       interval = setInterval(function() {
+         if (!paused) {
+           let elapsedTime = Date.now() - startTime;
+           document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+         }
+       }, 1);
+
+     }
+     exposeTile(square.x, square.y);
+     draw(true);
+   }
+ }
+}
+
+function flag(square) {
+  if (square) {
+    console.log("flag",square);
+    if (!map[square.y][square.x].opened) {
+      map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
+      draw(true);
+  
+      let f = 0;
+  
+      for (let x = 0; x < size_x; x++) {
+        for (let y = 0; y < size_y; y++) {
+          if (map[y][x].flagged) {
+            f++;
+          }
+        }
+      }
+  
+      flags = f;
+      document.getElementById("flags").innerText = flags + "/" + numMines.toString();
+    }
+  }
+}
 canvas.addEventListener("mouseup", (e) => {
     if (double) {
         double = false;
@@ -426,50 +477,10 @@ canvas.addEventListener("mouseup", (e) => {
 
     if (!(leftButtonDown && rightButtonDown)) {
         if (e.button === 0) {
-            if (square) {
-                if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
-                    if (first) {
-                        document.getElementById("clickAnywhere").style.display = "none";
-                        pausedTime = 0;
-                        generate(numMines,square.x, square.y);
-
-                        first = false;
-                        inGame = true;
-
-                        startTime = Date.now();
-                        interval = setInterval(function() {
-                            if (!paused) {
-                                let elapsedTime = Date.now() - startTime;
-                                document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-                            }
-                        }, 1);
-
-                    }
-                    exposeTile(square.x, square.y);
-                    draw(true);
-                }
-            }
+            open(square);
         }
-        if (e.button === 2) {
-            if (square) {
-                if (!map[square.y][square.x].opened) {
-                    map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
-                    draw(true);
-
-                    let f = 0;
-
-                    for (let x=0;x<size_x;x++) {
-                        for (let y=0;y<size_y;y++) {
-                            if (map[y][x].flagged) {
-                                f++;
-                            }
-                        }
-                    }
-
-                    flags = f;
-                    document.getElementById("flags").innerText = flags + "/" + numMines.toString();
-                }
-            }
+        if (e.button === 2 && inGame) {
+          flag(square);
         }
 
         // update cursor
@@ -501,6 +512,60 @@ canvas.addEventListener("mouseup", (e) => {
         }
     }
 });
+
+var touchHold;
+var touchPos;
+var touchHeld = false;
+
+var touchTimeout;
+document.addEventListener("touchstart", (e) => {
+  if (e.touches.length == 1) {
+    touchPos = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    }
+   touchHeld = false;
+    
+    touchHold = true;
+    
+    touchTimeout = setTimeout(function() {
+      if (touchHold) {
+        touchHeld = true;
+        let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
+    
+        let canvasY = (touchPos.y -  document.getElementById("top").clientHeight - canvasMargin) * window.devicePixelRatio;
+        let square = overSquare(canvasX, canvasY);
+
+        if (inGame) flag(square);
+      }
+    }, 500);
+  } else {
+    touchHold = false;
+  }
+});
+
+document.addEventListener("touchmove", (e) => {
+  touchPos = {
+    x: e.touches[0].clientX,
+    y: e.touches[0].clientY
+  }
+})
+
+canvas.addEventListener("touchend", (e) => {
+  if (e.touches.length == 0) {
+    let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
+    
+    let canvasY = (touchPos.y -  document.getElementById("top").clientHeight - canvasMargin) * window.devicePixelRatio;
+    let square = overSquare(canvasX, canvasY);
+
+    touchHold = false;
+    clearTimeout(touchTimeout);
+    
+    if (!touchHeld) {
+      open(square);
+    }
+  }
+})
 
 let pauseStart;
 

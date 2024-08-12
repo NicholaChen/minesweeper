@@ -8,6 +8,10 @@ Click anywhere to begin. Numbers indicate the number of mines adjacent (includin
 Supports chording (revealing all 8 adjacent squares when the number of adjacent mines equals the number of adjacent flags) by simultaneously right and left clicking.
 [https://nicholachen.github.io/minesweeper/](https://nicholachen.github.io/minesweeper/)
 
+## v1.2
+ - Mobile support
+ - Bug fixes
+
 ## v1.1
  - Added chording (left and right click together)
  - Displays your time on the "You Win!" screen
