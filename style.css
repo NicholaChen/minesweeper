@@ -78,3 +78,20 @@ input[type=text]:focus {
 #settings p {
     font-size: 18px;
 }
+.settingsDiv {
+    margin: 8px 0px 8px 0px;
+    display: flex;
+    flex-direction: row;
+}
+.settingsDiv > div {
+    width: 25%;
+}
+@media (max-width: 800px) {
+    .settingsDiv {
+        flex-direction: column;
+    }
+    
+    .settingsDiv > div {
+        width: 100%;
+    }
+}

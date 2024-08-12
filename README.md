@@ -24,8 +24,8 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
 
 ## To-Do
  - [x] Chording
+ - [x] Mobile support
  - [ ] Customizable map sizes
  - [ ] Customizable colour scheme
  - [ ] Settings page
  - [ ] No-guess maps
- - [ ] Mobile support

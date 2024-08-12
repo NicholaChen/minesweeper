@@ -56,14 +56,14 @@
                 </div>
             </div>
 
-            <div style="flex-grow: 1; position: relative; margin: 16px 10% 16px 10%; display: none" id="settings">
+            <div style="flex-grow: 1; position: relative; padding: 16px 10% 16px 10%; display: none; overflow: auto;" id="settings">
                 <h1 style="text-align: center; margin: 16px;">Settings</h1>
                 <h2>Coming soon...</h2>
-                <div style="display: none">
+                <div style="display: block">
 <h2>Gameplay</h2>
-                <div style="margin: 8px 0px 8px 0px;">
+                <div class="settingsDiv">
                     <h3 style="display: inline;">Map size (width x height)</h2>
-                    <div style="display: flex; width: 25%; float: right;">
+                    <div style="display: flex; float: right;">
                         <input type="text" style="flex-grow: 1; min-width: 0;" id="width"/>
                         <span style="float: right; margin: 0 4px 0 4px;">x</span>
                         <input type="text" style="flex-grow: 1; min-width: 0;" id="height"/>
@@ -73,9 +73,9 @@
                     </div>
                     
                 </div>
-                <div style="margin: 8px 0px 8px 0px;">
+                <div class="settingsDiv">
                     <h3 style="display: inline;">Number of mines</h2>
-                    <div style="display: flex; width: 25%; float: right;">
+                    <div style="display: flex; float: right;">
                         <input type="text" style="flex-grow: 1; min-width: 0;" id="numMines"/>
                         <button class="saveSettings">
                             <i class="fa-solid fa-floppy-disk"></i>

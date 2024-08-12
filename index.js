@@ -393,6 +393,7 @@ document.addEventListener("mousemove", (e) => {
     sessionStorage.setItem("pointer", overSquare(canvasX,canvasY) != null);
 });
 
+var touch = false;
 
 var leftButtonDown = false;
 var rightButtonDown = false;
@@ -417,53 +418,52 @@ var double = false
 
 
 function open(square) {
-   if (square) {
-     console.log("open",square);
-   if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
-     if (first) {
-       document.getElementById("clickAnywhere").style.display = "none";
-       pausedTime = 0;
-       generate(numMines, square.x, square.y);
+    if (square) {
+        console.log("open",square);
+        if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
+            if (first) {
+                document.getElementById("clickAnywhere").style.display = "none";
+                pausedTime = 0;
+                generate(numMines, square.x, square.y);
 
-       first = false;
-       inGame = true;
+                first = false;
+                inGame = true;
 
-       startTime = Date.now();
-       interval = setInterval(function() {
-         if (!paused) {
-           let elapsedTime = Date.now() - startTime;
-           document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-         }
-       }, 1);
-
-     }
-     exposeTile(square.x, square.y);
-     draw(true);
-   }
- }
+                startTime = Date.now();
+                interval = setInterval(function() {
+                    if (!paused) {
+                        let elapsedTime = Date.now() - startTime;
+                        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+                    }
+                }, 1);
+            }
+            exposeTile(square.x, square.y);
+            draw(true);
+        }
+    }
 }
 
 function flag(square) {
-  if (square) {
-    console.log("flag",square);
-    if (!map[square.y][square.x].opened) {
-      map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
-      draw(true);
+    if (square) {
+        console.log("flag",square);
+        if (!map[square.y][square.x].opened) {
+            map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
+            draw(true);
   
-      let f = 0;
+            let f = 0;
   
-      for (let x = 0; x < size_x; x++) {
-        for (let y = 0; y < size_y; y++) {
-          if (map[y][x].flagged) {
-            f++;
-          }
+            for (let x = 0; x < size_x; x++) {
+                for (let y = 0; y < size_y; y++) {
+                    if (map[y][x].flagged) {
+                        f++;
+                    }
+                }
+            }
+  
+            flags = f;
+            document.getElementById("flags").innerText = flags + "/" + numMines.toString();
         }
-      }
-  
-      flags = f;
-      document.getElementById("flags").innerText = flags + "/" + numMines.toString();
     }
-  }
 }
 canvas.addEventListener("mouseup", (e) => {
     if (double) {
@@ -480,7 +480,7 @@ canvas.addEventListener("mouseup", (e) => {
             open(square);
         }
         if (e.button === 2 && inGame) {
-          flag(square);
+            flag(square);
         }
 
         // update cursor
@@ -492,7 +492,7 @@ canvas.addEventListener("mouseup", (e) => {
     } else {
         // chording
         double = true; // fixes a bug where right + left together does two events
-        console.log("both");
+        //console.log("both");
 
         if (map[square.y][square.x].opened && map[square.y][square.x].value != 0) {
             let f = adjacentFlags(square.x, square.y);
@@ -519,52 +519,54 @@ var touchHeld = false;
 
 var touchTimeout;
 document.addEventListener("touchstart", (e) => {
-  if (e.touches.length == 1) {
-    touchPos = {
-      x: e.touches[0].clientX,
-      y: e.touches[0].clientY
-    }
-   touchHeld = false;
-    
-    touchHold = true;
-    
-    touchTimeout = setTimeout(function() {
-      if (touchHold) {
-        touchHeld = true;
-        let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
-    
-        let canvasY = (touchPos.y -  document.getElementById("top").clientHeight - canvasMargin) * window.devicePixelRatio;
-        let square = overSquare(canvasX, canvasY);
-
-        if (inGame) flag(square);
-      }
-    }, 500);
-  } else {
+    if (e.touches.length == 1) {
+        touchPos = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+        }
+        touchHeld = false;
+        
+        touchHold = true;
+         
+        touchTimeout = setTimeout(function() {
+            if (touchHold) {
+                touchHeld = true;
+                let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
+                
+                let canvasY = (touchPos.y -  document.getElementById("top").clientHeight - canvasMargin) * window.devicePixelRatio;
+                let square = overSquare(canvasX, canvasY);
+                
+                if (inGame) flag(square);
+            }
+        }, 500);
+    } else {
     touchHold = false;
-  }
+    }
 });
 
 document.addEventListener("touchmove", (e) => {
-  touchPos = {
-    x: e.touches[0].clientX,
-    y: e.touches[0].clientY
-  }
+    touchPos = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+    }
 })
 
 canvas.addEventListener("touchend", (e) => {
-  if (e.touches.length == 0) {
-    let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
-    
-    let canvasY = (touchPos.y -  document.getElementById("top").clientHeight - canvasMargin) * window.devicePixelRatio;
-    let square = overSquare(canvasX, canvasY);
-
-    touchHold = false;
-    clearTimeout(touchTimeout);
-    
-    if (!touchHeld) {
-      open(square);
+    e.preventDefault();
+    if (e.touches.length == 0) {
+        let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
+          
+        let canvasY = (touchPos.y -  document.getElementById("top").clientHeight - canvasMargin) * window.devicePixelRatio;
+        let square = overSquare(canvasX, canvasY);
+        
+        touchHold = false;
+        clearTimeout(touchTimeout);
+        
+        if (!touchHeld) {
+            //console.log("touch");
+            open(square);
+        }
     }
-  }
 })
 
 let pauseStart;
@@ -572,25 +574,25 @@ let pauseStart;
 document.getElementById("pauseButton").addEventListener("click", (e) => {
     if (inGame) {
         paused = !paused;
-
+        
         if (paused) {
             pauseStart = Date.now();
-
+            
             document.getElementById("pause").classList.remove("fa-circle-pause");
             document.getElementById("pause").classList.add("fa-circle-play");
-
+            
             canvas.style.display = "none"
             document.getElementById("pausedScreen").style.display = "flex";
         } else {
-        
+            
             pausedTime += Date.now() - pauseStart;
             document.getElementById("pause").classList.remove("fa-circle-play");
             document.getElementById("pause").classList.add("fa-circle-pause");
-
+            
             canvas.style.display = "block";
             document.getElementById("pausedScreen").style.display = "none";
         }
-
+        
         draw(true);
     }
 });
@@ -655,8 +657,8 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
     }
 
     if (width_issue != "" || height_issue != "") {
-        document.getElementById("invalidGameplay").style.display = "block";
         document.getElementById("invalidGameplay").innerText = "Could not save 'Map size'. " + width_issue + height_issue;
+        document.getElementById("invalidGameplay").style.display = "block";
 
         document.getElementById("width").value = size_x;
         document.getElementById("height").value = size_y;
@@ -665,12 +667,17 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
             document.getElementById("invalidGameplay").style.display = "none";
         }, 5000);
     } else {
-        document.getElementById("invalidGameplay").style.display = "none";
+        document.getElementById("invalidGameplay").innerText = "Successfully saved 'Map size'.";
+        document.getElementById("invalidGameplay").style.display = "block";
 
         size_x = Number(document.getElementById("width").value)
         size_y = Number(document.getElementById("height").value)
 
         document.getElementById("width").value = size_x;
         document.getElementById("height").value = size_y;
+        
+        setTimeout(function() {
+            document.getElementById("invalidGameplay").style.display = "none";
+        }, 5000);
     }
 })
