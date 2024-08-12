@@ -492,7 +492,6 @@ canvas.addEventListener("mouseup", (e) => {
     } else {
         // chording
         double = true; // fixes a bug where right + left together does two events
-        //console.log("both");
 
         if (map[square.y][square.x].opened && map[square.y][square.x].value != 0) {
             let f = adjacentFlags(square.x, square.y);
@@ -592,6 +591,10 @@ document.getElementById("pauseButton").addEventListener("click", (e) => {
             document.getElementById("pausedScreen").style.display = "none";
         }
         
+        let elapsedTime = Date.now() - startTime;
+        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+
+        
         draw(true);
     }
 });
@@ -624,6 +627,8 @@ if (sessionStorage.getItem("pointer") == "true") {
 
 // SETTINGS
 
+var gameplayTimeout;
+
 
 document.getElementById("width").value = size_x;
 document.getElementById("height").value = size_y;
@@ -636,19 +641,19 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
 
 
     if (isNaN(Number(document.getElementById("width").value))) {
-        width_issue = "Invalid width " + "('" + document.getElementById("width").value + "').";
+        width_issue = "Invalid 'Width' " + "('" + document.getElementById("width").value + "').";
     } else if (Number(document.getElementById("width").value) < 5) {
-        width_issue = "Invalid width " + "('" + document.getElementById("width").value + "'). Must be at least 5.";
+        width_issue = "Invalid 'Width' " + "('" + document.getElementById("width").value + "'). Must be at least 5.";
     } else if (Number(document.getElementById("width").value) >= 100) {
-        width_issue = "Invalid width " + "('" + document.getElementById("width").value + "'). Must be less than 100.";
+        width_issue = "Invalid 'Width' " + "('" + document.getElementById("width").value + "'). Must be less than 100.";
     }
 
     if (isNaN(Number(document.getElementById("height").value))) {
-        height_issue = "Invalid height " + "('" + document.getElementById("height").value + "').";
+        height_issue = "Invalid 'Heignt' " + "('" + document.getElementById("height").value + "').";
     } else if (Number(document.getElementById("height").value) < 5) {
-        height_issue = "Invalid height " + "('" + document.getElementById("height").value + "'). Must be at least 5.";
+        height_issue = "Invalid 'Height' " + "('" + document.getElementById("height").value + "'). Must be at least 5.";
     } else if (Number(document.getElementById("height").value) >= 100) {
-        height_issue = "Invalid height " + "('" + document.getElementById("height").value + "'). Must be less than 100.";
+        height_issue = "Invalid 'Height' " + "('" + document.getElementById("height").value + "'). Must be less than 100.";
     }
 
     if (width_issue != "" && height_issue != "") {
@@ -662,15 +667,28 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
         document.getElementById("width").value = size_x;
         document.getElementById("height").value = size_y;
 
-        setTimeout(function() {
+        if (gameplayTimeout != null) clearTimeout(gameplayTimeout);
+        
+        gameplayTimeout = setTimeout(function() {
             document.getElementById("invalidGameplay").style.display = "none";
         }, 5000);
     } else {
-        document.getElementById("invalidGameplay").innerText = "Successfully saved 'Map size'.";
-        document.getElementById("invalidGameplay").style.display = "block";
-
         size_x = Number(document.getElementById("width").value)
         size_y = Number(document.getElementById("height").value)
+        
+        if (numMines > Math.floor(size_x * size_y / 2)) {
+            numMines = Math.floor(size_x * size_y / 2);
+            
+            document.getElementById("invalidGameplay").innerText = "Successfully saved 'Map size'. Too many mines for map. 'Number of mines' set to '" + numMines + "'.";
+            
+            localStorage.setItem("mines", numMines);
+            
+            document.getElementById("numMines").value = numMines;
+        } else {
+            document.getElementById("invalidGameplay").innerText = "Successfully saved 'Map size'.";
+        }
+        
+        document.getElementById("invalidGameplay").style.display = "block";
         
         localStorage.setItem("mapX", size_x);
         localStorage.setItem("mapY", size_y);
@@ -678,8 +696,50 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
         document.getElementById("width").value = size_x;
         document.getElementById("height").value = size_y;
         
-        setTimeout(function() {
+        if (gameplayTimeout != null) clearTimeout(gameplayTimeout);
+        
+        gameplayTimeout = setTimeout(function() {
             document.getElementById("invalidGameplay").style.display = "none";
         }, 5000);
     }
 })
+
+document.getElementById("saveNumMines").addEventListener("click", (e) => {
+    let i = "";
+    
+    if (isNaN(Number(document.getElementById("numMines").value))) {
+        i = "Invalid 'Number of mines' " + "('" + document.getElementById("numMines").value + "').";
+    } else if (Number(document.getElementById("numMines").value) < 1) {
+        i = "Invalid 'Number of mines' " + "('" + document.getElementById("numMines").value + "'). Must be at least 1.";
+    } else if (Number(document.getElementById("numMines").value) > Math.floor(size_x * size_y / 2)) {
+        i = "Invalid 'Number of mines' " + "('" + document.getElementById("numMines").value + "'). Must be less than "+Math.floor(size_x * size_y / 2)+" for map size.";
+    }
+    if (i != "") {
+        document.getElementById("invalidGameplay").innerText = "Could not save 'Number of mines'. " + i;
+        document.getElementById("invalidGameplay").style.display = "block";
+
+        document.getElementById("numMines").value = numMines;
+        
+        if (gameplayTimeout != null) clearTimeout(gameplayTimeout);
+        
+        gameplayTimeout = setTimeout(function() {
+            document.getElementById("invalidGameplay").style.display = "none";
+        }, 5000);
+    } else {
+        document.getElementById("invalidGameplay").innerText = "Successfully saved 'Number of mines'.";
+        
+        document.getElementById("invalidGameplay").style.display = "block";
+        
+        numMines = Number(document.getElementById("numMines").value)
+        
+        localStorage.setItem("mines", numMines);
+        
+        document.getElementById("numMines").value = numMines;
+        
+        if (gameplayTimeout != null) clearTimeout(gameplayTimeout);
+        
+        gameplayTimeout = setTimeout(function() {
+            document.getElementById("invalidGameplay").style.display = "none";
+        }, 5000);
+    }
+});

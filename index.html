@@ -3,14 +3,14 @@
     <head>
         <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/> 
         <link rel="stylesheet" href="style.css"/>
-        <title>minesweeper v1.2.2</title>
+        <title>minesweeper v1.3</title>
         <script src="https://kit.fontawesome.com/760c95d571.js" crossorigin="anonymous"></script>    
     </head>
     <body oncontextmenu="return false;">
         <div style="display: flex; position: absolute; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; overflow: auto;">
             <div id="top">
                 <h1 style="margin: 8px 0 8px 8px; display: inline; font-size: 33px;">minesweeper</h1>
-                <p style="display: inline;">v1.2.2</p>
+                <p style="display: inline;">v1.3</p>
 
                 <a href="https://github.com/NicholaChen/minesweeper" style="color: white; float: right; margin: 8px;">
                     <h1 style="display: inline; font-size: 25px;">
@@ -76,18 +76,24 @@
                     <h3 style="display: inline;">Number of mines</h2>
                     <div style="display: flex; float: right;">
                         <input type="text" style="flex-grow: 1; min-width: 0;" id="numMines"/>
-                        <button class="saveSettings">
+                        <button class="saveSettings" id="saveNumMines">
                             <i class="fa-solid fa-floppy-disk"></i>
                         </button>
                     </div>
-                    
                 </div>
-                <h2 style="font-size: 20px; text-align: center; padding: 4px;">Difficulty: <span id="difficulty"></span></h2>
                 <p style="text-align: center; display: none;" id="invalidGameplay"></p>
                 <h2>Controls</h2>
                 <h2>Appearance</h2>
                 <h2>More settings coming soon</h2>
-                <p>v1.2.2</p>
+                <div>
+                    <p style="display: inline; margin: 0;">
+                        v1.3
+                    </p>
+                    <p style="display: inline; float: right; margin: 0;">
+                        By Nichola Chen
+                    </p>
+                </div>
+                <br>
             </div>
         </div>
         

@@ -1,5 +1,5 @@
 # Welcome!
-Welcome to this simple minesweeper game. Right now all maps are 10x10 with 15 mines. Future releases will include the ability to customize the map size, number of mines and colour theme. Not all maps are solvable and sometimes **you must guess**.
+Welcome to this minesweeper game. Customize map sizes and number of mines in its settings page. Future releases will add more customizable options. Not all maps are solvable and sometimes **you must guess**.
 
 ![minesweeper screenshot](images/1.jpg)
 
@@ -7,6 +7,11 @@ Welcome to this simple minesweeper game. Right now all maps are 10x10 with 15 mi
 Click anywhere to begin. Numbers indicate the number of mines adjacent (including corners) to the square.  Empty squares indicate no mines adjacent to it. Right click to flag squares that you believe have mines. Left click to open squares. Open a square with a mine and game over! Flag all squares with mines to win!
 Supports chording (revealing all 8 adjacent squares when the number of adjacent mines equals the number of adjacent flags) by simultaneously right and left clicking.
 [https://nicholachen.github.io/minesweeper/](https://nicholachen.github.io/minesweeper/)
+
+
+## v1.3
+ - Settings page
+ - Customize map size and number of mines
 
 ## v1.2
  - Mobile support
@@ -25,7 +30,8 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
 ## To-Do
  - [x] Chording
  - [x] Mobile support
- - [ ] Customizable map sizes
+ - [x] Settings page
+ - [x] Customizable map sizes + number of mines
  - [ ] Customizable colour scheme
- - [ ] Settings page
+ - [ ] Customize keyboard and mobile controls
  - [ ] No-guess maps
