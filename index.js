@@ -552,7 +552,7 @@ document.addEventListener("touchmove", (e) => {
 })
 
 canvas.addEventListener("touchend", (e) => {
-    //e.preventDefault();
+    e.preventDefault();
     if (e.touches.length == 0) {
         let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
           
