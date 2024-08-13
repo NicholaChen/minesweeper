@@ -8,6 +8,10 @@ Click anywhere to begin. Numbers indicate the number of mines adjacent (includin
 Supports chording (revealing all 8 adjacent squares when the number of adjacent mines equals the number of adjacent flags) by simultaneously right and left clicking.
 [https://nicholachen.github.io/minesweeper/](https://nicholachen.github.io/minesweeper/)
 
+## v1.4
+ - Themes are here! Customize the appearance in settings
+ - Added restart button
+ - Bug fixes
 
 ## v1.3
  - Settings page
@@ -32,6 +36,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - [x] Mobile support
  - [x] Settings page
  - [x] Customizable map sizes + number of mines
- - [ ] Customizable colour scheme
+ - [x] Customizable colour scheme
+ - [ ] Custom color scheme
  - [ ] Customize keyboard and mobile controls
  - [ ] No-guess maps

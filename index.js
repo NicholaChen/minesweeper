@@ -270,32 +270,15 @@ function draw(clear=false) {
                 
                 if (!map[y][x].opened) {
                 } else {
-                    if (map[y][x].value == -1) {
-                        // ctx.fillStyle = "#111";
-                        // ctx.strokeStyle = "#222";
-                        // ctx.lineWidth = squareSize / 15;
-
-                        // for (let i=0;i<8;i++) {
-                        //     ctx.beginPath();
-                        //     ctx.moveTo(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize)
-                        //     ctx.lineTo(startx+x*squareSize + 0.5*squareSize + Math.cos(Math.PI * 2 / 8 * i) * squareSize/3.6, starty+y*squareSize + 0.5*squareSize + Math.sin(Math.PI * 2 / 8 * i) * squareSize/3.6);
-                        //     ctx.stroke();
-                        // }
-
-                        // ctx.beginPath();
-                        // ctx.arc(startx+x*squareSize + 0.5*squareSize, starty+y*squareSize + 0.5*squareSize, squareSize/4.5, 0, 2 * Math.PI);
-                        // ctx.fill();
-
-
-                    } else if (map[y][x].value != 0) {
+                    if (map[y][x].value > 0) {
                         ctx.fillStyle = theme.text;
                         
                         ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
                 }
                 if (map[y][x].flagged) {
-                    ctx.strokeStyle = "rgba(170,0,0,1)";
-                    ctx.fillStyle = "rgba(200,0,0,1)";
+                    ctx.strokeStyle = theme.flag_stem;
+                    ctx.fillStyle = theme.flag;
                     ctx.lineWidth = squareSize / 15;
 
                     ctx.beginPath();
@@ -303,7 +286,7 @@ function draw(clear=false) {
                     ctx.lineTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
                     ctx.stroke();
 
-                    ctx.strokeStyle = "rgba(200,0,0,1)";
+                    ctx.strokeStyle = theme.flag;
                     ctx.beginPath();
                     ctx.moveTo(startx+x*squareSize + 0.3*squareSize, starty+y*squareSize + 0.2*squareSize);
                     ctx.lineTo(startx+x*squareSize + 0.7*squareSize, starty+y*squareSize + 0.35*squareSize);
@@ -604,6 +587,15 @@ document.getElementById("pauseButton").addEventListener("click", (e) => {
     }
 });
 
+document.getElementById("restartButton").addEventListener("click", (e) => {
+    inGame = false;
+    
+    clearInterval(interval);
+    
+    refreshMap();
+    draw(true);
+});
+
 document.getElementById("settingsButton").addEventListener("click", (e) => {
     if (document.getElementById("game").style.display == "none") {
         document.getElementById("game").style.display = "block";
@@ -633,6 +625,7 @@ if (sessionStorage.getItem("pointer") == "true") {
 // SETTINGS
 
 var gameplayTimeout;
+
 
 
 document.getElementById("width").value = size_x;
@@ -748,3 +741,33 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
         }, settingsMessageDuration);
     }
 });
+
+for (const [key, value] of Object.entries(themes)) {
+    console.log(key, value);
+    let b = document.createElement("button");
+    let i = document.createElement("i");
+    i.classList.add("fa-solid");
+    i.classList.add("fa-circle");
+    i.style.color = value.accent_color;
+    b.id = key;
+    b.innerText = value.name+" ";
+    b.appendChild(i);
+    b.classList.add("outline");
+    if (value.name != theme.name) {
+        b.classList.add("unselected");
+    }
+    b.style.backgroundColor = value.background_color;
+    b.style.color = value.text_color;
+    b.addEventListener("click", (e) => {
+        if (b.classList.contains("unselected")) {
+            b.classList.remove("unselected");
+            document.getElementById(theme.key).classList.add("unselected");
+            theme = themes[key];
+            setTheme(theme);
+            localStorage.setItem("theme", key);
+            draw(true);
+        }
+    })
+    
+    document.getElementById("themes-mobile").appendChild(b);
+}

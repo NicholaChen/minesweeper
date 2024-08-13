@@ -5,14 +5,14 @@
         <link rel="stylesheet" href="style.css"/>
         <link rel="stylesheet" href="themes.css">
         <script src="themes.js"></script>
-        <title>minesweeper v1.3</title>
+        <title>minesweeper v1.4</title>
         <script src="https://kit.fontawesome.com/760c95d571.js" crossorigin="anonymous"></script>
     </head>
     <body oncontextmenu="return false;" class="default-dark-theme">
         <div style="display: flex; position: absolute; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column;">
             <div id="top">
                 <h1 style="margin: 8px 0 8px 8px; display: inline; font-size: 33px;">minesweeper</h1>
-                <p style="display: inline;">v1.3</p>
+                <p style="display: inline;">v1.4</p>
 
                 <a href="https://github.com/NicholaChen/minesweeper" style="color: inherit; float: right; margin: 8px;">
                     <h1 style="display: inline; font-size: 25px;">
@@ -30,11 +30,16 @@
                         <i class="fa-solid fa-flag"></i>
                         <span id="flags"></span>
                     </h2>
-                    <button class="none" id="pauseButton">
-                        <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-circle-pause" id="pause" title="Pause/Unpause"></i></h2>
-                    </button>                    
-                    <button class="none" id="settingsButton">
-                        <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-gear" title="Settings"></i></h2>
+                    <button class="none" id="pauseButton" title=”Pause/Unpause>
+                        <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-circle-pause" id="pause"></i></h2>
+                    </button>
+                    
+                    <button class="none" id="restartButton">
+                        <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-rotate-right"></i></h2>
+                    </button>
+                    
+                    <button class="none" id="settingsButton" title="Settings">
+                        <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-gear"></i></h2>
                     </button>
                 </div>
             </div>
@@ -83,7 +88,6 @@
                     </div>
                 </div>
                 <p style="text-align: center; display: none;" id="invalidGameplay"></p>
-                <h2>Controls</h2>
                 <h2>Appearance</h2>
                 <div class="settingsDiv" style="margin: 8px 0 -8px 0;">
                     <h3>Theme</h3>
@@ -93,14 +97,11 @@
                     </div>
                 </div>
                 <div class="mobile" id="themes-mobile">
-                    <button class="outline">Default (System)</button>
-                    <button class="outline">Default Dark</button>
-                    <button class="outline">Default Light</button>
                 </div>
                 <h2>More settings coming soon</h2>
                 <div>
                     <p style="display: inline; margin: 0;">
-                        v1.3.3
+                        v1.4.0
                     </p>
                     <p style="display: inline; float: right; margin: 0;">
                         By Nichola Chen

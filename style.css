@@ -43,6 +43,7 @@ button:hover {
 .outline {
     border: 4px solid var(--accent-color);
     background-color: var(--background-color);
+    color: var(--text-color);
 }
 
 .outline:hover {
@@ -119,10 +120,22 @@ input:focus {
     padding: 6px;
     flex-grow: 1;
 }
-.settingsDiv > div .unselected {
+.unselected {
     background-color: var(--unselected-color);
     color: var(--unselected-text-color);
 }
+.outline.unselected {
+    border: 4px solid var(--input-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    }
+
+.outline.unselected:hover {
+    border: 4px solid var(--input-hover-color);
+    background-color: var(--background-color);
+}
+
+
 .mobile {
     display: none;
     margin: 8px 0px 8px 0px;
@@ -131,6 +144,7 @@ input:focus {
     margin: 4px 0 0 0;
     width: 100%;
 }
+
 @media (max-width: 800px) {
     .settingsDiv {
         flex-direction: column;

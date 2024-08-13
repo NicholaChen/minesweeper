@@ -1,5 +1,7 @@
 var themes = {
     default_dark: {
+        name: "Default Dark",
+        key: "default_dark",
         background_color: "#121212",
         text_color: "#E0E0E0",
         accent_color: "#136147",
@@ -12,9 +14,13 @@ var themes = {
         unselected_text_color: "#B0B0B0",
         unopened: "#252525",
         opened: "#3F3F3F",
-        text: "#CCCCCC"
+        text: "#CCCCCC",
+        flag: "#C80000",
+        flag_stem: "#AA0000"
     },
     default_light: {
+        name: "Default Light",
+        key: "default_light",
         background_color: "#E0E0E0",
         text_color: "#101010",
         accent_color: "#1E8462",
@@ -26,14 +32,16 @@ var themes = {
         unselected_color: "#155540",
         unselected_text_color: "#B0B0B0",
         unopened: "#B5B5B5",
-        opened: "#D0D0D0",
-        text: "#404040"
+        opened: "#C9C9C9",
+        text: "#404040",
+        flag: "#FF0808",
+        flag_stem: "#db0909"
     }
 }
 
 const root = document.documentElement;
 
-var theme = themes.default_dark;
+var theme = themes[localStorage.getItem("theme")]?? themes.default_dark;
 function setTheme(t) {
     root.style.setProperty("--background-color", t.background_color);
     root.style.setProperty("--text-color", t.text_color);
