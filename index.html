@@ -63,11 +63,11 @@
                 <h2>Coming soon...</h2>
                 <h2>Gameplay</h2>
                 <div class="settingsDiv">
-                    <h3 style="display: inline;">Map size (width x height)</h2>
-                    <div style="display: flex; float: right;">
-                        <input type="text" style="flex-grow: 1; min-width: 0;" id="width"/>
+                    <h3>Map size (width x height)</h2>
+                    <div>
+                        <input type="text" id="width"/>
                         <span style="float: right; margin: 0 4px 0 4px;">x</span>
-                        <input type="text" style="flex-grow: 1; min-width: 0;" id="height"/>
+                        <input type="text" id="height"/>
                         <button class="saveSettings" id="saveMapSize">
                             <i class="fa-solid fa-floppy-disk"></i>
                         </button>
@@ -75,9 +75,9 @@
                     
                 </div>
                 <div class="settingsDiv">
-                    <h3 style="display: inline;">Number of mines</h2>
-                    <div style="display: flex; float: right;">
-                        <input type="text" style="flex-grow: 1; min-width: 0;" id="numMines"/>
+                    <h3>Number of mines</h2>
+                    <div>
+                        <input type="text" id="numMines"/>
                         <button class="saveSettings" id="saveNumMines">
                             <i class="fa-solid fa-floppy-disk"></i>
                         </button>
@@ -86,10 +86,25 @@
                 <p style="text-align: center; display: none;" id="invalidGameplay"></p>
                 <h2>Controls</h2>
                 <h2>Appearance</h2>
+                <div class="settingsDiv">
+                    <h3>Theme</h3>
+                    <div>
+                        <button style="margin: 0 4px 0 0;" class="unselected">Preset</button>
+                        <button class="unselected">Custom</button>
+                    </div>
+                </div>
+                <div class="settingsDiv">
+                    <h3>Background</3>
+                    <div>
+                        <input type="text"/>
+                        <input type="color" style="float: right"/>
+                        
+                    </div>
+                </div>
                 <h2>More settings coming soon</h2>
                 <div>
                     <p style="display: inline; margin: 0;">
-                        v1.3.1
+                        v1.3.2
                     </p>
                     <p style="display: inline; float: right; margin: 0;">
                         By Nichola Chen

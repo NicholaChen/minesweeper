@@ -1,24 +1,9 @@
 .default-dark-theme {
-    background-color: #121212;
-    color: #E0E0E0;
-}
-
-.default-dark-theme #top {
-    background-color: #146147;
-}
-
-.default-dark-theme button {
-    background-color: #146147;
-}
-
-.default-dark-theme button:hover {
-    background-color: #247157;
-}
-
-.default-dark-theme input {
-    background-color: #303030;
-}
-
-.default-dark-theme input:hover {
-    background-color: #404040;
+    --background-color: #121212;
+    --text-color: #E0E0E0;
+    --accent-color: #136147;
+    --accent-hover-color: #247157;
+    --input-color: #303030;
+    --input-hover-color: #404040;
+    --unselected-color: #0F402F;
 }

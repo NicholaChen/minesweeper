@@ -264,7 +264,7 @@ function draw(clear=false) {
                             ctx.fillStyle = "rgba(200,0,0,0.3)";
                         }
                     } else {
-                        ctx.fillStyle = "#3F3F3F";
+                        ctx.fillStyle = theme.opened;
                     }
                 }
 

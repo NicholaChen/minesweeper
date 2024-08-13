@@ -2,6 +2,9 @@ html, body {
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden;
+    
+    background-color: var(--background-color);
+    color: var(--text-color);
 
     font-family: monospace, monospace;
     
@@ -14,6 +17,9 @@ html, body {
     user-select: none;
 }
 
+#top {
+    background-color: var(--accent-color);
+}
 
 h3 {
     font-size: 18px;
@@ -23,7 +29,7 @@ button {
     border: 0;
     padding: 8px;
     margin: 0;
-    background: #00cc0066;
+    background: var(--accent-color);
     font: 26px monospace, monospace;
     color: #f0f0f0;
     border-radius: 0;
@@ -31,7 +37,7 @@ button {
 }
 
 button:hover {
-    background: #00cc0077;
+    background: var(--accent-hover-color);
 }
 
 .none {
@@ -43,24 +49,25 @@ button:hover {
 }
 
 .saveSettings {
-    font-size: 20px;
-    padding: 4px 6px 4px 6px;
-    margin: 0 0 0 4px;
+    padding: 4px !important;
+    margin: 0 0 0 4px !important;
+    flex-grow: 0 !important;
 }
 
-input[type=text] {
+input[type="text"] {
     color: inherit;
     border: 0;
     font-size: 20px;
     padding: 4px;
     border-radius: 0;
+    background-color: var(--input-color);
 }
 
-input[type=text]:hover {
-    background: #88888855;
+input[type="text"]:hover {
+    background-color: var(--input-hover-color);
 }
 
-input[type=text]:focus {
+input:focus {
     outline: 1px solid rgba(200, 200, 200, 90%);
     background: #88888855;
 }
@@ -69,8 +76,11 @@ input[type=text]:focus {
 }
 #settings h2 {
     font-size: 29px;
+    margin: 0;
 }
 #settings h3 {
+    margin: 0 0 4px 0;
+    display: inline;
     font-size: 24px;
     font-weight: normal;
 }
@@ -84,6 +94,20 @@ input[type=text]:focus {
 }
 .settingsDiv > div {
     width: 25%;
+    display: flex;
+    float: right;
+}
+.settingsDiv input[type="text"] {
+    flex-grow: 1;
+    min-width: 0;
+}
+.settingsDiv > div button {
+    font-size: 20px;
+    padding: 6px;
+    flex-grow: 1;
+}
+.settingsDiv > div .unselected {
+    background-color: var(--unselected-color);
 }
 @media (max-width: 800px) {
     .settingsDiv {
