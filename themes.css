@@ -1,9 +1,12 @@
-.default-dark-theme {
+::root{
     --background-color: #121212;
     --text-color: #E0E0E0;
     --accent-color: #136147;
     --accent-hover-color: #247157;
+    --accent-text-color: #E0E0E0;
     --input-color: #303030;
-    --input-hover-color: #404040;
+    --input-hover-color: #404040
+    --input-text-color: #E0E0E0;
     --unselected-color: #0F402F;
+    --unselected-text-color: #B0B0B0;
 }

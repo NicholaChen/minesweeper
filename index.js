@@ -9,7 +9,6 @@ var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage
 var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ?  10 : Number(localStorage.getItem("mapY"));
 var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 ?  15 : Number(localStorage.getItem("mines"));;
 
-var theme = themes.default_dark;
 
 var flagHold = 500;
 var settingsMessageDuration = 5000;
@@ -184,7 +183,7 @@ function exposeTile(x,y) {
         document.getElementById("time").style.display = "none";
         document.getElementById("bestTime").style.display = "none";
         document.getElementById("gameEndText").innerText = "Game Over!";
-        document.getElementById("gameEnd").style.display = "block";
+        document.getElementById("gameEnd").style.display = "flex";
         
     } else {
         map[y][x].opened = true;
@@ -210,7 +209,6 @@ function exposeTile(x,y) {
         for (let y=0;y<size_y;y++) {
             if (!map[y][x].opened && map[y][x].value != -1) {
                 opened = false;
-                console.log("a");
                 break;
             }
         }
@@ -231,7 +229,7 @@ function exposeTile(x,y) {
         }
         
         document.getElementById("gameEndText").innerText = "You Win!";
-        document.getElementById("gameEnd").style.display = "block";
+        document.getElementById("gameEnd").style.display = "flex";
     }
 
     return

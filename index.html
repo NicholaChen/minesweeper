@@ -42,8 +42,8 @@
             <div style="flex-grow: 1; position: relative; margin: 16px;" id="game">
                 <canvas id="canvas" style="position:absolute; left:0; top:0; width:100%; height:100%;">
                 </canvas>
-                <div style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; pointer-events: none;">
-                    <div style="background-color: rgba(0,0,0,0.4); padding: 16px; pointer-events: all; text-align:center; display: none; min-width: 15%;" id="gameEnd">
+                <div style="position:absolute; left:-16px; top:-16px; right: -16px; bottom: -16px; display: flex; justify-content: center; align-items: center; pointer-events: none; background-color: rgba(0,0,0,0.2); display: none;" id="gameEnd">
+                    <div style="background-color: var(--background-color); padding: 16px; pointer-events: all; text-align:center; min-width: 15%;">
                         <h1 style="text-align: center; margin: 0; font-size: 38px;" id="gameEndText">Game Over!</h1>
                         <p id="time" style="font-size: 18px; margin: 4px;">Time: </p>
                         <p id="bestTime" style="font-size: 18px; margin: 4px;">Best: </p>
@@ -60,7 +60,6 @@
 
             <div style="flex-grow: 1; padding: 16px 10% 16px 10%; display: none; overflow: auto;" id="settings">
                 <h1 style="text-align: center; margin: 16px;">Settings</h1>
-                <h2>Coming soon...</h2>
                 <h2>Gameplay</h2>
                 <div class="settingsDiv">
                     <h3>Map size (width x height)</h2>
@@ -86,25 +85,22 @@
                 <p style="text-align: center; display: none;" id="invalidGameplay"></p>
                 <h2>Controls</h2>
                 <h2>Appearance</h2>
-                <div class="settingsDiv">
+                <div class="settingsDiv" style="margin: 8px 0 -8px 0;">
                     <h3>Theme</h3>
                     <div>
-                        <button style="margin: 0 4px 0 0;" class="unselected">Preset</button>
+                        <button style="margin: 0 4px 0 0;">Preset</button>
                         <button class="unselected">Custom</button>
                     </div>
                 </div>
-                <div class="settingsDiv">
-                    <h3>Background</3>
-                    <div>
-                        <input type="text"/>
-                        <input type="color" style="float: right"/>
-                        
-                    </div>
+                <div class="mobile" id="themes-mobile">
+                    <button class="outline">Default (System)</button>
+                    <button class="outline">Default Dark</button>
+                    <button class="outline">Default Light</button>
                 </div>
                 <h2>More settings coming soon</h2>
                 <div>
                     <p style="display: inline; margin: 0;">
-                        v1.3.2
+                        v1.3.3
                     </p>
                     <p style="display: inline; float: right; margin: 0;">
                         By Nichola Chen
