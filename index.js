@@ -5,9 +5,14 @@ const margin = 0.03; // percentage of each grid square
 
 const canvasMargin = 16; // pixels
 
-var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) <= 0 ?  10 : Number(localStorage.getItem("mapX"));
-var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) <= 0  ?  10 : Number(localStorage.getItem("mapY"));
+var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ?  10 : Number(localStorage.getItem("mapX"));
+var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ?  10 : Number(localStorage.getItem("mapY"));
 var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 ?  15 : Number(localStorage.getItem("mines"));;
+
+var theme = themes.default_dark;
+
+var flagHold = 500;
+var settingsMessageDuration = 5000;
 
 var inGame = false;
 var paused = false;
@@ -250,7 +255,7 @@ function draw(clear=false) {
         for (let y=0;y<size_y;y++) {
             if (!paused) {
                 if (!map[y][x].opened) {
-                    ctx.fillStyle = "#222";
+                    ctx.fillStyle = theme.unopened;
                 } else {
                     if (map[y][x].value == -1) {
                         ctx.fillStyle = "rgba(200,0,0,0.6)";
@@ -285,7 +290,7 @@ function draw(clear=false) {
 
 
                     } else if (map[y][x].value != 0) {
-                        ctx.fillStyle = "rgba(190,190,190,1)";
+                        ctx.fillStyle = theme.text;
                         
                         ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
@@ -491,6 +496,8 @@ canvas.addEventListener("mouseup", (e) => {
         }
     } else {
         // chording
+        
+        
         double = true; // fixes a bug where right + left together does two events
 
         if (map[square.y][square.x].opened && map[square.y][square.x].value != 0) {
@@ -537,7 +544,7 @@ document.addEventListener("touchstart", (e) => {
                 
                 if (inGame) flag(square);
             }
-        }, 500);
+        }, flagHold);
     } else {
     touchHold = false;
     }
@@ -567,7 +574,7 @@ canvas.addEventListener("touchend", (e) => {
     }
 })
 
-let pauseStart;
+var pauseStart;
 
 document.getElementById("pauseButton").addEventListener("click", (e) => {
     if (inGame) {
@@ -671,7 +678,7 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
         
         gameplayTimeout = setTimeout(function() {
             document.getElementById("invalidGameplay").style.display = "none";
-        }, 5000);
+        }, settingsMessageDuration);
     } else {
         size_x = Number(document.getElementById("width").value)
         size_y = Number(document.getElementById("height").value)
@@ -700,7 +707,7 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
         
         gameplayTimeout = setTimeout(function() {
             document.getElementById("invalidGameplay").style.display = "none";
-        }, 5000);
+        }, settingsMessageDuration);
     }
 })
 
@@ -724,7 +731,7 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
         
         gameplayTimeout = setTimeout(function() {
             document.getElementById("invalidGameplay").style.display = "none";
-        }, 5000);
+        }, settingsMessageDuration);
     } else {
         document.getElementById("invalidGameplay").innerText = "Successfully saved 'Number of mines'.";
         
@@ -740,6 +747,6 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
         
         gameplayTimeout = setTimeout(function() {
             document.getElementById("invalidGameplay").style.display = "none";
-        }, 5000);
+        }, settingsMessageDuration);
     }
 });
