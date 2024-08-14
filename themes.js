@@ -4,6 +4,8 @@ var themes = {
         key: "default_dark",
         background_color: "#121212",
         text_color: "#E0E0E0",
+        top_color: "#136146",
+        top_text_color: "#E0E0E0",
         accent_color: "#136147",
         accent_hover_color: "#237157",
         accent_text_color: "#E0E0E0",
@@ -23,6 +25,8 @@ var themes = {
         key: "default_light",
         background_color: "#E0E0E0",
         text_color: "#101010",
+        top_color: "#1E8462",
+        top_text_color: "#E0E0E0",
         accent_color: "#1E8462",
         accent_hover_color: "#237157",
         accent_text_color: "#E0E0E0",
@@ -36,6 +40,27 @@ var themes = {
         text: "#404040",
         flag: "#FF0808",
         flag_stem: "#db0909"
+    },
+    _console: {
+        name: "Console",
+        key: "_console",
+        background_color: "#090909",
+        text_color: "#55FF55",
+        top_color: "#090909",
+        top_text_color: "#33FF33",
+        accent_color: "#33FF33",
+        accent_hover_color: "#81FF81",
+        accent_text_color: "#090909",
+        input_color: "#303030",
+        input_hover_color: "#404040",
+        input_text_color: "#55FF55",
+        unselected_color: "#24B724",
+        unselected_text_color: "#090909",
+        unopened: "#24B724",
+        opened: "#191919",
+        text: "#33FF33",
+        flag: "#090909",
+        flag_stem: "#090909"
     }
 }
 
@@ -45,6 +70,8 @@ var theme = themes[localStorage.getItem("theme")]?? themes.default_dark;
 function setTheme(t) {
     root.style.setProperty("--background-color", t.background_color);
     root.style.setProperty("--text-color", t.text_color);
+    root.style.setProperty("--top-color", t.top_color);
+    root.style.setProperty("--top-text-color", t.top_text_color);
     root.style.setProperty("--accent-color", t.accent_color);
     root.style.setProperty("--accent-hover-color", t.accent_hover_color);
     root.style.setProperty("--accent-text-color",t.accent_text_color);
