@@ -628,6 +628,7 @@ if (sessionStorage.getItem("pointer") == "true") {
 
 var gameplayTimeout;
 var controlsTimeout;
+var appearanceTimeout;
 
 
 
@@ -636,6 +637,10 @@ document.getElementById("height").value = size_y;
 
 document.getElementById("numMines").value = numMines;
 document.getElementById("flagHold").value = flagHold;
+
+
+document.getElementById("backgroundColorText").value = themes.custom.background_color;
+document.getElementById("backgroundColor").value = themes.custom.background_color;
 
 document.getElementById("saveMapSize").addEventListener("click", (e) => {
     let width_issue = "";
@@ -784,7 +789,47 @@ document.getElementById("saveFlagHold").addEventListener("click", (e) => {
     }
 });
 
+if (theme.key == "custom") {
+    document.getElementById("presetThemeButton").classList.add("unselected");
+    document.getElementById("customTheme").style.display = "block";
+} else {
+    document.getElementById("customThemeButton").classList.add("unselected");
+    document.getElementById("themes-list").style.display = "block";
+}
+
+document.getElementById("presetThemeButton").addEventListener("click", (e) => {
+    document.getElementById("presetThemeButton").classList.remove("unselected");
+    document.getElementById("customThemeButton").classList.add("unselected");
+
+    document.getElementById("customTheme").style.display = "none";
+    document.getElementById("themes-list").style.display = "block";
+
+    for (let i = 0; i < document.getElementById("themes-list").children.length; i++) {
+        document.getElementById("themes-list").children[i].classList.remove("unselected");
+        document.getElementById("themes-list").children[i].classList.add("unselected");
+    }
+
+    document.getElementById("default_dark").classList.remove("unselected");
+
+    theme = themes.default_dark;
+    localStorage.setItem("theme", theme.key);
+    setTheme(theme);
+});
+
+document.getElementById("customThemeButton").addEventListener("click", (e) => {
+    document.getElementById("customThemeButton").classList.remove("unselected");
+    document.getElementById("presetThemeButton").classList.add("unselected");
+
+    document.getElementById("themes-list").style.display = "none";
+    document.getElementById("customTheme").style.display = "block";
+
+    theme = themes.custom;
+    localStorage.setItem("theme", theme.key);
+    setTheme(theme);
+});
+
 for (const [key, value] of Object.entries(themes)) {
+    if (key == "custom") continue;
     console.log(key, value);
     let b = document.createElement("button");
     let i = document.createElement("i");
@@ -815,6 +860,20 @@ for (const [key, value] of Object.entries(themes)) {
 }
 
 
+
+
+document.getElementById("backgroundColor").addEventListener("input", (e) => {
+    document.getElementById("backgroundColorText").value = document.getElementById("backgroundColor").value.toString().toUpperCase();
+});
+
+
+document.getElementById("backgroundColorText").addEventListener("input", (e) => {
+    document.getElementById("backgroundColor").value = document.getElementById("backgroundColorText").value;
+});
+
+
+
+
 function resetGameplay() {
     size_x = 10;
     size_y = 10;
@@ -829,6 +888,16 @@ function resetGameplay() {
     localStorage.setItem("mapX", size_x);
     localStorage.setItem("mapY", size_y);
     localStorage.setItem("mines", numMines);
+
+    document.getElementById("invalidGameplay").innerText = "Reset settings.";
+        
+    document.getElementById("invalidGameplay").style.display = "block";
+
+    if (gameplayTimeout != null) clearTimeout(gameplayTimeout);
+    
+    gameplayTimeout = setTimeout(function() {
+        document.getElementById("invalidGameplay").style.display = "none";
+    }, settingsMessageDuration);
 }
 
 
@@ -839,16 +908,46 @@ function resetControls() {
     document.getElementById("flagHold").value = flagHold;
 
     localStorage.setItem("flagHold", flagHold);
+
+    document.getElementById("invalidControls").innerText = "Reset settings.";
+        
+    document.getElementById("invalidControls").style.display = "block";
+
+    if (appearanceTimeout != null) clearTimeout(appearanceTimeout);
+    
+    appearanceTimeout = setTimeout(function() {
+        document.getElementById("invalidControls").style.display = "none";
+    }, settingsMessageDuration);
 }
 
 function resetAppearance() {
-    document.getElementById(theme.key).classList.add("unselected");
+    document.getElementById("presetThemeButton").classList.remove("unselected");
+    document.getElementById("customThemeButton").classList.add("unselected");
+
+    document.getElementById("customTheme").style.display = "none";
+    document.getElementById("themes-list").style.display = "block";
+
+    for (let i = 0; i < document.getElementById("themes-list").children.length; i++) {
+        document.getElementById("themes-list").children[i].classList.remove("unselected");
+        document.getElementById("themes-list").children[i].classList.add("unselected");
+    }
+
     document.getElementById("default_dark").classList.remove("unselected");
     theme = themes.default_dark;
     
     setTheme(theme);
 
     localStorage.setItem("theme", theme.key);
+
+    document.getElementById("invalidAppearance").innerText = "Reset settings.";
+        
+    document.getElementById("invalidAppearance").style.display = "block";
+
+    if (controlsTimeout != null) clearTimeout(controlsTimeout);
+    
+    controlsTimeout = setTimeout(function() {
+        document.getElementById("invalidAppearance").style.display = "none";
+    }, settingsMessageDuration);
 }
 
 

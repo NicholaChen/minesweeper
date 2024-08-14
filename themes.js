@@ -1,3 +1,13 @@
+function c(s) {
+    let hex = localStorage.getItem(s);
+
+    if (/^#[0-9A-F]{6}$/i.test(hex)) {
+        return hex;
+    }
+
+    return themes.default_dark[s];
+}
+
 var themes = {
     default_dark: {
         name: "Default Dark",
@@ -64,9 +74,16 @@ var themes = {
     }
 }
 
+themes["custom"] = {
+    name: "Custom",
+    key: "custom",
+    background_color: c("background_color").toUpperCase(),
+    text_color: c("text_color").toUpperCase(),
+};
+
 const root = document.documentElement;
 
-var theme = themes[localStorage.getItem("theme")]?? themes.default_dark;
+var theme = themes[localStorage.getItem("theme")] ?? themes.default_dark;
 function setTheme(t) {
     root.style.setProperty("--background-color", t.background_color);
     root.style.setProperty("--text-color", t.text_color);
@@ -80,6 +97,10 @@ function setTheme(t) {
     root.style.setProperty("--input-text-color", t.input_text_color);
     root.style.setProperty("--unselected-color", t.unselected_color);
     root.style.setProperty("--unselected-text-color", t.unselected_text_color);
+}
+
+if (localStorage.getItem("theme") == "custom") {
+    
 }
 
 setTheme(theme);

@@ -61,8 +61,8 @@ button:hover {
 }
 
 .saveSettings {
-    padding: 4px !important;
-    margin: 0 0 0 4px !important;
+    padding: 4px 8px !important;
+    margin: 0 0 0 8px !important;
     flex-grow: 0 !important;
 }
 
@@ -84,6 +84,27 @@ input:focus {
     outline: 1px solid rgba(200, 200, 200, 90%);
     background: #88888855;
 }
+
+input[type="color" i] {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    inline-size: 32px;
+    block-size: 32px;
+    padding: 0;
+
+    border: 4px solid var(--accent-color);
+}
+
+input[type="color" i]::-webkit-color-swatch,
+input[type="color" i]::-moz-color-swatch {
+    border: 0;
+    padding: 0;
+}
+
 #settings {
     font-size: 24px;
 }
@@ -130,7 +151,7 @@ input:focus {
     border: 4px solid var(--input-color);
     background-color: var(--background-color);
     color: var(--text-color);
-    }
+}
 
 .outline.unselected:hover {
     border: 4px solid var(--input-hover-color);
