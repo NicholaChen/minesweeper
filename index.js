@@ -639,9 +639,6 @@ document.getElementById("numMines").value = numMines;
 document.getElementById("flagHold").value = flagHold;
 
 
-document.getElementById("backgroundColorText").value = themes.custom.background_color;
-document.getElementById("backgroundColor").value = themes.custom.background_color;
-
 document.getElementById("saveMapSize").addEventListener("click", (e) => {
     let width_issue = "";
     let height_issue = "";
@@ -830,7 +827,6 @@ document.getElementById("customThemeButton").addEventListener("click", (e) => {
 
 for (const [key, value] of Object.entries(themes)) {
     if (key == "custom") continue;
-    console.log(key, value);
     let b = document.createElement("button");
     let i = document.createElement("i");
     i.classList.add("fa-solid");
@@ -852,7 +848,6 @@ for (const [key, value] of Object.entries(themes)) {
             theme = themes[key];
             setTheme(theme);
             localStorage.setItem("theme", key);
-            draw(true);
         }
     })
     
@@ -860,16 +855,108 @@ for (const [key, value] of Object.entries(themes)) {
 }
 
 
+for (const [key, value] of Object.entries(themeColors)) {
+    let settingsDiv = document.createElement("div");
+    settingsDiv.classList.add("settingsDiv");
+
+    let h3 = document.createElement("h3");
+    h3.innerText = themeColorsSetting[key];
+
+    settingsDiv.appendChild(h3);
+    
+    let div = document.createElement("div");
+
+    let t_i = document.createElement("input");
+    t_i.type = "text";
+    t_i.id = value + "Text";
+
+    let t_c = document.createElement("input");
+    t_c.type = "color";
+    t_c.style.margin = "0 0 0 8px";
+    t_c.id = value;
+
+    let b = document.createElement("button");
+    b.classList.add("saveSettings")
+
+    let i = document.createElement("i");
+    i.classList.add("fa-solid");
+    i.classList.add("fa-floppy-disk");
+
+    b.appendChild(i);
 
 
-document.getElementById("backgroundColor").addEventListener("input", (e) => {
-    document.getElementById("backgroundColorText").value = document.getElementById("backgroundColor").value.toString().toUpperCase();
-});
+    t_i.value = themes.custom[key];
+    t_c.value = themes.custom[key];
 
 
-document.getElementById("backgroundColorText").addEventListener("input", (e) => {
-    document.getElementById("backgroundColor").value = document.getElementById("backgroundColorText").value;
-});
+    t_c.addEventListener("input", (e) => {
+        t_i.value = t_c.value.toString().toUpperCase();
+    
+        themes.custom[key] =  t_c.value.toString().toUpperCase();
+        theme = themes.custom;
+        setTheme(theme);
+    });
+    
+    
+    t_i.addEventListener("input", (e) => {
+        t_i.value = t_i.value.toUpperCase();
+        t_c.value = t_i.value;
+    
+        if (/^#[0-9A-F]{6}$/i.test(t_i.value)) {
+            themes.custom[key] =  t_i.value;
+            theme = themes.custom;
+            setTheme(theme);
+        }
+    });
+
+
+    
+    b.addEventListener("click", (e) => {
+        let i = "";
+        
+        if (!/^#[0-9A-F]{6}$/i.test(t_i.value)) {
+            i = "Invalid " + "('" + t_i.value + "').";
+        }
+        if (i != "") {
+            document.getElementById("invalidAppearance").innerText = "Could not save '" + themeColorsSetting[key] + "'. " + i;
+            document.getElementById("invalidAppearance").style.display = "block";
+
+            t_i.value = themes.custom[key];
+            
+            if (appearanceTimeout != null) clearTimeout(appearanceTimeout);
+            
+            appearanceTimeout = setTimeout(function() {
+                document.getElementById("invalidAppearance").style.display = "none";
+            }, settingsMessageDuration);
+        } else {
+            document.getElementById("invalidAppearance").innerText = "Successfully saved '" + themeColorsSetting[key] + "'.";
+            document.getElementById("invalidAppearance").style.display = "block";
+            
+            themes.custom[key] = t_i.value;
+            theme = themes.custom;
+            setTheme(theme);
+            
+            localStorage.setItem(key, themes.custom[key]);
+            
+            if (appearanceTimeout != null) clearTimeout(appearanceTimeout);
+            
+            appearanceTimeout = setTimeout(function() {
+                document.getElementById("invalidAppearance").style.display = "none";
+            }, settingsMessageDuration);
+        }
+    });
+
+
+
+    div.appendChild(t_i);
+    div.appendChild(t_c);
+    div.appendChild(b);
+
+    settingsDiv.appendChild(div);
+
+    document.getElementById("customTheme").appendChild(settingsDiv);
+}
+
 
 
 
@@ -938,6 +1025,16 @@ function resetAppearance() {
     setTheme(theme);
 
     localStorage.setItem("theme", theme.key);
+
+    for (const [key, value] of Object.entries(themeColors)) {
+        document.getElementById(value).value = themes.default_dark[key];
+        document.getElementById(value+"Text").value = themes.default_dark[key];
+    
+        themes.custom[key] = themes.default_dark[key];
+
+        localStorage.setItem(key, themes.default_dark[key]);
+    }
+
 
     document.getElementById("invalidAppearance").innerText = "Reset settings.";
         

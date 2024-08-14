@@ -1,4 +1,4 @@
-function c(s) {
+function customColor(s) {
     let hex = localStorage.getItem(s);
 
     if (/^#[0-9A-F]{6}$/i.test(hex)) {
@@ -74,11 +74,65 @@ var themes = {
     }
 }
 
+var themeColors = { // name: name
+    background_color: "backgroundColor",
+    text_color: "textColor",
+    top_color: "topColor",
+    top_text_color: "topTextColor",
+    accent_color: "accentColor",
+    accent_hover_color: "accentHoverColor",
+    accent_text_color: "accentTextColor",
+    input_color: "inputColor",
+    input_hover_color: "inputHoverColor",
+    input_text_color: "inputTextColor",
+    unselected_color: "unselectedColor",
+    unselected_text_color: "unselectedTextColor",
+    unopened: "unopened",
+    opened: "opened",
+    text: "text",
+    flag: "flag",
+    flag_stem: "flagStem"
+}
+
+var themeColorsSetting = { // name: setting name
+    background_color: "Background",
+    text_color: "Text",
+    top_color: "Header",
+    top_text_color: "Text on header",
+    accent_color: "Accent",
+    accent_hover_color: "Accent hover",
+    accent_text_color: "Text on accent",
+    input_color: "Input",
+    input_hover_color: "Input hover",
+    input_text_color: "Text on input",
+    unselected_color: "Unselected",
+    unselected_text_color: "Text on unselected",
+    unopened: "Minesweeper unopened tile",
+    opened: "Minesweeper opened tile",
+    flag: "Minesweeper flag",
+    flag_stem: "Minesweeper flag stem",
+    text: "Minesweeper start text"
+}
 themes["custom"] = {
     name: "Custom",
     key: "custom",
-    background_color: c("background_color").toUpperCase(),
-    text_color: c("text_color").toUpperCase(),
+    background_color: customColor("background_color").toUpperCase(),
+    text_color: customColor("text_color").toUpperCase(),
+    top_color: customColor("top_color").toUpperCase(),
+    top_text_color: customColor("top_text_color").toUpperCase(),
+    accent_color: customColor("accent_color").toUpperCase(),
+    accent_hover_color: customColor("accent_hover_color").toUpperCase(),
+    accent_text_color: customColor("accent_text_color").toUpperCase(),
+    input_color: customColor("input_color").toUpperCase(),
+    input_hover_color: customColor("input_hover_color").toUpperCase(),
+    input_text_color: customColor("input_text_color").toUpperCase(),
+    unselected_color: customColor("unselected_color").toUpperCase(),
+    unselected_text_color: customColor("unselected_text_color").toUpperCase(),
+    unopened: customColor("unopened").toUpperCase(),
+    opened: customColor("opened").toUpperCase(),
+    text: customColor("text").toUpperCase(),
+    flag: customColor("flag").toUpperCase(),
+    flag_stem: customColor("flag_stem").toUpperCase()
 };
 
 const root = document.documentElement;
@@ -99,9 +153,6 @@ function setTheme(t) {
     root.style.setProperty("--unselected-text-color", t.unselected_text_color);
 }
 
-if (localStorage.getItem("theme") == "custom") {
-    
-}
 
 setTheme(theme);
 

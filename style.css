@@ -80,23 +80,27 @@ input[type="text"]:hover {
     background-color: var(--input-hover-color);
 }
 
-input:focus {
+input[type="text"]:focus {
     outline: 1px solid rgba(200, 200, 200, 90%);
-    background: #88888855;
+    background: var(--input-hover-color);;
 }
+
 
 input[type="color" i] {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
     background: none;
-    border: 0;
     cursor: pointer;
     inline-size: 32px;
     block-size: 32px;
     padding: 0;
 
     border: 4px solid var(--accent-color);
+}
+
+input[type="color" i] {
+    border: 4px solid var(--accent-hover-color);
 }
 
 input[type="color" i]::-webkit-color-swatch,
