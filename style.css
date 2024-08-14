@@ -34,7 +34,7 @@ button {
     font: 26px monospace, monospace;
     color: var(--accent-text-color);
     border-radius: 0;
-
+    cursor: pointer;
 }
 button:hover {
     background: var(--accent-hover-color);
@@ -105,10 +105,12 @@ input:focus {
     display: flex;
     flex-direction: row;
 }
+.settingsDiv > h3 {
+    flex-grow: 1;
+}
 .settingsDiv > div {
-    width: 25%;
+    width: 40%;
     display: flex;
-    float: right;
 }
 .settingsDiv input[type="text"] {
     flex-grow: 1;
@@ -117,7 +119,7 @@ input:focus {
 
 #settings button {
     font-size: 20px;
-    padding: 6px;
+    padding: 4px;
     flex-grow: 1;
 }
 .unselected {
@@ -137,10 +139,10 @@ input:focus {
 
 
 .mobile {
-    /*display: none;*/
+    display: none;
     margin: 8px 0px 8px 0px;
 }
-#themes-mobile button {
+#themes-list button {
     margin: 4px 0 0 0;
     width: 100%;
 }

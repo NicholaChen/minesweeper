@@ -65,7 +65,10 @@
 
             <div style="flex-grow: 1; padding: 16px 10% 16px 10%; display: none; overflow: auto;" id="settings">
                 <h1 style="text-align: center; margin: 16px;">Settings</h1>
-                <h2>Gameplay</h2>
+                <div>
+                    <h2 style="display: inline;">Gameplay</h2>
+                    <button class="none" style="float: right;" title="Reset" id="resetGameplaySettings"><i class="fa-solid fa-rotate-left"></i></button>
+                </div>
                 <div class="settingsDiv">
                     <h3>Map size (width x height)</h2>
                     <div>
@@ -88,7 +91,24 @@
                     </div>
                 </div>
                 <p style="text-align: center; display: none;" id="invalidGameplay"></p>
-                <h2>Appearance</h2>
+                <div>
+                    <h2 style="display: inline;">Controls</h2>
+                    <button class="none" style="float: right;" title="Reset" id="resetControlsSettings"><i class="fa-solid fa-rotate-left"></i></button>
+                </div>
+                <div class="settingsDiv">
+                    <h3>Mobile hold duration to flag (ms)</h3>
+                    <div>
+                        <input type="text" id="flagHold"/>
+                        <button class="saveSettings" id="saveFlagHold">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                        </button>
+                    </div>
+                </div>
+                <p style="text-align: center; display: none;" id="invalidControls"></p>
+                <div>
+                    <h2 style="display: inline;">Appearance</h2>
+                    <button class="none" style="float: right;" title="Reset" id="resetAppearanceSettings"><i class="fa-solid fa-rotate-left"></i></button>
+                </div>
                 <div class="settingsDiv" style="margin: 8px 0 -8px 0;">
                     <h3>Theme</h3>
                     <div>
@@ -96,12 +116,19 @@
                         <button class="unselected">Custom</button>
                     </div>
                 </div>
-                <div class="mobile" id="themes-mobile">
+                <div style="margin: 8px 0px 8px 0px;" id="themes-list">
+                </div>
+                <h2>Advanced</h2>
+                <div class="settingsDiv">
+                    <h3>Reset all settings (cannot be undone)</h3>
+                    <div>
+                        <button style="width: 100%;" id="resetSettingsButton">Reset</button>
+                    </div>
                 </div>
                 <h2>More settings coming soon</h2>
                 <div>
                     <p style="display: inline; margin: 0;">
-                        v1.4.1
+                        v1.4.2
                     </p>
                     <p style="display: inline; float: right; margin: 0;">
                         By Nichola Chen

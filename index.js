@@ -7,10 +7,10 @@ const canvasMargin = 16; // pixels
 
 var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ?  10 : Number(localStorage.getItem("mapX"));
 var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ?  10 : Number(localStorage.getItem("mapY"));
-var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 ?  15 : Number(localStorage.getItem("mines"));;
+var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ?  15 : Number(localStorage.getItem("mines"));
 
 
-var flagHold = 500;
+var flagHold = isNaN(Number(localStorage.getItem("flagHold"))) || Number(localStorage.getItem("flagHold")) <= 100 ?  500 : Number(localStorage.getItem("flagHold"));
 var settingsMessageDuration = 5000;
 
 var inGame = false;
@@ -367,6 +367,8 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
 });
 
 document.addEventListener("mousemove", (e) => {
+    if (!inGame) return;
+
     let canvasX = e.clientX - canvasMargin;
     let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
     
@@ -625,6 +627,7 @@ if (sessionStorage.getItem("pointer") == "true") {
 // SETTINGS
 
 var gameplayTimeout;
+var controlsTimeout;
 
 
 
@@ -632,6 +635,7 @@ document.getElementById("width").value = size_x;
 document.getElementById("height").value = size_y;
 
 document.getElementById("numMines").value = numMines;
+document.getElementById("flagHold").value = flagHold;
 
 document.getElementById("saveMapSize").addEventListener("click", (e) => {
     let width_issue = "";
@@ -706,11 +710,11 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
     let i = "";
     
     if (isNaN(Number(document.getElementById("numMines").value))) {
-        i = "Invalid 'Number of mines' " + "('" + document.getElementById("numMines").value + "').";
+        i = "Invalid " + "('" + document.getElementById("numMines").value + "').";
     } else if (Number(document.getElementById("numMines").value) < 1) {
-        i = "Invalid 'Number of mines' " + "('" + document.getElementById("numMines").value + "'). Must be at least 1.";
+        i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be at least 1.";
     } else if (Number(document.getElementById("numMines").value) > Math.floor(size_x * size_y / 2)) {
-        i = "Invalid 'Number of mines' " + "('" + document.getElementById("numMines").value + "'). Must be less than "+Math.floor(size_x * size_y / 2)+" for map size.";
+        i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be less than "+Math.floor(size_x * size_y / 2)+" for map size.";
     }
     if (i != "") {
         document.getElementById("invalidGameplay").innerText = "Could not save 'Number of mines'. " + i;
@@ -742,6 +746,44 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
     }
 });
 
+document.getElementById("saveFlagHold").addEventListener("click", (e) => {
+    let i = "";
+    
+    if (isNaN(Number(document.getElementById("flagHold").value))) {
+        i = "Invalid " + "('" + document.getElementById("flagHold").value + "').";
+    } else if (Number(document.getElementById("flagHold").value) < 100) {
+        i = "Invalid " + "('" + document.getElementById("flagHold").value + "'). Must be at least 100.";
+    }
+    if (i != "") {
+        document.getElementById("invalidControls").innerText = "Could not save 'Mobile hold duration to flag'. " + i;
+        document.getElementById("invalidControls").style.display = "block";
+
+        document.getElementById("flagHold").value = flagHold;
+        
+        if (controlsTimeout != null) clearTimeout(controlsTimeout);
+        
+        controlsTimeout = setTimeout(function() {
+            document.getElementById("invalidControls").style.display = "none";
+        }, settingsMessageDuration);
+    } else {
+        document.getElementById("invalidControls").innerText = "Successfully saved 'Mobile hold duration to flag'.";
+        
+        document.getElementById("invalidControls").style.display = "block";
+        
+        flagHold = Number(document.getElementById("flagHold").value)
+        
+        localStorage.setItem("flagHold", flagHold);
+        
+        document.getElementById("flagHold").value = flagHold;
+        
+        if (controlsTimeout != null) clearTimeout(controlsTimeout);
+        
+        controlsTimeout = setTimeout(function() {
+            document.getElementById("invalidControls").style.display = "none";
+        }, settingsMessageDuration);
+    }
+});
+
 for (const [key, value] of Object.entries(themes)) {
     console.log(key, value);
     let b = document.createElement("button");
@@ -769,5 +811,53 @@ for (const [key, value] of Object.entries(themes)) {
         }
     })
     
-    document.getElementById("themes-mobile").appendChild(b);
+    document.getElementById("themes-list").appendChild(b);
 }
+
+
+function resetGameplay() {
+    size_x = 10;
+    size_y = 10;
+
+    numMines = 15;
+
+    document.getElementById("width").value = size_x;
+    document.getElementById("height").value = size_y;
+
+    document.getElementById("numMines").value = numMines;
+
+    localStorage.setItem("mapX", size_x);
+    localStorage.setItem("mapY", size_y);
+    localStorage.setItem("mines", numMines);
+}
+
+
+
+function resetControls() {
+    flagHold = 500;
+
+    document.getElementById("flagHold").value = flagHold;
+
+    localStorage.setItem("flagHold", flagHold);
+}
+
+function resetAppearance() {
+    document.getElementById(theme.key).classList.add("unselected");
+    document.getElementById("default_dark").classList.remove("unselected");
+    theme = themes.default_dark;
+    
+    setTheme(theme);
+
+    localStorage.setItem("theme", theme.key);
+}
+
+
+document.getElementById("resetGameplaySettings").addEventListener("click", resetGameplay);
+document.getElementById("resetControlsSettings").addEventListener("click", resetControls);
+document.getElementById("resetAppearanceSettings").addEventListener("click", resetAppearance);
+
+document.getElementById("resetSettingsButton").addEventListener("click", (e) => {
+    resetGameplay();
+    resetControls();
+    resetAppearance();
+});

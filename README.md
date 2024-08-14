@@ -1,5 +1,5 @@
 # Welcome!
-Welcome to this minesweeper game. Customize map sizes and number of mines in its settings page. Future releases will add more customizable options. Not all maps are solvable and sometimes **you must guess**.
+Welcome to this minesweeper game. Customize the game to your preferences in the settings page. Future releases will add more customizable options. Not all maps are solvable and sometimes **you must guess**.
 
 ![minesweeper screenshot](images/1.jpg)
 
@@ -11,6 +11,8 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
 ## v1.4
  - Themes are here! Customize the appearance in settings
  - Added restart button
+ - Added more settings
+ - Reset setting buttons
  - Bug fixes
 
 ## v1.3
