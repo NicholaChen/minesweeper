@@ -109,15 +109,30 @@
                     <h2 style="display: inline;">Appearance</h2>
                     <button class="none" style="float: right;" title="Reset" id="resetAppearanceSettings"><i class="fa-solid fa-rotate-left"></i></button>
                 </div>
-                <div class="settingsDiv" style="margin: 8px 0 -8px 0;">
+                <div class="settingsDiv">
                     <h3>Theme</h3>
                     <div>
-                        <button style="margin: 0 4px 0 0;">Preset</button>
-                        <button class="unselected">Custom</button>
+                        <button style="margin: 0 4px 0 0;" id="presetThemeButton">Preset</button>
+                        <button id="customThemeButton">Custom</button>
                     </div>
                 </div>
-                <div style="margin: 8px 0px 8px 0px;" id="themes-list">
+                <div style="margin: -4px 0px 8px 0px; display: none;" id="themes-list">
                 </div>
+                <div id="customTheme" style="display: none;">
+                    <div class="settingsDiv">
+                        <h3>Background</h3>
+                        <div>
+                            <input type="text" id="backgroundColorText"/>
+                            <div style="display: inline;">
+                                <input type="color" id="backgroundColor" style="margin: 0 0 0 8px;"/>
+                            </div>
+                            <button class="saveSettings">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center; display: none;" id="invalidAppearance"></p>
                 <h2>Advanced</h2>
                 <div class="settingsDiv">
                     <h3>Reset all settings (cannot be undone)</h3>
@@ -128,7 +143,7 @@
                 <h2>More settings coming soon</h2>
                 <div>
                     <p style="display: inline; margin: 0;">
-                        v1.4.2
+                        v1.4.3
                     </p>
                     <p style="display: inline; float: right; margin: 0;">
                         By Nichola Chen
