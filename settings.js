@@ -155,7 +155,7 @@ document.getElementById("onMouseDownOn").addEventListener("click", (e) => {
 
     onMouseDown = true;
 
-    localStorage.setItem("onMouseDown", showRestaonMouseDownrt);
+    localStorage.setItem("onMouseDown", onMouseDown);
 });
 
 document.getElementById("chordingOff").addEventListener("click", (e) => {
@@ -503,6 +503,10 @@ for (const [key, value] of Object.entries(themeColors)) {
     document.getElementById("customTheme").appendChild(settingsDiv);
 }
 
+
+
+document.getElementById("wins").innerText = wins;
+document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
 
 
 

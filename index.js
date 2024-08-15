@@ -1,3 +1,17 @@
+const VERSION = "1.6.1";
+document.getElementById("logoVersion").innerText = "v" + VERSION;
+document.getElementById("versionFooter").innerText = "v" + VERSION;
+
+
+
+fetch("https://api.github.com/repos/nicholachen/minesweeper/releases/tags/"+"v"+VERSION).then((response) => response.json()).then((json) => {
+    if (json.html_url == null) {
+        return;
+    }
+    document.getElementById("logoVersion").href = json.html_url;
+    document.getElementById("versionFooter").href = json.html_url;
+});
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -17,6 +31,12 @@ var showTimer = localStorage.getItem("showTimer") != "false";
 var showFlags = localStorage.getItem("showFlags") != "false";
 var showPause = localStorage.getItem("showPause") != "false";
 var showRestart = localStorage.getItem("showRestart") != "false";
+
+
+// stats
+
+var wins = isNaN(Number(localStorage.getItem("wins"))) || Number(localStorage.getItem("wins")) < 0 ? 0 : Number(localStorage.getItem("wins"));
+var hours = isNaN(Number(localStorage.getItem("hours"))) || Number(localStorage.getItem("hours")) < 0 ? 0 : Number(localStorage.getItem("hours")); // in ms
 
 var settingsMessageDuration = 5000;
 
@@ -180,6 +200,12 @@ function exposeTile(x,y) {
         let elapsedTime = Date.now() - startTime;
         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
 
+        hours += elapsedTime - pausedTime;
+
+        document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
+
+        localStorage.setItem("hours", hours);
+
         for (let x=0;x<size_x;x++) {
             for (let y=0;y<size_y;y++) {
                 if (map[y][x].value == -1) {
@@ -226,6 +252,15 @@ function exposeTile(x,y) {
         clearInterval(interval);
         let elapsedTime = Date.now() - startTime;
         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+
+        hours += elapsedTime - pausedTime;
+        wins += 1;
+
+        document.getElementById("wins").innerText = wins;
+        document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
+
+        localStorage.setItem("wins", wins);
+        localStorage.setItem("hours", hours);
 
         document.getElementById("time").style.display = "block";
         document.getElementById("bestTime").style.display = "none";
@@ -519,7 +554,7 @@ canvas.addEventListener("mousedown", (e) => {
     
             chord(square);
         }
-    }, 10)
+    }, 1)
     
 })
 canvas.addEventListener("mouseup", (e) => {
@@ -686,3 +721,15 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
 if (sessionStorage.getItem("pointer") == "true") {
     canvas.style.cursor = "pointer"; 
 }
+
+
+document.addEventListener('keydown', function(event) {
+    if(event.key == "Escape") {
+        inGame = false;
+    
+        clearInterval(interval);
+        
+        refreshMap();
+        draw(true);
+    }
+});
