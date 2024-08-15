@@ -22,11 +22,11 @@
                 
 
                 <div style="margin: 0 8px 8px 8px; text-align: center;">
-                    <h2 style="margin: 0; display: inline;" title="Time">
+                    <h2 style="margin: 0; display: inline;" title="Time" id="h2Timer">
                         <i class="fa-solid fa-clock"></i>
                         <span id="timer"></span>
                     </h2>
-                    <h2 style="margin: 0; display: inline;" title="Flags">
+                    <h2 style="margin: 0; display: inline;" title="Flags" id="h2Flags">
                         <i class="fa-solid fa-flag"></i>
                         <span id="flags"></span>
                     </h2>
@@ -34,7 +34,7 @@
                         <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-circle-pause" id="pause"></i></h2>
                     </button>
                     
-                    <button class="none" id="restartButton">
+                    <button class="none" id="restartButton" title="Restart">
                         <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-rotate-right"></i></h2>
                     </button>
                     
@@ -110,6 +110,34 @@
                     <button class="none" style="float: right;" title="Reset" id="resetAppearanceSettings"><i class="fa-solid fa-rotate-left"></i></button>
                 </div>
                 <div class="settingsDiv">
+                    <h3>Show timer</h2>
+                        <div>
+                            <button style="margin: 0 4px 0 0;" id="showTimerOff">Off</button>
+                            <button id="showTimerOn">On</button>
+                        </div>
+                </div>
+                <div class="settingsDiv">
+                    <h3>Show number of flags</h2>
+                        <div>
+                            <button style="margin: 0 4px 0 0;" id="showFlagsOff">Off</button>
+                            <button id="showFlagsOn">On</button>
+                        </div>
+                </div>
+                <div class="settingsDiv">
+                    <h3>Show pause/unpause button</h2>
+                        <div>
+                            <button style="margin: 0 4px 0 0;" id="showPauseOff">Off</button>
+                            <button id="showPausesOn">On</button>
+                        </div>
+                </div>
+                <div class="settingsDiv">
+                    <h3>Show restart button</h2>
+                        <div>
+                            <button style="margin: 0 4px 0 0;" id="showRestartOff">Off</button>
+                            <button id="showRestartOn">On</button>
+                        </div>
+                </div>
+                <div class="settingsDiv">
                     <h3>Theme</h3>
                     <div>
                         <button style="margin: 0 4px 0 0;" id="presetThemeButton">Preset</button>
@@ -131,7 +159,7 @@
                 <h2>More settings coming soon</h2>
                 <div>
                     <p style="display: inline; margin: 0;">
-                        v1.5
+                        v1.5.1
                     </p>
                     <p style="display: inline; float: right; margin: 0;">
                         By Nichola Chen
@@ -142,5 +170,6 @@
         </div>
         
         <script src="index.js"></script>
+        <script src="settings.js"></script>
     </body>
 </html
