@@ -9,7 +9,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
 [https://nicholachen.github.io/minesweeper/](https://nicholachen.github.io/minesweeper/)
 
 
-## v1/6
+## v1.6
  - Better chording - use middle button to chord and chord on mobile
  - Made mouse clicks register when first pressed down and not on release
  - A lot of new settings to customize the game
