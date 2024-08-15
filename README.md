@@ -5,9 +5,15 @@ Welcome to this minesweeper game. Customize the game to your preferences in the 
 
 ## How to play?
 Press anywhere to begin. Numbers indicate the number of mines adjacent (including corners) to the square.  Empty squares indicate no mines adjacent to it. Left click/tap to open squares. Right click/hold tap to flag squares that you believe have mines. Open a square with a mine and game over! Flag all squares with mines to win!
-Supports chording (revealing all 8 adjacent squares when the number of adjacent mines equals the number of adjacent flags) by simultaneously right and left clicking.
+Supports chording (revealing all 8 adjacent squares when the number of adjacent mines equals the number of adjacent flags) by simultaneously right and left clicking or by clicking using the midde mouse button. Chording can be done by tapping normally on an exposed tile on mobile.
 [https://nicholachen.github.io/minesweeper/](https://nicholachen.github.io/minesweeper/)
 
+
+## v1/6
+ - Better chording - use middle button to chord and chord on mobile
+ - Made mouse clicks register when first pressed down and not on release
+ - A lot of new settings to customize the game
+ - Bug fixes :D
 
 ## v1.5
  - Create custom themes! Select your own colors for everything. Found in **Settings > Appearance** and then by pressing **Custom**. Remember to save each option by pressing the icon on the right.

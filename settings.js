@@ -127,6 +127,56 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
     }
 });
 
+if (onMouseDown) {
+    document.getElementById("onMouseDownOff").classList.add("unselected");
+} else {
+    document.getElementById("onMouseDownOn").classList.add("unselected");
+}
+
+if (chording) {
+    document.getElementById("chordingOff").classList.add("unselected");
+} else {
+    document.getElementById("chordingOn").classList.add("unselected");
+}
+
+
+document.getElementById("onMouseDownOff").addEventListener("click", (e) => {
+    document.getElementById("onMouseDownOff").classList.remove("unselected");
+    document.getElementById("onMouseDownOn").classList.add("unselected");
+
+    onMouseDown = false;
+
+    localStorage.setItem("onMouseDown", onMouseDown);
+});
+
+document.getElementById("onMouseDownOn").addEventListener("click", (e) => {
+    document.getElementById("onMouseDownOn").classList.remove("unselected");
+    document.getElementById("onMouseDownOff").classList.add("unselected");
+
+    onMouseDown = true;
+
+    localStorage.setItem("onMouseDown", showRestaonMouseDownrt);
+});
+
+document.getElementById("chordingOff").addEventListener("click", (e) => {
+    document.getElementById("chordingOff").classList.remove("unselected");
+    document.getElementById("chordingOn").classList.add("unselected");
+
+    chording = false;
+
+    localStorage.setItem("chording", chording);
+});
+
+document.getElementById("chordingOn").addEventListener("click", (e) => {
+    document.getElementById("chordingOn").classList.remove("unselected");
+    document.getElementById("chordingOff").classList.add("unselected");
+
+    chording = true;
+
+    localStorage.setItem("chording", chording);
+});
+
+
 document.getElementById("saveFlagHold").addEventListener("click", (e) => {
     let i = "";
     
@@ -189,13 +239,98 @@ if (showPause) {
 if (showRestart) {
     document.getElementById("showRestartOff").classList.add("unselected");
 } else {
-    document.getElementById("showRestartsOn").classList.add("unselected");
+    document.getElementById("showRestartOn").classList.add("unselected");
 }
 
 
+document.getElementById("showTimerOff").addEventListener("click", (e) => {
+    document.getElementById("showTimerOff").classList.remove("unselected");
+    document.getElementById("showTimerOn").classList.add("unselected");
+
+    showTimer = false;
+
+    document.getElementById("h2Timer").style.display = "none";
+
+    localStorage.setItem("showTimer", showTimer);
+});
+
+document.getElementById("showTimerOn").addEventListener("click", (e) => {
+    document.getElementById("showTimerOn").classList.remove("unselected");
+    document.getElementById("showTimerOff").classList.add("unselected");
+
+    showTimer = true;
+
+    document.getElementById("h2Timer").style.display = "inline";
+
+    localStorage.setItem("showTimer", showTimer);
+});
 
 
+document.getElementById("showFlagsOff").addEventListener("click", (e) => {
+    document.getElementById("showFlagsOff").classList.remove("unselected");
+    document.getElementById("showFlagsOn").classList.add("unselected");
 
+    showFlags = false;
+
+    document.getElementById("h2Flags").style.display = "none";
+
+    localStorage.setItem("showFlags", showFlags);
+});
+
+document.getElementById("showFlagsOn").addEventListener("click", (e) => {
+    document.getElementById("showFlagsOn").classList.remove("unselected");
+    document.getElementById("showFlagsOff").classList.add("unselected");
+
+    showFlags = true;
+
+    document.getElementById("h2Flags").style.display = "inline";
+
+    localStorage.setItem("showFlags", showFlags);
+});
+
+document.getElementById("showPauseOff").addEventListener("click", (e) => {
+    document.getElementById("showPauseOff").classList.remove("unselected");
+    document.getElementById("showPauseOn").classList.add("unselected");
+
+    showPause = false;
+
+    document.getElementById("pauseButton").style.display = "none";
+
+    localStorage.setItem("showPause", showPause);
+});
+
+document.getElementById("showPauseOn").addEventListener("click", (e) => {
+    document.getElementById("showPauseOn").classList.remove("unselected");
+    document.getElementById("showPauseOff").classList.add("unselected");
+
+    showPause = true;
+
+    document.getElementById("pauseButton").style.display = "initial";
+
+    localStorage.setItem("showPause", showPause);
+});
+
+document.getElementById("showRestartOff").addEventListener("click", (e) => {
+    document.getElementById("showRestartOff").classList.remove("unselected");
+    document.getElementById("showRestartOn").classList.add("unselected");
+
+    showRestart = false;
+
+    document.getElementById("restartButton").style.display = "none";
+
+    localStorage.setItem("showRestart", showRestart);
+});
+
+document.getElementById("showRestartOn").addEventListener("click", (e) => {
+    document.getElementById("showRestartOn").classList.remove("unselected");
+    document.getElementById("showRestartOff").classList.add("unselected");
+
+    showRestart = true;
+
+    document.getElementById("restartButton").style.display = "initial";
+
+    localStorage.setItem("showRestart", showRestart);
+});
 
 if (theme.key == "custom") {
     document.getElementById("presetThemeButton").classList.add("unselected");
@@ -401,7 +536,12 @@ function resetGameplay() {
 
 
 function resetControls() {
+    onMouseDown = true;
+    chording = true;
     flagHold = 500;
+
+    localStorage.setItem("onMouseDown", onMouseDown);
+    localStorage.setItem("chording", chording);
 
     document.getElementById("flagHold").value = flagHold;
 
@@ -419,6 +559,32 @@ function resetControls() {
 }
 
 function resetAppearance() {
+    document.getElementById("showTimerOn").classList.remove("unselected");
+    document.getElementById("showTimerOff").classList.add("unselected");
+    document.getElementById("h2Timer").style.display = "inline";
+    
+    document.getElementById("showFlagsOn").classList.remove("unselected");
+    document.getElementById("showFlagsOff").classList.add("unselected");
+    document.getElementById("h2Flags").style.display = "inline";
+
+    document.getElementById("showPauseOn").classList.remove("unselected");
+    document.getElementById("showPauseOff").classList.add("unselected");
+    document.getElementById("pauseButton").style.display = "initial";
+
+    document.getElementById("showRestartOn").classList.remove("unselected");
+    document.getElementById("showRestartOff").classList.add("unselected");
+    document.getElementById("restartButton").style.display = "initial";
+
+    showTimer = true;
+    showFlags = true;
+    showPause = true;
+    showRestart = true;
+
+    localStorage.setItem("showTimer", showTimer);
+    localStorage.setItem("showFlags", showFlags);
+    localStorage.setItem("showPause", showPause);
+    localStorage.setItem("showRestart", showRestart);
+
     document.getElementById("presetThemeButton").classList.remove("unselected");
     document.getElementById("customThemeButton").classList.add("unselected");
 
@@ -426,7 +592,6 @@ function resetAppearance() {
     document.getElementById("themes-list").style.display = "block";
 
     for (let i = 0; i < document.getElementById("themes-list").children.length; i++) {
-        document.getElementById("themes-list").children[i].classList.remove("unselected");
         document.getElementById("themes-list").children[i].classList.add("unselected");
     }
 

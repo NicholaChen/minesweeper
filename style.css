@@ -160,13 +160,13 @@ input[type="color" i]::-moz-color-swatch-wrapper {
     color: var(--unselected-text-color);
 }
 .outline.unselected {
-    border: 4px solid var(--input-color);
+    border: 4px solid var(--unselected-color);
     background-color: var(--background-color);
     color: var(--text-color);
 }
 
 .outline.unselected:hover {
-    border: 4px solid var(--input-hover-color);
+    border: 4px solid var(--accent-hover-color);
     background-color: var(--background-color);
 }
 

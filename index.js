@@ -9,13 +9,14 @@ var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage
 var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ?  10 : Number(localStorage.getItem("mapY"));
 var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ?  15 : Number(localStorage.getItem("mines"));
 
-
+var onMouseDown = localStorage.getItem("onMouseDown") != "false";
+var chording = localStorage.getItem("chording") != "false";
 var flagHold = isNaN(Number(localStorage.getItem("flagHold"))) || Number(localStorage.getItem("flagHold")) <= 100 ?  500 : Number(localStorage.getItem("flagHold"));
 
-var showTimer = localStorage.getItem("showTimer") != false;
-var showFlags = localStorage.getItem("showFlags") != false;
-var showPause = localStorage.getItem("showPause") != false;
-var showRestart = localStorage.getItem("showRestart") != false;
+var showTimer = localStorage.getItem("showTimer") != "false";
+var showFlags = localStorage.getItem("showFlags") != "false";
+var showPause = localStorage.getItem("showPause") != "false";
+var showRestart = localStorage.getItem("showRestart") != "false";
 
 var settingsMessageDuration = 5000;
 
@@ -413,8 +414,8 @@ var double = false
 
 function open(square) {
     if (square) {
-        console.log("open",square);
         if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
+            console.log("open",square);
             if (first) {
                 document.getElementById("clickAnywhere").style.display = "none";
                 pausedTime = 0;
@@ -439,8 +440,8 @@ function open(square) {
 
 function flag(square) {
     if (square) {
-        console.log("flag",square);
         if (!map[square.y][square.x].opened) {
+            console.log("flag",square);
             map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
             draw(true);
   
@@ -459,37 +460,12 @@ function flag(square) {
         }
     }
 }
-canvas.addEventListener("mouseup", (e) => {
-    if (double) {
-        double = false;
-        return
-    };
-    let canvasX = e.clientX - canvasMargin;
-    let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
-    let square = overSquare(canvasX, canvasY);
 
-
-    if (!(leftButtonDown && rightButtonDown)) {
-        if (e.button === 0) {
-            open(square);
-        }
-        if (e.button === 2 && inGame) {
-            flag(square);
-        }
-
-        // update cursor
-        if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
-            canvas.style.cursor = "pointer";
-        } else {
-            canvas.style.cursor = "default";
-        }
-    } else {
-        // chording
-        
-        
-        double = true; // fixes a bug where right + left together does two events
-
+function chord(square) {
+    if (square) {
         if (map[square.y][square.x].opened && map[square.y][square.x].value != 0) {
+            console.log("chord",square);
+
             let f = adjacentFlags(square.x, square.y);
 
             if (f == map[square.y][square.x].value) {
@@ -505,6 +481,84 @@ canvas.addEventListener("mouseup", (e) => {
             }
             draw(true);
         }
+    }
+}
+var mouseTimeout;
+canvas.addEventListener("mousedown", (e) => {
+    if (!onMouseDown) return;
+    let canvasX = e.clientX - canvasMargin;
+    let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
+    let square = overSquare(canvasX, canvasY);
+
+    if (mouseTimeout) clearTimeout(mouseTimeout);
+    mouseTimeout = setTimeout(function() {
+        if (!(leftButtonDown && rightButtonDown)) {
+            if (e.button == 0) {
+                open(square);
+            } else if (e.button == 2 && inGame) {
+                flag(square);
+            } else if (e.button == 1) {
+                if (!chording) return;
+    
+                chord(square);
+            }
+    
+            // update cursor
+            if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+                canvas.style.cursor = "pointer";
+            } else {
+                canvas.style.cursor = "default";
+            }
+        } else {
+            // chording
+            
+            
+            double = true; // fixes a bug where right + left together does two events
+    
+            if (!chording) return;
+    
+            chord(square);
+        }
+    }, 10)
+    
+})
+canvas.addEventListener("mouseup", (e) => {
+    if (onMouseDown) return;
+    if (double) {
+        double = false;
+        return
+    };
+    let canvasX = e.clientX - canvasMargin;
+    let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
+    let square = overSquare(canvasX, canvasY);
+
+
+    if (!(leftButtonDown && rightButtonDown)) {
+        if (e.button == 0) {
+            open(square);
+        } else if (e.button == 2 && inGame) {
+            flag(square);
+        } else if (e.button == 1) {
+            if (!chording) return;
+
+            chord(square);
+        }
+
+        // update cursor
+        if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+            canvas.style.cursor = "pointer";
+        } else {
+            canvas.style.cursor = "default";
+        }
+    } else {
+        // chording
+        
+        
+        double = true; // fixes a bug where right + left together does two events
+
+        if (!chording) return;
+
+        chord(square);
     }
 });
 
@@ -558,7 +612,13 @@ canvas.addEventListener("touchend", (e) => {
         clearTimeout(touchTimeout);
         
         if (!touchHeld) {
-            open(square);
+            if (square) {
+                if (!map[square.y][square.x].opened) {
+                    open(square);
+                } else {
+                    chord(square);
+                }
+            }        
         }
     }
 })

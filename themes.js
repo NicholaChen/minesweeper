@@ -47,7 +47,7 @@ var themes = {
         unselected_text_color: "#B0B0B0",
         unopened: "#B5B5B5",
         opened: "#C9C9C9",
-        text: "#404040",
+        text: "#151515",
         flag: "#FF0808",
         flag_stem: "#db0909"
     },
@@ -66,11 +66,11 @@ var themes = {
         input_text_color: "#55FF55",
         unselected_color: "#24B724",
         unselected_text_color: "#090909",
-        unopened: "#14A714",
+        unopened: "#062E06",
         opened: "#191919",
         text: "#33FF33",
-        flag: "#090909",
-        flag_stem: "#090909"
+        flag: "#33FF33",
+        flag_stem: "#33FF33"
     }
 }
 
@@ -109,9 +109,10 @@ var themeColorsSetting = { // name: setting name
     unselected_text_color: "Text on unselected",
     unopened: "Minesweeper unopened tile",
     opened: "Minesweeper opened tile",
+    text: "Minesweeper number text",
     flag: "Minesweeper flag",
     flag_stem: "Minesweeper flag stem",
-    text: "Minesweeper start text"
+    
 }
 themes["custom"] = {
     name: "Custom",
