@@ -37,7 +37,16 @@ button {
     cursor: pointer;
 }
 button:hover {
-    background: var(--accent-hover-color);
+    background-color: var(--accent-hover-color);
+}
+
+button.keybind {
+    background-color: var(--input-color);
+    color: var(--input-text-color)
+}
+
+button.keybind:hover {
+    background-color: var(--input-hover-color);
 }
 
 .outline {

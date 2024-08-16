@@ -176,6 +176,14 @@ document.getElementById("chordingOn").addEventListener("click", (e) => {
     localStorage.setItem("chording", chording);
 });
 
+var shortcutID = ""
+document.getElementById("restartShortcut").addEventListener("click", (e) => {
+    document.getElementById("keybindsScreen").style.display = "flex";
+
+    shortcutID = "restartShortcut";
+});
+
+
 
 document.getElementById("saveFlagHold").addEventListener("click", (e) => {
     let i = "";
@@ -636,4 +644,22 @@ document.getElementById("resetSettingsButton").addEventListener("click", (e) => 
     resetGameplay();
     resetControls();
     resetAppearance();
+});
+
+
+
+
+document.getElementById("keybindsScreen").addEventListener("click", (e) => {
+    document.getElementById("keybindsScreen").style.display = "none";
+    shortcutID = "";
+});
+
+document.addEventListener("keydown", (e) => {
+    if (document.getElementById("keybindsScreen").style.display == "flex" && shortcutID != "") {
+        let i = [];
+
+        if (e.ctrlKey) {
+
+        }
+    }
 });
