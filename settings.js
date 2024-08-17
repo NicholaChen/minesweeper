@@ -630,6 +630,8 @@ function resetControls() {
     appearanceTimeout = setTimeout(function() {
         document.getElementById("invalidControls").style.display = "none";
     }, settingsMessageDuration);
+
+    resetGame();
 }
 
 function resetAppearance() {
@@ -751,3 +753,25 @@ document.getElementById("keybindConfirm").addEventListener("click", (e) => {
 
     localStorage.setItem(shortcutID, window[shortcutID]);
 });
+
+
+document.getElementById("shareSettings").addEventListener("click", (e) => {
+    let h = btoa(JSON.stringify({
+        w: size_x,
+        h: size_y,
+        n: numMines,
+        il: infiniteLives,
+        md: onMouseDown,
+        c: chording,
+        rs: restartShortcut,
+        ss: settingsShortcut,
+        fh: flagHold,
+        ts: showTimer,
+        fs: showFlags,
+        ps: showPause,
+        rs: showRestart,
+        theme: theme
+    }))
+
+    navigator.clipboard.writeText(document.location.origin + "?s=" + h);
+})

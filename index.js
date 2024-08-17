@@ -1,7 +1,6 @@
-const VERSION = "1.6.4";
+const VERSION = "1.7.0";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
-
 
 
 fetch("https://api.github.com/repos/nicholachen/minesweeper/releases/tags/"+"v"+VERSION).then((response) => response.json()).then((json) => {
@@ -46,6 +45,39 @@ var showRestart = localStorage.getItem("showRestart") != "false";
 
 var wins = isNaN(Number(localStorage.getItem("wins"))) || Number(localStorage.getItem("wins")) < 0 ? 0 : Number(localStorage.getItem("wins"));
 var hours = isNaN(Number(localStorage.getItem("hours"))) || Number(localStorage.getItem("hours")) < 0 ? 0 : Number(localStorage.getItem("hours")); // in ms
+
+
+
+
+const params = new URLSearchParams(document.location.search);
+
+function readSetting() {
+    if (params.get("s")) {
+        try {
+            let s = params.get("s");
+        
+            let t = JSON.parse(atob(s));
+
+            if (t.w && t.h && t.n && t.il && t.md && t.c && t.rs && t.ss && t.fh && t.ts && t.fs && t.ps && t.rs && t.theme) {
+                if (typeof(t.w) != "number" || t.w < 5 || t.w >= 100) return
+                if (typeof(t.h) != "number" || t.h < 5 || t.h >= 100) return
+
+                size_x = t.w;
+                size_y = t.h;
+
+                console.log(t)
+
+                document.getElementById("saveImportedSettings").style.display = "inline";
+            }
+        } catch (e) {
+
+        }
+    }
+}
+
+readSetting();
+
+
 
 var settingsMessageDuration = 5000;
 
@@ -810,15 +842,14 @@ document.addEventListener('keydown', function(e) {
 });
 
 /* TODO (not in order)
- - 100% random board setting - (allow mines in 8 adjacent squares to first click)
  X Pause/unpause shortcut
  - More themes
  - Hints, enable hint setting
  - Share map+map id
- ~ Google SEO, meta, description, etc...
+ X Google SEO, meta, description, etc...
  - Import/export themes
  - Import/export settings
- - favicon
+ X favicon
  X Infinite lives
  X settings page doesn't reset game
 */

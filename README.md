@@ -1,5 +1,5 @@
 # Welcome!
-Welcome to this minesweeper game. Customize the game to your preferences in the settings page. Remember to save settings by pressing the icon on the right on some settings. Future releases will add more customizable options. Not all maps are solvable and sometimes **you must guess**.
+Welcome to this minesweeper game. Customize the game to your preferences in the settings page. Remember to save settings by pressing the icon on the right on text input settings. Future releases will add more customizable options. Not all maps are solvable and sometimes **you must guess**.
 
 ![minesweeper screenshot](images/1.jpg)
 

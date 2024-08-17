@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Minesweeper</title>
         <meta charset="utf-8"/>
+        <meta name="title" content="Minesweeper"/>
         <meta name="description" content="A simple customizable minesweeper game."/>
+        <meta name="robots" content="index,follow"/>
         <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/> 
         <link rel="stylesheet" href="style.css"/>
         <link rel="stylesheet" href="themes.css">
+        <link rel="icon" type="image/x-icon" href="images/favicon.png">
         <script src="themes.js"></script>
-        <title>minesweeper</title>
         <script src="https://kit.fontawesome.com/760c95d571.js" crossorigin="anonymous"></script>
+
+        <meta name="google-site-verification" content="RxQrAskRY0MF3xounDwxAz3FUPINcluYu7gR433u6ko"/>
     </head>
     <body oncontextmenu="return false;">
         <div style="display: flex; position: absolute; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column;">
@@ -72,6 +77,9 @@
                     <button id="keybindConfirm" style="display: none;">Confirm</button>
                 </div>
                 <h1 style="text-align: center; margin: 16px;">Settings</h1>
+                <div style="text-align: center;">
+                    <button style="display: none" id="saveImportedSettings">Save imported settings</button>
+                </div>
                 <div>
                     <h2 style="display: inline;">Gameplay</h2>
                     <button class="none" style="float: right;" title="Reset" id="resetGameplaySettings"><i class="fa-solid fa-rotate-left"></i></button>
@@ -98,10 +106,10 @@
                 </div>
                 <div class="settingsDiv">
                     <h3>Infinite lives</h2>
-                        <div>
-                            <button style="margin: 0 8px 0 0;" id="infiniteLivesOff">Off</button>
-                            <button id="infiniteLivesOn">On</button>
-                        </div>
+                    <div>
+                        <button style="margin: 0 8px 0 0;" id="infiniteLivesOff">Off</button>
+                        <button id="infiniteLivesOn">On</button>
+                    </div>
                 </div>
                 <p style="text-align: center; display: none;" id="invalidGameplay"></p>
                 <div>
@@ -195,6 +203,12 @@
                 </div>
                 <p style="text-align: center; display: none;" id="invalidAppearance"></p>
                 <h2>Advanced</h2>
+                <div class="settingsDiv">
+                    <h3>Share settings</h3>
+                    <div>
+                        <button style="width: 100%;" id="shareSettings">Share</button>
+                    </div>
+                </div>
                 <div class="settingsDiv">
                     <h3>Reset all settings (cannot be undone)</h3>
                     <div>
