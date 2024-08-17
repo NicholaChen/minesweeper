@@ -140,18 +140,18 @@ const root = document.documentElement;
 
 var theme = themes[localStorage.getItem("theme")] ?? themes.default_dark;
 function setTheme(t) {
-    root.style.setProperty("--background-color", t.background_color);
-    root.style.setProperty("--text-color", t.text_color);
-    root.style.setProperty("--top-color", t.top_color);
-    root.style.setProperty("--top-text-color", t.top_text_color);
-    root.style.setProperty("--accent-color", t.accent_color);
-    root.style.setProperty("--accent-hover-color", t.accent_hover_color);
-    root.style.setProperty("--accent-text-color",t.accent_text_color);
-    root.style.setProperty("--input-color", t.input_color);
-    root.style.setProperty("--input-hover-color", t.input_hover_color);
-    root.style.setProperty("--input-text-color", t.input_text_color);
-    root.style.setProperty("--unselected-color", t.unselected_color);
-    root.style.setProperty("--unselected-text-color", t.unselected_text_color);
+    root.style.setProperty("--background-color", t.background_color ?? theme.default_dark.background_color);
+    root.style.setProperty("--text-color", t.text_color ?? theme.default_dark.text_color);
+    root.style.setProperty("--top-color", t.top_color ?? theme.default_dark.top_color);
+    root.style.setProperty("--top-text-color", t.top_text_color ?? theme.default_dark.text_color);
+    root.style.setProperty("--accent-color", t.accent_color ?? theme.default_dark.accent_color);
+    root.style.setProperty("--accent-hover-color", t.accent_hover_color ?? theme.default_dark.accent_hover_color);
+    root.style.setProperty("--accent-text-color",t.accent_text_color ?? theme.default_dark.accent_text_color);
+    root.style.setProperty("--input-color", t.input_color ?? theme.default_dark.input_color);
+    root.style.setProperty("--input-hover-color", t.input_hover_color ?? theme.default_dark.input_hover_color);
+    root.style.setProperty("--input-text-color", t.input_text_color ?? theme.default_dark.input_text_color);
+    root.style.setProperty("--unselected-color", t.unselected_color ?? theme.default_dark.unselected_color);
+    root.style.setProperty("--unselected-text-color", t.unselected_text_color ?? theme.default_dark.unselected_text_color);
 }
 
 

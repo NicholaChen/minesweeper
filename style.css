@@ -148,7 +148,7 @@ input[type="color" i]::-moz-color-swatch-wrapper {
     flex-direction: row;
 }
 .settingsDiv > h3 {
-    flex-grow: 1;
+    width: 60%;
 }
 .settingsDiv > div {
     width: 40%;
@@ -195,6 +195,10 @@ input[type="color" i]::-moz-color-swatch-wrapper {
     }
     
     .settingsDiv > div {
+        width: 100%;
+    }
+
+    .settingsDiv > h3 {
         width: 100%;
     }
     

@@ -3,7 +3,7 @@
 var gameplayTimeout;
 var controlsTimeout;
 var appearanceTimeout;
-
+var advancedTimeout;
 
 
 document.getElementById("width").value = size_x;
@@ -763,15 +763,58 @@ document.getElementById("shareSettings").addEventListener("click", (e) => {
         il: infiniteLives,
         md: onMouseDown,
         c: chording,
+        ps: pauseShortcut,
         rs: restartShortcut,
         ss: settingsShortcut,
         fh: flagHold,
-        ts: showTimer,
-        fs: showFlags,
-        ps: showPause,
-        rs: showRestart,
-        theme: theme
-    }))
+        st: showTimer,
+        sf: showFlags,
+        sp: showPause,
+        sr: showRestart,
+        t: theme
+    }));
 
     navigator.clipboard.writeText(document.location.origin + "?s=" + h);
+
+    document.getElementById("invalidAdvanced").innerText = "Share link copied.";
+        
+    document.getElementById("invalidAdvanced").style.display = "block";
+    
+    
+    if (advancedTimeout != null) clearTimeout(advancedTimeout);
+    
+    advancedTimeout = setTimeout(function() {
+        document.getElementById("invalidAdvanced").style.display = "none";
+    }, settingsMessageDuration);
 })
+
+document.getElementById("saveImportedSettings").addEventListener("click", (e) => {
+    localStorage.setItem("mapX", size_x);
+    localStorage.setItem("mapY", size_y);
+    localStorage.setItem("mines", numMines);
+    localStorage.setItem("infiniteLives", infiniteLives);
+
+    localStorage.setItem("onMouseDown", onMouseDown);
+    localStorage.setItem("chording", chording);
+
+    localStorage.setItem("flagHold", flagHold);
+    localStorage.setItem("showTimer", showTimer);
+    localStorage.setItem("showFlags", showFlags);
+    localStorage.setItem("showPause", showPause);
+    localStorage.setItem("showRestart", showRestart);
+
+    localStorage.setItem("theme", theme.key);
+
+    if (theme.key == "custom") {
+        for (const [key, value] of Object.entries(themeColors)) {
+            localStorage.setItem(key, themes.custom[key]);
+        }
+    }
+
+    document.getElementById("saveImportedSettings").style.display = "none";
+    document.getElementById("cancelImportedSettings").style.display = "none";
+});
+
+document.getElementById("cancelImportedSettings").addEventListener("click", (e) => {
+    document.location = document.location.origin;
+});

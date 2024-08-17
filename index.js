@@ -58,17 +58,59 @@ function readSetting() {
         
             let t = JSON.parse(atob(s));
 
-            if (t.w && t.h && t.n && t.il && t.md && t.c && t.rs && t.ss && t.fh && t.ts && t.fs && t.ps && t.rs && t.theme) {
-                if (typeof(t.w) != "number" || t.w < 5 || t.w >= 100) return
-                if (typeof(t.h) != "number" || t.h < 5 || t.h >= 100) return
+            if (typeof(t.w) != "number" || t.w < 5 || t.w >= 100) return
+            if (typeof(t.h) != "number" || t.h < 5 || t.h >= 100) return
+            if (typeof(t.n) != "number" || t.n <= 0 || t.h > Math.floor(t.w * t.h / 2)) return
+            
+            if (typeof(t.il) != "boolean") return;
+            
+            
+            if (typeof(t.md) != "boolean") return;
+            if (typeof(t.c) != "boolean") return;
+            if (typeof(t.ps) != "string") return;
+            if (typeof(t.rs) != "string") return;
+            if (typeof(t.ss) != "string") return;
+            if (typeof(t.fh) != "number" || t.fh < 100) return;
 
-                size_x = t.w;
-                size_y = t.h;
+            if (typeof(t.st) != "boolean") return;
+            if (typeof(t.sf) != "boolean") return;
+            if (typeof(t.sp) != "boolean") return;
+            if (typeof(t.sr) != "boolean") return;
 
-                console.log(t)
 
-                document.getElementById("saveImportedSettings").style.display = "inline";
+            if (t.t == null) return;
+
+            size_x = t.w;
+            size_y = t.h;
+
+            numMines = t.n;
+            infiniteLives = t.il;
+
+            onMouseDown = t.md;
+            chording = t.c;
+
+            pauseShortcut = t.ps;
+            restartShortcut = t.rs;
+            settingsShortcut = t.ss;
+
+            flagHold = t.fh;
+
+            showTimer = t.st;
+            showFlags = t.sf;
+            showPause - t.sp;
+            showRestart = t.sr;
+
+            theme = t.t;
+            
+            if (theme.key == "custom") {
+                themes.custom = theme;
             }
+
+            setTheme(theme);
+
+
+            document.getElementById("saveImportedSettings").style.display = "inline";
+            document.getElementById("cancelImportedSettings").style.display = "inline";
         } catch (e) {
 
         }
@@ -767,26 +809,36 @@ document.getElementById("restartButton").addEventListener("click", (e) => {
 
 document.getElementById("settingsButton").addEventListener("click", (e) => {
     if (document.getElementById("game").style.display == "none") {
+        settings = false;
         document.getElementById("game").style.display = "block";
         document.getElementById("settings").style.display = "none";
 
         document.getElementById("keybindsScreen").style.display = "none";
 
-        refreshMap();
-        draw(true);
+        if (inGame && !lastPause) unpause();
     } else {
+        settings = true;
         document.getElementById("game").style.display = "none";
         document.getElementById("settings").style.display = "block";
 
         document.getElementById("keybindsScreen").style.display = "none";
 
-        inGame = false;
-
-        clearInterval(interval);
-
-        refreshMap();
+        if (inGame) pause();
     }
 });
+
+if (params.get("s")) {
+    document.getElementById("game").style.display = "none";
+    document.getElementById("settings").style.display = "block";
+
+    document.getElementById("keybindsScreen").style.display = "none";
+
+    inGame = false;
+
+    clearInterval(interval);
+
+    refreshMap();
+}
 
 if (sessionStorage.getItem("pointer") == "true") {
     canvas.style.cursor = "pointer"; 
