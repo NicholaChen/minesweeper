@@ -159,7 +159,7 @@ input[type="color" i]::-moz-color-swatch-wrapper {
     min-width: 0;
 }
 
-#settings button {
+.settingsDiv button, #themes-list button {
     font-size: 20px;
     padding: 4px;
     flex: 1;

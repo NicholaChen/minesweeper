@@ -10,6 +10,7 @@ document.getElementById("width").value = size_x;
 document.getElementById("height").value = size_y;
 
 document.getElementById("numMines").value = numMines;
+
 document.getElementById("flagHold").value = flagHold;
 
 if (!showTimer) document.getElementById("h2Timer").style.display = "none";
@@ -177,13 +178,18 @@ document.getElementById("chordingOn").addEventListener("click", (e) => {
 });
 
 var shortcutID = ""
-document.getElementById("restartShortcut").addEventListener("click", (e) => {
-    document.getElementById("keybindsScreen").style.display = "flex";
 
-    shortcutID = "restartShortcut";
-});
+var shortcuts = ["restartShortcut", "settingsShortcut"];
 
+for (let i=0;i<shortcuts.length;i++) {
+    document.getElementById(shortcuts[i]).innerText = window[shortcuts[i]];
 
+    document.getElementById(shortcuts[i]).addEventListener("click", (e) => {
+        document.getElementById("keybindsScreen").style.display = "flex";
+    
+        shortcutID = shortcuts[i];
+    });
+}
 
 document.getElementById("saveFlagHold").addEventListener("click", (e) => {
     let i = "";
@@ -550,6 +556,14 @@ function resetGameplay() {
 function resetControls() {
     onMouseDown = true;
     chording = true;
+    
+    restartShortcut = "ESCAPE";
+    settingsShortcut = "S";
+    
+    for (let i=0;i<shortcuts.length;i++) {
+        localStorage.setItem(shortcuts[i], window[shortcuts[i]]);
+    }
+    
     flagHold = 500;
 
     localStorage.setItem("onMouseDown", onMouseDown);
@@ -654,12 +668,38 @@ document.getElementById("keybindsScreen").addEventListener("click", (e) => {
     shortcutID = "";
 });
 
+var heldModifiers = [];
+var settingsHeldKeys = [];
+
 document.addEventListener("keydown", (e) => {
     if (document.getElementById("keybindsScreen").style.display == "flex" && shortcutID != "") {
-        let i = [];
-
+        e.preventDefault();
+        settingsHeldKeys = [];
         if (e.ctrlKey) {
-
+            settingsHeldKeys.push("CONTROL");
         }
+
+        if (e.altKey) {
+            settingsHeldKeys.push("ALT");
+        }
+
+        if (e.shiftKey) {
+            settingsHeldKeys.push("SHIFT");
+        }
+
+        if (!settingsHeldKeys.includes(e.key.toUpperCase())) {
+            settingsHeldKeys.push(e.key.toUpperCase());
+        }
+
+        document.getElementById("keyList").innerText = settingsHeldKeys.join("+");
+        document.getElementById("keybindConfirm").style.display = "block";
     }
+});
+
+document.getElementById("keybindConfirm").addEventListener("click", (e) => {
+    window[shortcutID] = settingsHeldKeys.join("+");
+
+    document.getElementById(shortcutID).innerText =  window[shortcutID];
+
+    localStorage.setItem(shortcutID, window[shortcutID]);
 });

@@ -1,4 +1,4 @@
-const VERSION = "1.6.1";
+const VERSION = "1.6.2";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -25,6 +25,10 @@ var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStora
 
 var onMouseDown = localStorage.getItem("onMouseDown") != "false";
 var chording = localStorage.getItem("chording") != "false";
+
+var restartShortcut = localStorage.getItem("restartShortcut") ?? "ESCAPE";
+var settingsShortcut = localStorage.getItem("settingsShortcut") ?? "S";
+
 var flagHold = isNaN(Number(localStorage.getItem("flagHold"))) || Number(localStorage.getItem("flagHold")) <= 100 ?  500 : Number(localStorage.getItem("flagHold"));
 
 var showTimer = localStorage.getItem("showTimer") != "false";
@@ -704,11 +708,15 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
         document.getElementById("game").style.display = "block";
         document.getElementById("settings").style.display = "none";
 
+        document.getElementById("keybindsScreen").style.display = "none";
+
         refreshMap();
         draw(true);
     } else {
         document.getElementById("game").style.display = "none";
         document.getElementById("settings").style.display = "block";
+
+        document.getElementById("keybindsScreen").style.display = "none";
 
         inGame = false;
 
@@ -722,14 +730,66 @@ if (sessionStorage.getItem("pointer") == "true") {
     canvas.style.cursor = "pointer"; 
 }
 
+document.addEventListener('keydown', function(e) {
+    if (document.getElementById("keybindsScreen").style.display == "flex" && shortcutID != "") return
+    let heldKeys = [];
+    if (e.ctrlKey) {
+        heldKeys.push("CONTROL");
+    }
 
-document.addEventListener('keydown', function(event) {
-    if(event.key == "Escape") {
+    if (e.altKey) {
+        heldKeys.push("ALT");
+    }
+
+    if (e.shiftKey) {
+        heldKeys.push("SHIFT");
+    }
+
+    if (!heldKeys.includes(e.key.toUpperCase())) {
+        heldKeys.push(e.key.toUpperCase());
+    }
+
+    if (heldKeys.join("+") == restartShortcut) {
         inGame = false;
     
         clearInterval(interval);
         
         refreshMap();
         draw(true);
+    } else if (heldKeys.join("+") == settingsShortcut) {
+        if (document.getElementById("game").style.display == "none") {
+            document.getElementById("game").style.display = "block";
+            document.getElementById("settings").style.display = "none";
+
+            document.getElementById("keybindsScreen").style.display = "none";
+    
+            refreshMap();
+            draw(true);
+        } else {
+            document.getElementById("game").style.display = "none";
+            document.getElementById("settings").style.display = "block";
+
+            document.getElementById("keybindsScreen").style.display = "none";
+    
+            inGame = false;
+    
+            clearInterval(interval);
+    
+            refreshMap();
+        }
     }
+    
 });
+
+/* TODO (not in order)
+ - 100% random board setting - (allow mines in 8 adjacent squares to first click)
+ - Pause/unpause shortcut
+ - More themes
+ - Hints, enable hint setting
+ - Share map+map id
+ - Google SEO, meta, description, etc...
+ - Import/export themes
+ - Import/export settings
+ - favicon
+ - Infinite lives
+*/
