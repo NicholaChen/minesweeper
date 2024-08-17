@@ -1,4 +1,4 @@
-const VERSION = "1.7.0";
+const VERSION = "1.7.1";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 

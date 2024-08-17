@@ -774,7 +774,7 @@ document.getElementById("shareSettings").addEventListener("click", (e) => {
         t: theme
     }));
 
-    navigator.clipboard.writeText(document.location.origin + "?s=" + h);
+    navigator.clipboard.writeText("nicholachen.github.io/minesweeper?s=" + h);
 
     document.getElementById("invalidAdvanced").innerText = "Share link copied.";
         
