@@ -1,4 +1,4 @@
-const VERSION = "1.6.3";
+const VERSION = "1.6.4";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -18,6 +18,8 @@ const ctx = canvas.getContext("2d");
 const margin = 0.03; // percentage of each grid square
 
 const canvasMargin = 16; // pixels
+
+var settings = false;
 
 var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ?  10 : Number(localStorage.getItem("mapX"));
 var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ?  10 : Number(localStorage.getItem("mapY"));
@@ -143,13 +145,13 @@ function adjacentMines(x,y) {
     return m;
 }
 
-function adjacentFlags(x,y) {
+function adjacentFlags(x,y) { // flags + opened mines on infinite lives
     let f = 0;
     for (let i=-1;i<=1;i++) {
         for (let j=-1;j<=1;j++) {
             if (i != 0 || j != 0) {
                 if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                    if (map[y+j][x+i].flagged) {
+                    if (map[y+j][x+i].flagged || (map[y+j][x+i].opened && map[y+j][x+i].value == -1)) {
                         f += 1;
                     }
                 }
@@ -666,28 +668,18 @@ canvas.addEventListener("touchend", (e) => {
 })
 
 var pauseStart;
-function pause() {
-    if (inGame) {
-        paused = !paused;
+function unpause() {
+    if (paused) {
+        paused = false;
         
-        if (paused) {
-            pauseStart = Date.now();
-            
-            document.getElementById("pause").classList.remove("fa-circle-pause");
-            document.getElementById("pause").classList.add("fa-circle-play");
-            
-            canvas.style.display = "none"
-            document.getElementById("pausedScreen").style.display = "flex";
-        } else {
-            
-            pausedTime += Date.now() - pauseStart;
-            document.getElementById("pause").classList.remove("fa-circle-play");
-            document.getElementById("pause").classList.add("fa-circle-pause");
-            
-            canvas.style.display = "block";
-            document.getElementById("pausedScreen").style.display = "none";
-        }
+        pausedTime += Date.now() - pauseStart;
+        document.getElementById("pause").classList.remove("fa-circle-play");
+        document.getElementById("pause").classList.add("fa-circle-pause");
         
+        canvas.style.display = "block";
+        document.getElementById("pausedScreen").style.display = "none";
+
+         
         let elapsedTime = Date.now() - startTime;
         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
 
@@ -696,7 +688,41 @@ function pause() {
     }
 }
 
-document.getElementById("pauseButton").addEventListener("click", pause);
+function pause() {
+    if (!paused) {
+        paused = true;
+
+        pauseStart = Date.now();
+            
+        document.getElementById("pause").classList.remove("fa-circle-pause");
+        document.getElementById("pause").classList.add("fa-circle-play");
+        
+        canvas.style.display = "none"
+        document.getElementById("pausedScreen").style.display = "flex";
+
+        let elapsedTime = Date.now() - startTime;
+        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+
+        draw(true);
+    }
+}
+
+
+var lastPause = paused;
+
+function pauseUnpause() {
+    if (settings || !inGame) return;
+
+    if (lastPause) {
+        unpause();
+    } else {
+        pause();
+    }
+
+    lastPause = paused;
+}
+
+document.getElementById("pauseButton").addEventListener("click", pauseUnpause);
 
 document.getElementById("restartButton").addEventListener("click", (e) => {
     inGame = false;
@@ -754,7 +780,7 @@ document.addEventListener('keydown', function(e) {
     }
 
     if (heldKeys.join("+") == pauseShortcut) {
-        pause();
+        pauseUnpause();
     } else if (heldKeys.join("+") == restartShortcut) {
         inGame = false;
     
@@ -764,27 +790,23 @@ document.addEventListener('keydown', function(e) {
         draw(true);
     } else if (heldKeys.join("+") == settingsShortcut) {
         if (document.getElementById("game").style.display == "none") {
+            settings = false;
             document.getElementById("game").style.display = "block";
             document.getElementById("settings").style.display = "none";
 
             document.getElementById("keybindsScreen").style.display = "none";
     
-            refreshMap();
-            draw(true);
+            if (inGame && !lastPause) unpause();
         } else {
+            settings = true;
             document.getElementById("game").style.display = "none";
             document.getElementById("settings").style.display = "block";
 
             document.getElementById("keybindsScreen").style.display = "none";
     
-            inGame = false;
-    
-            clearInterval(interval);
-    
-            refreshMap();
+            if (inGame) pause();
         }
     }
-    
 });
 
 /* TODO (not in order)
@@ -793,9 +815,10 @@ document.addEventListener('keydown', function(e) {
  - More themes
  - Hints, enable hint setting
  - Share map+map id
- - Google SEO, meta, description, etc...
+ ~ Google SEO, meta, description, etc...
  - Import/export themes
  - Import/export settings
  - favicon
- - Infinite lives
+ X Infinite lives
+ X settings page doesn't reset game
 */

@@ -25,6 +25,14 @@ if (infiniteLives) {
 }
 
 
+function resetGame() {
+    inGame = false;
+    
+    clearInterval(interval);
+
+    refreshMap();
+
+}
 document.getElementById("saveMapSize").addEventListener("click", (e) => {
     let width_issue = "";
     let height_issue = "";
@@ -66,8 +74,8 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
         size_x = Number(document.getElementById("width").value);
         size_y = Number(document.getElementById("height").value);
         
-        refreshMap();
-        
+        resetGame();
+
         if (numMines > Math.floor(size_x * size_y / 2)) {
             numMines = Math.floor(size_x * size_y / 2);
             
@@ -122,7 +130,9 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
         
         document.getElementById("invalidGameplay").style.display = "block";
         
-        numMines = Number(document.getElementById("numMines").value)
+        numMines = Number(document.getElementById("numMines").value);
+        
+        resetGame();
         
         localStorage.setItem("mines", numMines);
         
@@ -214,6 +224,7 @@ for (let i=0;i<shortcuts.length;i++) {
     document.getElementById(shortcuts[i]).addEventListener("click", (e) => {
         document.getElementById("keybindsScreen").style.display = "flex";
         document.getElementById("keyList").innerText = "Press any key";
+        document.getElementById("keybindConfirm").style.display = "none";
     
         shortcutID = shortcuts[i];
     });
