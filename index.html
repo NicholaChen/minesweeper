@@ -59,7 +59,7 @@
                     <h1 style="text-align: center; margin: 0; vertical-align: middle;">Paused</h1>
                 </div>
                 <div style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; pointer-events: none;" id="clickAnywhere">
-                    <h1 style="text-align: center; margin: 0; vertical-align: middle;">Click anywhere to begin</h1>
+                    <h1 style="text-align: center; margin: 0; vertical-align: middle;">Open any tile to begin</h1>
                 </div>
             </div>
 
@@ -94,6 +94,13 @@
                         </button>
                     </div>
                 </div>
+                <div class="settingsDiv">
+                    <h3>Infinite lives</h2>
+                        <div>
+                            <button style="margin: 0 8px 0 0;" id="infiniteLivesOff">Off</button>
+                            <button id="infiniteLivesOn">On</button>
+                        </div>
+                </div>
                 <p style="text-align: center; display: none;" id="invalidGameplay"></p>
                 <div>
                     <h2 style="display: inline;">Controls</h2>
@@ -114,16 +121,22 @@
                     </div>
                 </div>
                 <div class="settingsDiv">
+                    <h3>Pause/unpause shortcut</h2>
+                    <div>
+                        <button class="keybind" id="pauseShortcut"></button>
+                    </div>
+                </div>
+                <div class="settingsDiv">
                     <h3>Restart shortcut</h2>
-                        <div>
-                            <button class="keybind" id="restartShortcut"></button>
-                        </div>
+                    <div>
+                        <button class="keybind" id="restartShortcut"></button>
+                    </div>
                 </div>
                 <div class="settingsDiv">
                     <h3>Settings shortcut</h2>
-                        <div>
-                            <button class="keybind" id="settingsShortcut"></button>
-                        </div>
+                    <div>
+                        <button class="keybind" id="settingsShortcut"></button>
+                    </div>
                 </div>
                 <div class="settingsDiv">
                     <h3>Mobile hold duration to flag (ms)</h3>

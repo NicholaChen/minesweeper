@@ -1,4 +1,4 @@
-const VERSION = "1.6.2";
+const VERSION = "1.6.3";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -23,9 +23,12 @@ var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage
 var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ?  10 : Number(localStorage.getItem("mapY"));
 var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ?  15 : Number(localStorage.getItem("mines"));
 
+var infiniteLives = localStorage.getItem("infiniteLives") == "true";
+
 var onMouseDown = localStorage.getItem("onMouseDown") != "false";
 var chording = localStorage.getItem("chording") != "false";
 
+var pauseShortcut = localStorage.getItem("pauseShortcut") ?? "SPACE";
 var restartShortcut = localStorage.getItem("restartShortcut") ?? "ESCAPE";
 var settingsShortcut = localStorage.getItem("settingsShortcut") ?? "S";
 
@@ -198,30 +201,31 @@ function exposeTile(x,y) {
     } else if (map[y][x].value == -1) {
         map[y][x].opened = true; // LOSE
 
-        inGame = false;
+        if (!infiniteLives) {
+            inGame = false;
 
-        clearInterval(interval);
-        let elapsedTime = Date.now() - startTime;
-        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+            clearInterval(interval);
+            let elapsedTime = Date.now() - startTime;
+            document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
 
-        hours += elapsedTime - pausedTime;
+            hours += elapsedTime - pausedTime;
 
-        document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
+            document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
 
-        localStorage.setItem("hours", hours);
+            localStorage.setItem("hours", hours);
 
-        for (let x=0;x<size_x;x++) {
-            for (let y=0;y<size_y;y++) {
-                if (map[y][x].value == -1) {
-                    map[y][x].opened = true;
+            for (let x=0;x<size_x;x++) {
+                for (let y=0;y<size_y;y++) {
+                    if (map[y][x].value == -1) {
+                        map[y][x].opened = true;
+                    }
                 }
             }
+            document.getElementById("time").style.display = "none";
+            document.getElementById("bestTime").style.display = "none";
+            document.getElementById("gameEndText").innerText = "Game Over!";
+            document.getElementById("gameEnd").style.display = "flex";
         }
-        document.getElementById("time").style.display = "none";
-        document.getElementById("bestTime").style.display = "none";
-        document.getElementById("gameEndText").innerText = "Game Over!";
-        document.getElementById("gameEnd").style.display = "flex";
-        
     } else {
         map[y][x].opened = true;
     }
@@ -413,17 +417,16 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
 });
 
 document.addEventListener("mousemove", (e) => {
-    if (!inGame) return;
-
     let canvasX = e.clientX - canvasMargin;
     let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
     
-    if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
-        canvas.style.cursor = "pointer";
-    } else {
-        canvas.style.cursor = "default";
-    }
-
+    if (first && !inGame || inGame) {
+        if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+            canvas.style.cursor = "pointer";
+        } else {
+            canvas.style.cursor = "default";
+        }
+    } 
     sessionStorage.setItem("pointer", overSquare(canvasX,canvasY) != null);
 });
 
@@ -663,8 +666,7 @@ canvas.addEventListener("touchend", (e) => {
 })
 
 var pauseStart;
-
-document.getElementById("pauseButton").addEventListener("click", (e) => {
+function pause() {
     if (inGame) {
         paused = !paused;
         
@@ -692,7 +694,9 @@ document.getElementById("pauseButton").addEventListener("click", (e) => {
         
         draw(true);
     }
-});
+}
+
+document.getElementById("pauseButton").addEventListener("click", pause);
 
 document.getElementById("restartButton").addEventListener("click", (e) => {
     inGame = false;
@@ -746,10 +750,12 @@ document.addEventListener('keydown', function(e) {
     }
 
     if (!heldKeys.includes(e.key.toUpperCase())) {
-        heldKeys.push(e.key.toUpperCase());
+        heldKeys.push(e.key.toUpperCase().replace(" ", "SPACE"));
     }
 
-    if (heldKeys.join("+") == restartShortcut) {
+    if (heldKeys.join("+") == pauseShortcut) {
+        pause();
+    } else if (heldKeys.join("+") == restartShortcut) {
         inGame = false;
     
         clearInterval(interval);
@@ -783,7 +789,7 @@ document.addEventListener('keydown', function(e) {
 
 /* TODO (not in order)
  - 100% random board setting - (allow mines in 8 adjacent squares to first click)
- - Pause/unpause shortcut
+ X Pause/unpause shortcut
  - More themes
  - Hints, enable hint setting
  - Share map+map id

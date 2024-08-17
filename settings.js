@@ -18,6 +18,12 @@ if (!showFlags) document.getElementById("h2Flags").style.display = "none";
 if (!showPause) document.getElementById("pauseButton").style.display = "none";
 if (!showRestart) document.getElementById("restartButton").style.display = "none";
 
+if (infiniteLives) {
+    document.getElementById("infiniteLivesOff").classList.add("unselected");
+} else {
+    document.getElementById("infiniteLivesOn").classList.add("unselected");
+}
+
 
 document.getElementById("saveMapSize").addEventListener("click", (e) => {
     let width_issue = "";
@@ -57,8 +63,10 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
             document.getElementById("invalidGameplay").style.display = "none";
         }, settingsMessageDuration);
     } else {
-        size_x = Number(document.getElementById("width").value)
-        size_y = Number(document.getElementById("height").value)
+        size_x = Number(document.getElementById("width").value);
+        size_y = Number(document.getElementById("height").value);
+        
+        refreshMap();
         
         if (numMines > Math.floor(size_x * size_y / 2)) {
             numMines = Math.floor(size_x * size_y / 2);
@@ -128,6 +136,25 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
     }
 });
 
+
+document.getElementById("infiniteLivesOff").addEventListener("click", (e) => {
+    document.getElementById("infiniteLivesOff").classList.remove("unselected");
+    document.getElementById("infiniteLivesOn").classList.add("unselected");
+
+    infiniteLives = false;
+
+    localStorage.setItem("infiniteLives", infiniteLives);
+});
+
+document.getElementById("infiniteLivesOn").addEventListener("click", (e) => {
+    document.getElementById("infiniteLivesOn").classList.remove("unselected");
+    document.getElementById("infiniteLivesOff").classList.add("unselected");
+
+    infiniteLives = true;
+
+    localStorage.setItem("infiniteLives", infiniteLives);
+});
+
 if (onMouseDown) {
     document.getElementById("onMouseDownOff").classList.add("unselected");
 } else {
@@ -179,13 +206,14 @@ document.getElementById("chordingOn").addEventListener("click", (e) => {
 
 var shortcutID = ""
 
-var shortcuts = ["restartShortcut", "settingsShortcut"];
+var shortcuts = ["restartShortcut", "settingsShortcut", "pauseShortcut"];
 
 for (let i=0;i<shortcuts.length;i++) {
     document.getElementById(shortcuts[i]).innerText = window[shortcuts[i]];
 
     document.getElementById(shortcuts[i]).addEventListener("click", (e) => {
         document.getElementById("keybindsScreen").style.display = "flex";
+        document.getElementById("keyList").innerText = "Press any key";
     
         shortcutID = shortcuts[i];
     });
@@ -531,6 +559,14 @@ function resetGameplay() {
 
     numMines = 15;
 
+    infiniteLives = false;
+
+    document.getElementById("infiniteLivesOff").classList.remove("unselected");
+    document.getElementById("infiniteLivesOn").classList.add("unselected");
+
+    
+    localStorage.setItem("infiniteLives", false);
+
     document.getElementById("width").value = size_x;
     document.getElementById("height").value = size_y;
 
@@ -557,6 +593,7 @@ function resetControls() {
     onMouseDown = true;
     chording = true;
     
+    pauseShortcut = "SPACE";
     restartShortcut = "ESCAPE";
     settingsShortcut = "S";
     
@@ -688,7 +725,7 @@ document.addEventListener("keydown", (e) => {
         }
 
         if (!settingsHeldKeys.includes(e.key.toUpperCase())) {
-            settingsHeldKeys.push(e.key.toUpperCase());
+            settingsHeldKeys.push(e.key.toUpperCase().replace(" ", "SPACE"));
         }
 
         document.getElementById("keyList").innerText = settingsHeldKeys.join("+");
