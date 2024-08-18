@@ -1,4 +1,4 @@
-const VERSION = "1.7.2";
+const VERSION = "1.7.3";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -156,6 +156,8 @@ function refreshMap() {
     document.getElementById("gameEnd").style.display = "none";
 
     paused = false;
+    lastPause = false;
+
     document.getElementById("pause").classList.remove("fa-circle-play");
     document.getElementById("pause").classList.add("fa-circle-pause");
 
@@ -813,6 +815,10 @@ document.getElementById("restartButton").addEventListener("click", (e) => {
     
     refreshMap();
     draw(true);
+
+    if (sessionStorage.getItem("pointer") == "true") {
+        canvas.style.cursor = "pointer"; 
+    }
 });
 
 document.getElementById("settingsButton").addEventListener("click", (e) => {
@@ -872,15 +878,22 @@ document.addEventListener('keydown', function(e) {
     }
 
     if (heldKeys.join("+") == pauseShortcut) {
+        e.preventDefault();
         pauseUnpause();
     } else if (heldKeys.join("+") == restartShortcut) {
+        e.preventDefault();
         inGame = false;
     
         clearInterval(interval);
         
         refreshMap();
         draw(true);
+        
+        if (sessionStorage.getItem("pointer") == "true") {
+            canvas.style.cursor = "pointer"; 
+        }
     } else if (heldKeys.join("+") == settingsShortcut) {
+        e.preventDefault();
         if (document.getElementById("game").style.display == "none") {
             settings = false;
             document.getElementById("game").style.display = "block";

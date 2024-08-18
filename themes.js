@@ -113,6 +113,27 @@ var themes = {
         text: "#93a1a1",
         flag: "#dc322f",
         flag_stem: "#dc322f"
+    },
+    github_light: {
+        name: "GitHub Light",
+        key: "github_light",
+        background_color: "#FFFFFF",
+        text_color: "#1F2328",
+        top_color: "#F6F8FA",
+        top_text_color: "#636C76",
+        accent_color: "#1F883D",
+        accent_hover_color: "#1C8139",
+        accent_text_color: "#FFFFFF",
+        input_color: "#F6F8FA",
+        input_hover_color: "#F6F8FA",
+        input_text_color: "#1F2328",
+        unselected_color: "#F6F8FA",
+        unselected_text_color: "#1F2328",
+        unopened: "#DDF4FF",
+        opened: "#F6F8FA",
+        text: "#636C76",
+        flag: "#D1242F",
+        flag_stem: "#A40E26"
     }
 }
 

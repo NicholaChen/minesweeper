@@ -38,6 +38,7 @@ button {
 }
 button:hover {
     background-color: var(--accent-hover-color);
+    color: var(--accent-text-color);
 }
 
 button.keybind {

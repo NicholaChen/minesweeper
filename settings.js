@@ -631,6 +631,7 @@ function resetControls() {
     
     for (let i=0;i<shortcuts.length;i++) {
         localStorage.setItem(shortcuts[i], window[shortcuts[i]]);
+        document.getElementById(shortcuts[i]).innerText = window[shortcuts[i]];
     }
     
     flagHold = 500;
