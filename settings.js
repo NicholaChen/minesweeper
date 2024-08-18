@@ -388,6 +388,7 @@ document.getElementById("showRestartOn").addEventListener("click", (e) => {
 if (theme.key == "custom") {
     document.getElementById("presetThemeButton").classList.add("unselected");
     document.getElementById("customTheme").style.display = "block";
+    document.getElementById("shareThemeDiv").style.display = "flex";
 } else {
     document.getElementById("customThemeButton").classList.add("unselected");
     document.getElementById("themes-list").style.display = "block";
@@ -398,6 +399,7 @@ document.getElementById("presetThemeButton").addEventListener("click", (e) => {
     document.getElementById("customThemeButton").classList.add("unselected");
 
     document.getElementById("customTheme").style.display = "none";
+    document.getElementById("shareThemeDiv").style.display = "none";
     document.getElementById("themes-list").style.display = "block";
 
     for (let i = 0; i < document.getElementById("themes-list").children.length; i++) {
@@ -418,6 +420,7 @@ document.getElementById("customThemeButton").addEventListener("click", (e) => {
 
     document.getElementById("themes-list").style.display = "none";
     document.getElementById("customTheme").style.display = "block";
+    document.getElementById("shareThemeDiv").style.display = "flex";
 
     theme = themes.custom;
     localStorage.setItem("theme", theme.key);
@@ -665,6 +668,7 @@ function resetAppearance() {
     document.getElementById("customThemeButton").classList.add("unselected");
 
     document.getElementById("customTheme").style.display = "none";
+    document.getElementById("shareThemeDiv").style.display = "none";
     document.getElementById("themes-list").style.display = "block";
 
     for (let i = 0; i < document.getElementById("themes-list").children.length; i++) {

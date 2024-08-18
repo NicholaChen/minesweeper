@@ -1,4 +1,4 @@
-const VERSION = "1.7.0";
+const VERSION = "1.7.1";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -58,6 +58,20 @@ function readSetting() {
         
             let t = JSON.parse(atob(s));
 
+            if (t.t == null) return;
+
+            theme = t.t;
+            
+            if (theme.key == "custom") {
+                themes.custom = theme;
+            }
+
+            setTheme(theme);
+
+            document.getElementById("saveImportedSettings").innerText = "Save imported theme";
+            document.getElementById("cancelImportedSettings").innerText = "Cancel imported theme";
+
+
             if (typeof(t.w) != "number" || t.w < 5 || t.w >= 100) return
             if (typeof(t.h) != "number" || t.h < 5 || t.h >= 100) return
             if (typeof(t.n) != "number" || t.n <= 0 || t.h > Math.floor(t.w * t.h / 2)) return
@@ -77,8 +91,6 @@ function readSetting() {
             if (typeof(t.sp) != "boolean") return;
             if (typeof(t.sr) != "boolean") return;
 
-
-            if (t.t == null) return;
 
             size_x = t.w;
             size_y = t.h;
@@ -100,14 +112,8 @@ function readSetting() {
             showPause - t.sp;
             showRestart = t.sr;
 
-            theme = t.t;
-            
-            if (theme.key == "custom") {
-                themes.custom = theme;
-            }
-
-            setTheme(theme);
-
+            document.getElementById("saveImportedSettings").innerText = "Save imported settings";
+            document.getElementById("cancelImportedSettings").innerText = "Cancel imported settings";
 
             document.getElementById("saveImportedSettings").style.display = "inline";
             document.getElementById("cancelImportedSettings").style.display = "inline";
