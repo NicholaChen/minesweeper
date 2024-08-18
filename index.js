@@ -1,4 +1,4 @@
-const VERSION = "1.7.1";
+const VERSION = "1.7.2";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -71,6 +71,8 @@ function readSetting() {
             document.getElementById("saveImportedSettings").innerText = "Save imported theme";
             document.getElementById("cancelImportedSettings").innerText = "Cancel imported theme";
 
+            document.getElementById("saveImportedSettings").style.display = "inline";
+            document.getElementById("cancelImportedSettings").style.display = "inline";
 
             if (typeof(t.w) != "number" || t.w < 5 || t.w >= 100) return
             if (typeof(t.h) != "number" || t.h < 5 || t.h >= 100) return
@@ -901,12 +903,11 @@ document.addEventListener('keydown', function(e) {
 
 /* TODO (not in order)
  X Pause/unpause shortcut
- - More themes
- - Hints, enable hint setting
+ ~ More themes
  - Share map+map id
  X Google SEO, meta, description, etc...
- - Import/export themes
- - Import/export settings
+ X Import/export themes
+ X Import/export settings
  X favicon
  X Infinite lives
  X settings page doesn't reset game

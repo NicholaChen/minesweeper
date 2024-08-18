@@ -559,6 +559,24 @@ for (const [key, value] of Object.entries(themeColors)) {
     document.getElementById("customTheme").appendChild(settingsDiv);
 }
 
+document.getElementById("shareTheme").addEventListener("click", (e) => {
+    let h = btoa(JSON.stringify({
+        t: theme
+    }));
+
+    navigator.clipboard.writeText("nicholachen.github.io/minesweeper?s=" + h);
+
+    document.getElementById("invalidAppearance").innerText = "Share link copied.";
+    document.getElementById("invalidAppearance").style.display = "block";
+
+
+    if (appearanceTimeout != null) clearTimeout(appearanceTimeout);
+
+    appearanceTimeout = setTimeout(function() {
+        document.getElementById("invalidAppearance").style.display = "none";
+    }, settingsMessageDuration);
+});
+
 
 
 document.getElementById("wins").innerText = wins;

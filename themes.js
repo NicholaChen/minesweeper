@@ -71,6 +71,48 @@ var themes = {
         text: "#33FF33",
         flag: "#33FF33",
         flag_stem: "#33FF33"
+    },
+    solarized_dark: {
+        name: "Solarized Dark",
+        key: "solarized_dark",
+        background_color: "#002B36",
+        text_color: "#93a1a1",
+        top_color: "#073642",
+        top_text_color: "#93a1a1",
+        accent_color: "#073642",
+        accent_hover_color: "#073642",
+        accent_text_color: "#268bd2",
+        input_color: "#073642",
+        input_hover_color: "#073642",
+        input_text_color: "#859900",
+        unselected_color: "#002B36",
+        unselected_text_color: "#657b83",
+        unopened: "#073642",
+        opened: "#002B36",
+        text: "#93a1a1",
+        flag: "#dc322f",
+        flag_stem: "#dc322f"
+    },
+    solarized_light: {
+        name: "Solarized Light",
+        key: "solarized_light",
+        background_color: "#eee8d5",
+        text_color: "#93a1a1",
+        top_color: "#fdf6e3",
+        top_text_color: "#93a1a1",
+        accent_color: "#fdf6e3",
+        accent_hover_color: "#fdf6e3",
+        accent_text_color: "#268bd2",
+        input_color: "#fdf6e3",
+        input_hover_color: "#fdf6e3",
+        input_text_color: "#859900",
+        unselected_color: "#eee8d5",
+        unselected_text_color: "#657b83",
+        unopened: "#fdf6e3",
+        opened: "#eee8d5",
+        text: "#93a1a1",
+        flag: "#dc322f",
+        flag_stem: "#dc322f"
     }
 }
 
