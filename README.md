@@ -20,7 +20,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - `Pause/unpause shortcut` - Selects keyboard shortcut to pause and unpause game `Default: SPACE`
  - `Restart shortcut` - Selects keyboard shortcut to restart game `Default: ESC`
  - `Settings shortcut` - Selects keybaord shortcut open and close the settings page `Default: S`
- - `Mobile hold duration to flag` - Minimum time in ms needed to tap and hold on mobile in order to flag a square `>=100` `Default: 500`
+ - `Mobile hold duration to flag` - Minimum time in ms needed to tap and hold on mobile in order to flag a square `>=50` `Default: 250`
 ### Appearance
  - `Show timer` - Selects if the timer should be displayed in the header `Off/On` `Default: On`
  - `Show number of flags` - Selects if the flag counter should be displayed in the header `Off/On` `Default: On`

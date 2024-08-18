@@ -235,8 +235,8 @@ document.getElementById("saveFlagHold").addEventListener("click", (e) => {
     
     if (isNaN(Number(document.getElementById("flagHold").value))) {
         i = "Invalid " + "('" + document.getElementById("flagHold").value + "').";
-    } else if (Number(document.getElementById("flagHold").value) < 100) {
-        i = "Invalid " + "('" + document.getElementById("flagHold").value + "'). Must be at least 100.";
+    } else if (Number(document.getElementById("flagHold").value) < 50) {
+        i = "Invalid " + "('" + document.getElementById("flagHold").value + "'). Must be at least 50.";
     }
     if (i != "") {
         document.getElementById("invalidControls").innerText = "Could not save 'Mobile hold duration to flag'. " + i;
@@ -634,7 +634,7 @@ function resetControls() {
         document.getElementById(shortcuts[i]).innerText = window[shortcuts[i]];
     }
     
-    flagHold = 500;
+    flagHold = 250;
 
     localStorage.setItem("onMouseDown", onMouseDown);
     localStorage.setItem("chording", chording);

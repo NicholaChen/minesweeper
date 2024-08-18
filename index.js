@@ -1,4 +1,4 @@
-const VERSION = "1.7.3";
+const VERSION = "1.8.0";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -33,7 +33,7 @@ var pauseShortcut = localStorage.getItem("pauseShortcut") ?? "SPACE";
 var restartShortcut = localStorage.getItem("restartShortcut") ?? "ESCAPE";
 var settingsShortcut = localStorage.getItem("settingsShortcut") ?? "S";
 
-var flagHold = isNaN(Number(localStorage.getItem("flagHold"))) || Number(localStorage.getItem("flagHold")) <= 100 ?  500 : Number(localStorage.getItem("flagHold"));
+var flagHold = isNaN(Number(localStorage.getItem("flagHold"))) || Number(localStorage.getItem("flagHold")) < 50 ?  250 : Number(localStorage.getItem("flagHold"));
 
 var showTimer = localStorage.getItem("showTimer") != "false";
 var showFlags = localStorage.getItem("showFlags") != "false";
@@ -210,6 +210,9 @@ function generate(mines, firstx, firsty) {
             }
         }
     }
+    
+    
+    threeBV()
 }
 
 function adjacentMines(x,y) {
@@ -246,26 +249,147 @@ function adjacentFlags(x,y) { // flags + opened mines on infinite lives
     return f;
 }
 
+function threeBV() {
+    let m = [];
+    for (let i = 0; i < size_y; i++) {
+        m[i] = [];
+        for (let j = 0; j < size_x; j++) {
+            m[i][j] = Object.assign({}, map[i][j]);
+        }
+    }
+    
+    let i=0;
+    for (let y = 0; y < size_y; y++) {
+        for (let x = 0; x < size_x; x++) {
+            if (!m[y][x].opened) {
+                if (m[y][x].value == 0) {
+                    _exposeTile(m,x,y);
+                    
+                    i++;
+                } else if (map[y][x].value > 0) {
+                    m[y][x].opened = true;
+                    
+                    i++;
+                }
+            }
+        }
+    }
+    
+    console.log(i)
+    
+    return i
+}
 
 function idToTile(n) {
     return {x: n%size_x, y: Math.floor(n/size_x)}
 }
-
 function exposeTile(x,y) {
-
     if (!inGame || paused || x < 0 || x >= size_x || y < 0 || y >= size_y) {
         return
     }
+    if (map[y][x].opened) return;
+    
     if (map[y][x].value == 0) {
+        _exposeTile(map,x,y);
+    } else if (map[y][x].value == -1) {
+        map[y][x].opened = true; // LOSE
+    
+        if (!infiniteLives) {
+            inGame = false;
+
+            clearInterval(interval);
+            let elapsedTime = Date.now() - startTime;
+            document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+    
+            hours += elapsedTime - pausedTime;
+    
+            document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
+    
+            localStorage.setItem("hours", hours);
+    
+            for (let x = 0; x < size_x; x++) {
+                for (let y = 0; y < size_y; y++) {
+                    if (map[y][x].value == -1) {
+                        map[y][x].opened = true;
+                    }
+                }
+            }
+            document.getElementById("time").style.display = "none";
+            document.getElementById("bestTime").style.display = "none";
+            document.getElementById("gameEndText").innerText = "Game Over!";
+            document.getElementById("gameEnd").style.display = "flex";
+        }
+    } else {
+        map[y][x].opened = true;
+    }
+    
+    
+    let f = 0;
+    
+    for (let x = 0; x < size_x; x++) {
+        for (let y = 0; y < size_y; y++) {
+            if (map[y][x].flagged) {
+                f++;
+            }
+        }
+    }
+    
+    flags = f;
+    document.getElementById("flags").innerText = flags + "/" + numMines.toString();
+    
+    let opened = true;
+    
+    for (let x = 0; x < size_x; x++) {
+        for (let y = 0; y < size_y; y++) {
+            if (!map[y][x].opened && map[y][x].value != -1) {
+                opened = false;
+                break;
+            }
+        }
+    }
+    
+    if (opened) { // WIN (all tiles opened)
+        inGame = false;
+        clearInterval(interval);
+        let elapsedTime = Date.now() - startTime;
+        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+    
+        hours += elapsedTime - pausedTime;
+        wins += 1;
+    
+        document.getElementById("wins").innerText = wins;
+        document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
+    
+        localStorage.setItem("wins", wins);
+        localStorage.setItem("hours", hours);
+    
+        document.getElementById("time").style.display = "block";
+        document.getElementById("bestTime").style.display = "none";
+        if ((elapsedTime - pausedTime) / 1000 < 60) {
+            document.getElementById("time").innerText = "Time: " + timeToText((elapsedTime - pausedTime) / 1000);
+        } else {
+            document.getElementById("time").innerText = "Time: " + ((elapsedTime - pausedTime) / 1000).toFixed(1) + "s" + " (" + timeToText((elapsedTime - pausedTime) / 1000) + ")";
+        }
+    
+        document.getElementById("gameEndText").innerText = "You Win!";
+        document.getElementById("gameEnd").style.display = "flex";
+    }
+}
+function _exposeTile(m,x,y) {
+
+    if (x < 0 || x >= size_x || y < 0 || y >= size_y) {
+        return
+    }
+    if (m[y][x].value == 0) {
         let n = [y*size_x + x];
         let done = [y*size_x + x];
 
         while (true) {
             let n_ = [];
             for (let a=0;a<n.length;a++) {
-                map[idToTile(n[a]).y][idToTile(n[a]).x].opened = true;
-                map[idToTile(n[a]).y][idToTile(n[a]).x].flagged = false;
-                if (map[idToTile(n[a]).y][idToTile(n[a]).x].value == 0) {
+                m[idToTile(n[a]).y][idToTile(n[a]).x].opened = true;
+                m[idToTile(n[a]).y][idToTile(n[a]).x].flagged = false;
+                if (m[idToTile(n[a]).y][idToTile(n[a]).x].value == 0) {
                     for (let i=-1;i<=1;i++) {
                         for (let j=-1;j<=1;j++) {
                             if (idToTile(n[a]).x+i>=0 && idToTile(n[a]).x+i<size_x && idToTile(n[a]).y+j>=0 && idToTile(n[a]).y+j<size_y && !done.includes((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i)) {
@@ -282,101 +406,15 @@ function exposeTile(x,y) {
 
             n = n_;
         }
-
-
-    } else if (map[y][x].value == -1) {
-        map[y][x].opened = true; // LOSE
-
-        if (!infiniteLives) {
-            inGame = false;
-
-            clearInterval(interval);
-            let elapsedTime = Date.now() - startTime;
-            document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-
-            hours += elapsedTime - pausedTime;
-
-            document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
-
-            localStorage.setItem("hours", hours);
-
-            for (let x=0;x<size_x;x++) {
-                for (let y=0;y<size_y;y++) {
-                    if (map[y][x].value == -1) {
-                        map[y][x].opened = true;
-                    }
-                }
-            }
-            document.getElementById("time").style.display = "none";
-            document.getElementById("bestTime").style.display = "none";
-            document.getElementById("gameEndText").innerText = "Game Over!";
-            document.getElementById("gameEnd").style.display = "flex";
-        }
-    } else {
-        map[y][x].opened = true;
     }
-
-
-    let f = 0;
-
-    for (let x=0;x<size_x;x++) {
-        for (let y=0;y<size_y;y++) {
-            if (map[y][x].flagged) {
-                f++;
-            }
-        }
-    }
-
-    flags = f;
-    document.getElementById("flags").innerText = flags + "/" + numMines.toString();
-
-    let opened = true;
-
-    for (let x=0;x<size_x;x++) {
-        for (let y=0;y<size_y;y++) {
-            if (!map[y][x].opened && map[y][x].value != -1) {
-                opened = false;
-                break;
-            }
-        }
-    }
-
-    if (opened) { // WIN (all tiles opened)
-        inGame = false;
-        clearInterval(interval);
-        let elapsedTime = Date.now() - startTime;
-        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-
-        hours += elapsedTime - pausedTime;
-        wins += 1;
-
-        document.getElementById("wins").innerText = wins;
-        document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
-
-        localStorage.setItem("wins", wins);
-        localStorage.setItem("hours", hours);
-
-        document.getElementById("time").style.display = "block";
-        document.getElementById("bestTime").style.display = "none";
-        if ((elapsedTime - pausedTime) / 1000 < 60) {
-            document.getElementById("time").innerText = "Time: " + timeToText((elapsedTime - pausedTime) / 1000);
-        } else {
-            document.getElementById("time").innerText = "Time: " + ((elapsedTime - pausedTime) / 1000).toFixed(1) + "s" + " (" + timeToText((elapsedTime - pausedTime) / 1000) + ")";
-        }
-        
-        document.getElementById("gameEndText").innerText = "You Win!";
-        document.getElementById("gameEnd").style.display = "flex";
-    }
-
-    return
 }
 
 function draw(clear=false) {
     if (clear) {
         ctx.clearRect(0,0,canvas.width,canvas.height);
     }
-    ctx.fillStyle = "rgba(120,120,120,0.5)";
-    let squareSize = Math.min(canvas.width/size_x,canvas.height/size_y);
+    
+    let squareSize = Math.min((canvas.width-2*canvasMargin)/size_x,(canvas.height-2*canvasMargin)/size_y);
     let startx = canvas.width/2 - squareSize * size_x / 2;
     let starty = canvas.height/2 - squareSize * size_y / 2;
 
@@ -476,7 +514,7 @@ resizeObserver.observe(canvas, {box: 'content-box'});
 
 
 function overSquare(canvasX,canvasY) { // gets the square under the canvas at position (x,y)
-    let squareSize = Math.min(canvas.width/size_x,canvas.height/size_y);
+    let squareSize = Math.min((canvas.width-2*canvasMargin)/size_x,(canvas.height-2*canvasMargin)/size_y);
     let startx = canvas.width/2 - squareSize * size_x / 2;
     let starty = canvas.height/2 - squareSize * size_y / 2;
 
@@ -496,6 +534,12 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
     return null
 }
 
+document.getElementById("gameEnd").addEventListener("click", (e) => {
+    refreshMap();
+    
+    document.getElementById("gameEnd").style.display = "none";
+})
+
 document.getElementById("playAgainButton").addEventListener("click", (e) => {
     refreshMap();
 
@@ -503,8 +547,8 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
 });
 
 document.addEventListener("mousemove", (e) => {
-    let canvasX = e.clientX - canvasMargin;
-    let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
+    let canvasX = e.clientX;
+    let canvasY = e.clientY -  document.getElementById("top").clientHeight;
     
     if (first && !inGame || inGame) {
         if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
@@ -614,8 +658,8 @@ function chord(square) {
 var mouseTimeout;
 canvas.addEventListener("mousedown", (e) => {
     if (!onMouseDown) return;
-    let canvasX = e.clientX - canvasMargin;
-    let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
+    let canvasX = e.clientX;
+    let canvasY = e.clientY -  document.getElementById("top").clientHeight;
     let square = overSquare(canvasX, canvasY);
 
     if (mouseTimeout) clearTimeout(mouseTimeout);
@@ -656,8 +700,8 @@ canvas.addEventListener("mouseup", (e) => {
         double = false;
         return
     };
-    let canvasX = e.clientX - canvasMargin;
-    let canvasY = e.clientY -  document.getElementById("top").clientHeight - canvasMargin;
+    let canvasX = e.clientX;
+    let canvasY = e.clientY -  document.getElementById("top").clientHeight;
     let square = overSquare(canvasX, canvasY);
 
 
@@ -708,9 +752,9 @@ document.addEventListener("touchstart", (e) => {
         touchTimeout = setTimeout(function() {
             if (touchHold) {
                 touchHeld = true;
-                let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
+                let canvasX = touchPos.x * window.devicePixelRatio;
                 
-                let canvasY = (touchPos.y -  document.getElementById("top").clientHeight - canvasMargin) * window.devicePixelRatio;
+                let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
                 let square = overSquare(canvasX, canvasY);
                 
                 if (inGame) flag(square);
@@ -731,9 +775,9 @@ document.addEventListener("touchmove", (e) => {
 canvas.addEventListener("touchend", (e) => {
     e.preventDefault();
     if (e.touches.length == 0) {
-        let canvasX = (touchPos.x - canvasMargin) * window.devicePixelRatio;
+        let canvasX = touchPos.x * window.devicePixelRatio;
           
-        let canvasY = (touchPos.y -  document.getElementById("top").clientHeight - canvasMargin) * window.devicePixelRatio;
+        let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
         let square = overSquare(canvasX, canvasY);
         
         touchHold = false;

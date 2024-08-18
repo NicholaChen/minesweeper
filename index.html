@@ -39,7 +39,7 @@
                         <i class="fa-solid fa-flag"></i>
                         <span id="flags"></span>
                     </h2>
-                    <button class="none" id="pauseButton" title=”Pause/Unpause">
+                    <button class="none" id="pauseButton" title="Pause/Unpause">
                         <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-circle-pause" id="pause"></i></h2>
                     </button>
                     
@@ -53,11 +53,11 @@
                 </div>
             </div>
             
-            <div style="flex-grow: 1; position: relative; margin: 16px;" id="game">
+            <div style="flex-grow: 1; position: relative; margin: 0;" id="game">
                 <canvas id="canvas" style="position:absolute; left:0; top:0; width:100%; height:100%;">
                 </canvas>
-                <div style="position:absolute; left:-16px; top:-16px; right: -16px; bottom: -16px; display: flex; justify-content: center; align-items: center; pointer-events: none; background-color: rgba(0,0,0,0.3); display: none;" id="gameEnd">
-                    <div style="background-color: var(--background-color); padding: 16px; pointer-events: all; text-align:center; min-width: 15%;">
+                <div style="position:absolute; left:0; top: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background-color: rgba(0,0,0,0.3); display: none;" id="gameEnd">
+                    <div style="background-color: var(--background-color); padding: 16px; text-align:center; min-width: 15%;" onclick="event.stopPropagation();">
                         <h1 style="text-align: center; margin: 0; font-size: 38px;" id="gameEndText">Game Over!</h1>
                         <p id="time" style="font-size: 18px; margin: 4px;">Time: </p>
                         <p id="bestTime" style="font-size: 18px; margin: 4px;">Best: </p>
