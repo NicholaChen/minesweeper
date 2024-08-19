@@ -78,10 +78,24 @@ else winPercentage = wins/gamesPlayed;
 
 
 
-var beginnerWins = isNaN(Number(localStorage.getItem("beginnerWins"))) || Number(localStorage.getItem("beginnerWins")) < 0 ? 0 : Number(localStorage.getItem("beyinnerWins"));
+var beginnerWins = isNaN(Number(localStorage.getItem("beginnerWins"))) || Number(localStorage.getItem("beginnerWins")) < 0 ? 0 : Number(localStorage.getItem("beginnerWins"));
+var beginnerGamesPlayed = isNaN(Number(localStorage.getItem("beginnerGamesPlayed"))) || Number(localStorage.getItem("beginnerGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("beginnerGamesPlayed"));
+
+var beginnerWinPercentage;
+if (beginnerGamesPlayed == 0) beginnerWinPercentage = 0;
+else beginnerWinPercentage = beginnerWins / beginnerGamesPlayed;
+
+var beginnerAverageTime = isNaN(Number(localStorage.getItem("beginnerAverageTime"))) || Number(localStorage.getItem("beginnerAverageTime")) < 0 ? 0 : Number(localStorage.getItem("beginnerAverageTime")); // in ms
 
 
+var intermediateWins = isNaN(Number(localStorage.getItem("intermediateWins"))) || Number(localStorage.getItem("intermediateWins")) < 0 ? 0 : Number(localStorage.getItem("intermediateWins"));
+var intermediateGamesPlayed = isNaN(Number(localStorage.getItem("intermediateGamesPlayed"))) || Number(localStorage.getItem("intermediateGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("intermediateGamesPlayed"));
 
+var intermediateWinPercentage;
+if (intermediateGamesPlayed == 0) intermediateWinPercentage = 0;
+else intermediateWinPercentage = intermediateWins / intermediateGamesPlayed;
+
+var intermediateAverageTime = isNaN(Number(localStorage.getItem("intermediateAverageTime"))) || Number(localStorage.getItem("intermediateAverageTime")) < 0 ? 0 : Number(localStorage.getItem("intermediateAverageTime")); // in ms
 
 const params = new URLSearchParams(document.location.search);
 
@@ -209,7 +223,7 @@ function resize(entries) {
     }
     canvas.width = displayWidth;
     canvas.height = displayHeight;
-    if (!inGame) refreshMap();
+    if (!inGame && first) refreshMap();
     draw();
 }
 
@@ -405,6 +419,12 @@ function exposeTile(x,y) {
             gamesPlayed += 1;
             
             updateStatsAllGames();
+            
+            if (difficulty == "Beginner") {
+				beginnerGamesPlayed += 1;
+
+				updateStatsBeginner();
+			}
     
             for (let x = 0; x < size_x; x++) {
                 for (let y = 0; y < size_y; y++) {
@@ -458,6 +478,15 @@ function exposeTile(x,y) {
         gamesPlayed += 1;
         
         updateStatsAllGames();
+        
+        if (difficulty == "Beginner") {
+        	beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
+        	
+        	beginnerWins += 1;
+        	beginnerGamesPlayed += 1;
+        	
+        	updateStatsBeginner();
+        }
     
         document.getElementById("time").style.display = "block";
         document.getElementById("3BVSec").style.display = show3BV ? "block" : "none";
@@ -1057,4 +1086,6 @@ document.addEventListener('keydown', function(e) {
  X Infinite lives
  X settings page doesn't reset game
  ~ Stats page for each difficulty
+ - Show only mobile settings
+ - Zoom and pan for mobile
 */

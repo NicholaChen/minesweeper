@@ -146,24 +146,23 @@ input[type="color" i]::-moz-color-swatch-wrapper {
 
 .select::before,
 .select::after {
-    --size: 0.3rem;
     position: absolute;
     content: "";
-    right: 1rem;
+    right: 4px;
     pointer-events: none;
 }
 
 .select::before {
-    border-left: var(--size) solid transparent;
-    border-right: var(--size) solid transparent;
-    border-bottom: var(--size) solid var(--input-text-color);;
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-bottom: 0.3rem solid var(--input-text-color);;
     top: 25%;
 }
 
 .select::after {
-    border-left: var(--size) solid transparent;
-    border-right: var(--size) solid transparent;
-    border-top: var(--size) solid var(--input-text-color);
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-top: 0.3rem solid var(--input-text-color);
     top: 60%;
 }
 
