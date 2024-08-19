@@ -90,7 +90,7 @@ input[type="text"]:hover {
 }
 
 input[type="text"]:focus {
-    outline: 1px solid rgba(200, 200, 200, 90%);
+    outline: 1px solid var(--input-text-color);
     background: var(--input-hover-color);;
 }
 
@@ -133,7 +133,6 @@ input[type="color" i]::-moz-color-swatch-wrapper {
 .select select {
     appearance: none;
     width: 100%;
-    border: 0;
     color: var(--input-text-color);
     border: 0;
     font-size: 20px;
@@ -142,8 +141,14 @@ input[type="color" i]::-moz-color-swatch-wrapper {
     background-color: var(--input-color);
     border-radius: 0;
     cursor: pointer;
+    outline: 0;
 }
-
+.select select:hover, .select select:focus {
+	background-color: var(--input-hover-color);
+}
+.select select:focus {
+	outline: 1px solid var(--input-text-color);
+}
 .select::before,
 .select::after {
     position: absolute;

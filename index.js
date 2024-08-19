@@ -17,6 +17,7 @@ const ctx = canvas.getContext("2d");
 const margin = 0.03; // percentage of each grid square
 
 const canvasMargin = 16; // pixels
+var scale = 1;
 
 var settings = false;
 var stats = false;
@@ -95,7 +96,18 @@ var intermediateWinPercentage;
 if (intermediateGamesPlayed == 0) intermediateWinPercentage = 0;
 else intermediateWinPercentage = intermediateWins / intermediateGamesPlayed;
 
-var intermediateAverageTime = isNaN(Number(localStorage.getItem("intermediateAverageTime"))) || Number(localStorage.getItem("intermediateAverageTime")) < 0 ? 0 : Number(localStorage.getItem("intermediateAverageTime")); // in ms
+var intermediateAverageTime = isNaN(Number(localStorage.getItem("intermediateAverageTime"))) || Number(localStorage.getItem("intermediateAverageTime")) < 0 ? 0 : Number(localStorage.getItem("intermediateAverageTime"));
+
+
+
+var expertWins = isNaN(Number(localStorage.getItem("expertWins"))) || Number(localStorage.getItem("expertWins")) < 0 ? 0 : Number(localStorage.getItem("expertWins"));
+var expertGamesPlayed = isNaN(Number(localStorage.getItem("expertGamesPlayed"))) || Number(localStorage.getItem("expertGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("expertGamesPlayed"));
+
+var expertWinPercentage;
+if (expertGamesPlayed == 0) expertWinPercentage = 0;
+else expertWinPercentage = expertWins / expertGamesPlayed;
+
+var expertAverageTime = isNaN(Number(localStorage.getItem("expertAverageTime"))) || Number(localStorage.getItem("expertAverageTime")) < 0 ? 0 : Number(localStorage.getItem("expertAverageTime"));
 
 const params = new URLSearchParams(document.location.search);
 
@@ -424,6 +436,14 @@ function exposeTile(x,y) {
 				beginnerGamesPlayed += 1;
 
 				updateStatsBeginner();
+			} else if (difficulty == "Intermediate") {
+				intermediateGamesPlayed += 1;
+
+				updateStatsIntermediate();
+			} else if (difficulty == "Expert") {
+ 				expertGamesPlayed += 1;
+
+ 				updateStatsExpert();
 			}
     
             for (let x = 0; x < size_x; x++) {
@@ -486,11 +506,25 @@ function exposeTile(x,y) {
         	beginnerGamesPlayed += 1;
         	
         	updateStatsBeginner();
-        }
+        } else if (difficulty == "Intermediate") {
+			intermediateAverageTime = (intermediateAverageTime * intermediateWins + (elapsedTime - pausedTime)) / (intermediateWins + 1);
+
+			intermediateWins += 1;
+			intermediateGamesPlayed += 1;
+
+			updateStatsIntermediate();
+		} else if (difficulty == "Advanced") {
+ 			expertAverageTime = (expertAverageTime * expertWins + (elapsedTime - pausedTime)) / (expertWins + 1);
+
+ 			expertWins += 1;
+ 			expertGamesPlayed += 1;
+
+ 			updateStatsExpert();
+		}
     
         document.getElementById("time").style.display = "block";
         document.getElementById("3BVSec").style.display = show3BV ? "block" : "none";
-        document.getElementById("3BVSec").innerText = "3BV/sec: " + (map3BV / ((elapsedTime - pausedTime) / 1000)).toFixed(1);
+        document.getElementById("3BVSec").innerText = "3BV/sec: " + (map3BV / ((elapsedTime - pausedTime) / 1000)).toFixed(2);
         
         if ((elapsedTime - pausedTime) / 1000 < 60) {
             document.getElementById("time").innerText = "Time: " + timeToText((elapsedTime - pausedTime) / 1000);
@@ -541,7 +575,7 @@ function draw(clear=false) {
         ctx.clearRect(0,0,canvas.width,canvas.height);
     }
     
-    let squareSize = Math.min((canvas.width-2*canvasMargin)/size_x,(canvas.height-2*canvasMargin)/size_y);
+    let squareSize = Math.min((canvas.width-2*canvasMargin)/size_x,(canvas.height-2*canvasMargin)/size_y) * scale;
     let startx = canvas.width/2 - squareSize * size_x / 2;
     let starty = canvas.height/2 - squareSize * size_y / 2;
 
@@ -829,6 +863,8 @@ var touchPos;
 var touchHeld = false;
 
 var touchTimeout;
+
+var notOneTouch = false;
 document.addEventListener("touchstart", (e) => {
     if (e.touches.length == 1) {
         touchPos = {
@@ -851,7 +887,9 @@ document.addEventListener("touchstart", (e) => {
             }
         }, flagHold);
     } else {
-    touchHold = false;
+    	touchHold = false;
+    	
+    	notOneTouch = true;
     }
 });
 
@@ -865,23 +903,26 @@ document.addEventListener("touchmove", (e) => {
 canvas.addEventListener("touchend", (e) => {
     e.preventDefault();
     if (e.touches.length == 0) {
-        let canvasX = touchPos.x * window.devicePixelRatio;
-          
-        let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
-        let square = overSquare(canvasX, canvasY);
-        
-        touchHold = false;
-        clearTimeout(touchTimeout);
-        
-        if (!touchHeld) {
-            if (square) {
-                if (!map[square.y][square.x].opened) {
-                    open(square);
-                } else {
-                    chord(square);
-                }
-            }        
-        }
+    	if (!notOneTouch) {
+	        let canvasX = touchPos.x * window.devicePixelRatio;
+	        
+	        let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+	        let square = overSquare(canvasX, canvasY);
+	        
+	        touchHold = false;
+	        clearTimeout(touchTimeout);
+	        
+	        if (!touchHeld) {
+	            if (square) {
+	                if (!map[square.y][square.x].opened) {
+	                    open(square);
+	                } else {
+	                    chord(square);
+	                }
+	            }        
+	        }
+    	}
+    	notOneTouch = false;
     }
 })
 
