@@ -6,8 +6,8 @@ var appearanceTimeout;
 var advancedTimeout;
 
 
-document.getElementById("width").value = size_x;
-document.getElementById("height").value = size_y;
+document.getElementById("width").value = isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ? 10 : Number(localStorage.getItem("mapX"));;
+document.getElementById("height").value = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ? 10 : Number(localStorage.getItem("mapY"));
 
 document.getElementById("numMines").value = numMines;
 
@@ -23,7 +23,17 @@ if (infiniteLives) {
 } else {
     document.getElementById("infiniteLivesOn").classList.add("unselected");
 }
+var difficultyIndex = {
+    Beginner: 0,
+    Intermediate: 1,
+    Expert: 2,
+    Custom: 3
+}
+document.getElementById("difficulty").selectedIndex = difficultyIndex[difficulty];
 
+if (difficulty == "Custom") {
+    document.getElementById("customMap").style.display = "block";
+}
 
 function resetGame() {
     inGame = false;
@@ -38,9 +48,33 @@ document.getElementById("difficulty").addEventListener("change", (e) => {
     localStorage.setItem("difficulty", difficulty);
     if (difficulty == "Custom") {
         document.getElementById("customMap").style.display = "block";
+        
+        size_x = isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ? 10 : Number(localStorage.getItem("mapX"));
+        size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ? 10 : Number(localStorage.getItem("mapY"));
+
+        numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ? 15 : Number(localStorage.getItem("mines"));
     } else {
         document.getElementById("customMap").style.display = "none";
+        
+        if (difficulty == "Beginner") {
+            size_x = 9;
+            size_y = 9;
+            
+            numMines = 10;
+        } else if (difficulty == "Intermediate") {
+            size_x = 16;
+            size_y = 16;
+            
+            numMines = 40;
+        } else if (difficulty == "Expert") {
+            size_x = 30;
+            size_y = 16;
+    
+            numMines = 99;
+        }
     }
+    
+    resetGame();
 })
 
 document.getElementById("saveMapSize").addEventListener("click", (e) => {

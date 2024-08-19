@@ -75,11 +75,28 @@
             </div>
             <div style="flex-grow: 1; padding: 16px 10% 16px 10%; display: none; overflow: auto;" id="stats">
                 <h1 style="text-align: center; margin: 16px;">Stats</h1>
+                <h2>All games</h2>
                 <div class="settingsDiv">
                     <h3 style="width: 100%">Wins <span style="float: right;" id="wins"></span></h3>
                 </div>
                 <div class="settingsDiv">
+                    <h3 style="width: 100%">Games played <span style="float: right;" id="gamesPlayed"></span></h3>
+                </div>
+                <div class="settingsDiv">
+                    <h3 style="width: 100%">Win percentage <span style="float: right;" id="winPercentage"></span></h3>
+                </div>
+                <div class="settingsDiv">
                     <h3 style="width: 100%">Hours played <span style="float: right;" id="hoursPlayed"></span></h3>
+                </div>
+                <h2>Beginner</h2>
+                <h2>Intermediate</h2>
+                <h2>Expert</h2>
+                <h2>Reset</h2>
+                <div class="settingsDiv">
+                    <h3>Reset all statd (cannot be undone)</h3>
+                    <div>
+                        <button style="width: 100%;" id="resetStatsButton">Reset</button>
+                    </div>
                 </div>
             </div>
             <div style="flex-grow: 1; padding: 16px 10% 16px 10%; display: none; overflow: auto;" id="settings">
@@ -105,9 +122,9 @@
                                     <option value="Intermediate">Intermediate</option>
                                     <option value="Expert">Expert</option>
                                     <option value="Custom">Custom</option>
-                                </select>
-                            </div>
+                            </select>
                         </div>
+                    </div>
                 </div>
                 <div style="display: none;" id="customMap">
                     <div class="settingsDiv">

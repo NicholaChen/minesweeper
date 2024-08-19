@@ -69,8 +69,11 @@ var showRestart = localStorage.getItem("showRestart") != "false";
 
 var wins = isNaN(Number(localStorage.getItem("wins"))) || Number(localStorage.getItem("wins")) < 0 ? 0 : Number(localStorage.getItem("wins"));
 var hours = isNaN(Number(localStorage.getItem("hours"))) || Number(localStorage.getItem("hours")) < 0 ? 0 : Number(localStorage.getItem("hours")); // in ms
+var gamesPlayed = isNaN(Number(localStorage.getItem("gamesPlayed"))) || Number(localStorage.getItem("gamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("gamesPlayed"));
 
-
+var winPercentage;
+if (gamesPlayed == 0) winPercentage = 0;
+else winPercentage = wins/gamesPlayed;
 
 
 const params = new URLSearchParams(document.location.search);
@@ -247,8 +250,6 @@ function refreshMap() {
             size_y = large;
         }
     }
-    console.log(canvas.width, canvas.height)
-    console.log(size_x, size_y)
     
     first = true;
     flags = 0;
@@ -350,6 +351,16 @@ function threeBV() {
                 } else if (map[y][x].value > 0) {
                     m[y][x].opened = true;
                     
+                    for (let i = -1; i <= 1; i++) {
+                        for (let j = -1; j <= 1; j++) {
+                            if (i != 0 || j != 0) {
+            if (x + i >= 0 && x + i < size_x && y + j >= 0 && y + j < size_y) {
+                _exposeTile(m,x+i,y+j);
+            }
+        }
+    }
+}
+                    
                     i++;
                 }
             }
@@ -383,10 +394,9 @@ function exposeTile(x,y) {
             document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
     
             hours += elapsedTime - pausedTime;
-    
-            document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
-    
-            localStorage.setItem("hours", hours);
+            gamesPlayed += 1;
+            
+            updateStatsAllGames();
     
             for (let x = 0; x < size_x; x++) {
                 for (let y = 0; y < size_y; y++) {
@@ -437,12 +447,9 @@ function exposeTile(x,y) {
     
         hours += elapsedTime - pausedTime;
         wins += 1;
-    
-        document.getElementById("wins").innerText = wins;
-        document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
-    
-        localStorage.setItem("wins", wins);
-        localStorage.setItem("hours", hours);
+        gamesPlayed += 1;
+        
+        updateStatsAllGames();
     
         document.getElementById("time").style.display = "block";
         document.getElementById("bestTime").style.display = "none";
@@ -680,11 +687,11 @@ function flag(square) {
 function chord(square) {
     if (square) {
         if (map[square.y][square.x].opened && map[square.y][square.x].value != 0) {
-            console.log("chord",square);
 
             let f = adjacentFlags(square.x, square.y);
 
             if (f == map[square.y][square.x].value) {
+                console.log("chord",square);
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
                         if (i != 0 || j != 0) {
