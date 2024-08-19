@@ -19,6 +19,7 @@ const margin = 0.03; // percentage of each grid square
 const canvasMargin = 16; // pixels
 
 var settings = false;
+var stats = false;
 
 var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ?  10 : Number(localStorage.getItem("mapX"));
 var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ?  10 : Number(localStorage.getItem("mapY"));
@@ -144,6 +145,8 @@ var pausedTime = 0;
 var interval;
 var first = true;
 
+var map3BV;
+
 function timeToText(t) {
     if (t < 60) {
         return t.toFixed(1) + "s"
@@ -212,7 +215,7 @@ function generate(mines, firstx, firsty) {
     }
     
     
-    threeBV()
+    map3BV = threeBV();
 }
 
 function adjacentMines(x,y) {
@@ -839,7 +842,7 @@ function pause() {
 var lastPause = paused;
 
 function pauseUnpause() {
-    if (settings || !inGame) return;
+    if (settings || stats || !inGame) return;
 
     if (lastPause) {
         unpause();
@@ -865,8 +868,31 @@ document.getElementById("restartButton").addEventListener("click", (e) => {
     }
 });
 
+document.getElementById("statsButton").addEventListener("click", (e) => {
+    if (stats) {
+        stats = false;
+        document.getElementById("game").style.display = "block";
+        document.getElementById("stats").style.display = "none";
+
+        document.getElementById("keybindsScreen").style.display = "none";
+
+        if (inGame && !lastPause) unpause();
+    } else {
+        settings = false;
+        stats = true;
+        
+        document.getElementById("game").style.display = "none";
+        document.getElementById("settings").style.display = "none";
+        document.getElementById("stats").style.display = "block";
+        
+        document.getElementById("keybindsScreen").style.display = "none";
+        
+        if (inGame) pause();
+    }
+});
+
 document.getElementById("settingsButton").addEventListener("click", (e) => {
-    if (document.getElementById("game").style.display == "none") {
+    if (settings) {
         settings = false;
         document.getElementById("game").style.display = "block";
         document.getElementById("settings").style.display = "none";
@@ -875,8 +901,10 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
 
         if (inGame && !lastPause) unpause();
     } else {
+        stats = false;
         settings = true;
         document.getElementById("game").style.display = "none";
+        document.getElementById("stats").style.display = "none";
         document.getElementById("settings").style.display = "block";
 
         document.getElementById("keybindsScreen").style.display = "none";
@@ -938,7 +966,7 @@ document.addEventListener('keydown', function(e) {
         }
     } else if (heldKeys.join("+") == settingsShortcut) {
         e.preventDefault();
-        if (document.getElementById("game").style.display == "none") {
+        if (settings) {
             settings = false;
             document.getElementById("game").style.display = "block";
             document.getElementById("settings").style.display = "none";
@@ -947,8 +975,10 @@ document.addEventListener('keydown', function(e) {
     
             if (inGame && !lastPause) unpause();
         } else {
+            stats = false;
             settings = true;
             document.getElementById("game").style.display = "none";
+            document.getElementById("stats").style.display = "none";
             document.getElementById("settings").style.display = "block";
 
             document.getElementById("keybindsScreen").style.display = "none";

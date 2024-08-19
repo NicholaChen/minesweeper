@@ -126,20 +126,61 @@ input[type="color" i]::-moz-color-swatch-wrapper {
     padding: 0px;
 }
 
-#settings {
+.select {
+    position: relative;
+    width: 100%;
+}
+.select select {
+    appearance: none;
+    width: 100%;
+    border: 0;
+    color: var(--input-text-color);
+    border: 0;
+    font-size: 20px;
+    font-family: inherit;
+    padding: 4px;
+    background-color: var(--input-color);
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.select::before,
+.select::after {
+    --size: 0.3rem;
+    position: absolute;
+    content: "";
+    right: 1rem;
+    pointer-events: none;
+}
+
+.select::before {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-bottom: var(--size) solid var(--input-text-color);;
+    top: 25%;
+}
+
+.select::after {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-top: var(--size) solid var(--input-text-color);
+    top: 60%;
+}
+
+#settings, #stats{
     font-size: 24px;
 }
-#settings h2 {
+#settings h2, #stats h2{
     font-size: 29px;
     margin: 0;
 }
-#settings h3 {
+#settings h3, #stats h3{
     margin: 0 0 4px 0;
     display: inline;
     font-size: 24px;
     font-weight: normal;
 }
-#settings p {
+#settings p, #stats p{
     font-size: 18px;
 }
 .settingsDiv {
