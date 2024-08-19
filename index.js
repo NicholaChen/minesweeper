@@ -21,9 +21,32 @@ const canvasMargin = 16; // pixels
 var settings = false;
 var stats = false;
 
-var size_x =  isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ?  10 : Number(localStorage.getItem("mapX"));
-var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ?  10 : Number(localStorage.getItem("mapY"));
+var difficulty = localStorage.getItem("difficulty") ?? "Beginner";
+
+var size_x = isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ? 10 : Number(localStorage.getItem("mapX"));
+var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ? 10 : Number(localStorage.getItem("mapY"));
+
 var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ?  15 : Number(localStorage.getItem("mines"));
+
+if (difficulty == "Beginner") {
+    size_x = 9;
+    size_y = 9;
+    
+    numMines = 10;
+} else if (difficulty == "Intermediate") {
+    size_x = 16;
+    size_y = 16;
+    
+    numMines = 40;
+} else if (difficulty == "Expert") {
+    size_x = 30;
+    size_y = 16;
+    
+    numMines = 99;
+} else {
+    difficulty = "Custom";
+}
+
 
 var infiniteLives = localStorage.getItem("infiniteLives") == "true";
 
@@ -147,6 +170,46 @@ var first = true;
 
 var map3BV;
 
+
+function resize(entries) {
+    let displayWidth, displayHeight;
+    for (const entry of entries) {
+        let width;
+        let height;
+        let dpr = window.devicePixelRatio;
+        if (entry.devicePixelContentBoxSize) {
+            width = entry.devicePixelContentBoxSize[0].inlineSize;
+            height = entry.devicePixelContentBoxSize[0].blockSize;
+            dpr = 1;
+        } else if (entry.contentBoxSize) {
+            if (entry.contentBoxSize[0]) {
+                width = entry.contentBoxSize[0].inlineSize;
+                height = entry.contentBoxSize[0].blockSize;
+            } else {
+                width = entry.contentBoxSize.inlineSize;
+                height = entry.contentBoxSize.blockSize;
+            }
+        } else {
+            width = entry.contentRect.width;
+            height = entry.contentRect.height;
+        }
+        displayWidth = Math.round(width * dpr);
+        displayHeight = Math.round(height * dpr);
+    }
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+    if (!inGame) refreshMap();
+    draw();
+}
+
+
+const resizeObserver = new ResizeObserver(resize);
+resizeObserver.observe(canvas, { box: 'content-box' });
+
+
+
+
+
 function timeToText(t) {
     if (t < 60) {
         return t.toFixed(1) + "s"
@@ -172,6 +235,21 @@ function refreshMap() {
     document.getElementById("timer").innerText = "0.0s";
     document.getElementById("clickAnywhere").style.display = "flex";
 
+    if (difficulty != "Custom") {
+        let large = Math.max(size_x, size_y);
+        let small = Math.min(size_x, size_y);
+
+        if (canvas.width > canvas.height) {
+            size_x = large;
+            size_y = small;
+        } else {
+            size_x = small;
+            size_y = large;
+        }
+    }
+    console.log(canvas.width, canvas.height)
+    console.log(size_x, size_y)
+    
     first = true;
     flags = 0;
     map = [];
@@ -477,43 +555,6 @@ function draw(clear=false) {
     }
 }
 
-
-
-
-function resize(entries) {
-    let displayWidth, displayHeight;
-    for (const entry of entries) {
-        let width;
-        let height;
-        let dpr = window.devicePixelRatio;
-        if (entry.devicePixelContentBoxSize) {
-        width = entry.devicePixelContentBoxSize[0].inlineSize;
-        height = entry.devicePixelContentBoxSize[0].blockSize;
-        dpr = 1;
-        } else if (entry.contentBoxSize) {
-        if (entry.contentBoxSize[0]) {
-            width = entry.contentBoxSize[0].inlineSize;
-            height = entry.contentBoxSize[0].blockSize;
-        } else {
-            width = entry.contentBoxSize.inlineSize;
-            height = entry.contentBoxSize.blockSize;
-        }
-        } else {
-        width = entry.contentRect.width;
-        height = entry.contentRect.height;
-        }
-        displayWidth = Math.round(width * dpr);
-        displayHeight = Math.round(height * dpr);
-    }
-    canvas.width = displayWidth;
-    canvas.height = displayHeight;
-
-    draw();
-}
-
-
-const resizeObserver = new ResizeObserver(resize);
-resizeObserver.observe(canvas, {box: 'content-box'});
 
 
 function overSquare(canvasX,canvasY) { // gets the square under the canvas at position (x,y)

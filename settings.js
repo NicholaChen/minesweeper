@@ -31,8 +31,18 @@ function resetGame() {
     clearInterval(interval);
 
     refreshMap();
-
 }
+
+document.getElementById("difficulty").addEventListener("change", (e) => {
+    difficulty = document.getElementById("difficulty").value;
+    localStorage.setItem("difficulty", difficulty);
+    if (difficulty == "Custom") {
+        document.getElementById("customMap").style.display = "block";
+    } else {
+        document.getElementById("customMap").style.display = "none";
+    }
+})
+
 document.getElementById("saveMapSize").addEventListener("click", (e) => {
     let width_issue = "";
     let height_issue = "";

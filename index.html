@@ -100,33 +100,35 @@
                     <h3>Difficulty</h2>
                         <div>
                             <div class="select">
-                                <select>
-                                    <option value="0">Beginner</option>
-                                    <option value="1">Intermediate</option>
-                                    <option value="2">Expert</option>
-                                    <option value="3">Custom</option>
+                                <select id="difficulty">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Expert">Expert</option>
+                                    <option value="Custom">Custom</option>
                                 </select>
                             </div>
                         </div>
-                 </div>
-                <div class="settingsDiv">
-                    <h3>Map size (width x height)</h2>
-                    <div>
-                        <input type="text" id="width"/>
-                        <span style="float: right; margin: 0 4px 0 4px;">x</span>
-                        <input type="text" id="height"/>
-                        <button class="saveSettings" id="saveMapSize">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                        </button>
-                    </div>
                 </div>
-                <div class="settingsDiv">
-                    <h3>Number of mines</h2>
-                    <div>
-                        <input type="text" id="numMines"/>
-                        <button class="saveSettings" id="saveNumMines">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                        </button>
+                <div style="display: none;" id="customMap">
+                    <div class="settingsDiv">
+                        <h3>Map size (width x height)</h2>
+                            <div>
+                                <input type="text" id="width" />
+                                <span style="float: right; margin: 0 4px 0 4px;">x</span>
+                                <input type="text" id="height" />
+                                <button class="saveSettings" id="saveMapSize">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                </button>
+                            </div>
+                    </div>
+                    <div class="settingsDiv">
+                        <h3>Number of mines</h2>
+                            <div>
+                                <input type="text" id="numMines" />
+                                <button class="saveSettings" id="saveNumMines">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                </button>
+                            </div>
                     </div>
                 </div>
                 <div class="settingsDiv">
@@ -213,7 +215,7 @@
                         <div>
                             <button style="margin: 0 8px 0 0;" id="showRestartOff">Off</button>
                             <button id="showRestartOn">On</button>
-                        </div>
+                    </div>
                 </div>
                 <div class="settingsDiv">
                     <h3>Theme</h3>
