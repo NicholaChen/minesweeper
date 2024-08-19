@@ -62,7 +62,7 @@
                     <div style="background-color: var(--background-color); padding: 16px; text-align:center; min-width: 15%;" onclick="event.stopPropagation();">
                         <h1 style="text-align: center; margin: 0; font-size: 38px;" id="gameEndText">Game Over!</h1>
                         <p id="time" style="font-size: 18px; margin: 4px;">Time: </p>
-                        <p id="bestTime" style="font-size: 18px; margin: 4px;">Best: </p>
+                        <p id="3BVSec" style="font-size: 18px; margin: 4px;">3BV/sec: </p>
                         <button id="playAgainButton">Play again</button>
                     </div>
                 </div>
@@ -90,10 +90,13 @@
                 </div>
                 <h2>Beginner</h2>
                 <h2>Intermediate</h2>
+                <div class="settingsDiv">
+                    <h3 style="width: 100%">Wins <span style="float: right;" id="gamesPlayed"></span></h3>
+                </div>
                 <h2>Expert</h2>
                 <h2>Reset</h2>
                 <div class="settingsDiv">
-                    <h3>Reset all statd (cannot be undone)</h3>
+                    <h3>Reset all stats (cannot be undone)</h3>
                     <div>
                         <button style="width: 100%;" id="resetStatsButton">Reset</button>
                     </div>
@@ -207,28 +210,28 @@
                     <button class="none" style="float: right;" title="Reset" id="resetAppearanceSettings"><i class="fa-solid fa-rotate-left"></i></button>
                 </div>
                 <div class="settingsDiv">
-                    <h3>Show timer</h2>
+                    <h3>Show timer</h3>
                         <div>
                             <button style="margin: 0 8px 0 0;" id="showTimerOff">Off</button>
                             <button id="showTimerOn">On</button>
                         </div>
                 </div>
                 <div class="settingsDiv">
-                    <h3>Show number of flags</h2>
+                    <h3>Show number of flags</h3>
                         <div>
                             <button style="margin: 0 8px 0 0;" id="showFlagsOff">Off</button>
                             <button id="showFlagsOn">On</button>
                         </div>
                 </div>
                 <div class="settingsDiv">
-                    <h3>Show pause/unpause button</h2>
+                    <h3>Show pause/unpause button</h3>
                         <div>
                             <button style="margin: 0 8px 0 0;" id="showPauseOff">Off</button>
                             <button id="showPauseOn">On</button>
                         </div>
                 </div>
                 <div class="settingsDiv">
-                    <h3>Show restart button</h2>
+                    <h3>Show restart button</h3>
                         <div>
                             <button style="margin: 0 8px 0 0;" id="showRestartOff">Off</button>
                             <button id="showRestartOn">On</button>
@@ -252,7 +255,17 @@
                     </div>
                 </div>
                 <p style="text-align: center; display: none;" id="invalidAppearance"></p>
-                <h2>Advanced</h2>
+                <div>
+                    <h2 style="display: inline;">Advanced</h2>
+                    <button class="none" style="float: right;" title="Reset" id="resetAdvancedSettings"><i class="fa-solid fa-rotate-left"></i></button>
+                </div>
+                <div class="settingsDiv">
+                    <h3>Show 3BV/sec on win screen</h3>
+                    <div>
+                        <button style="margin: 0 8px 0 0;" id="show3BVOff">Off</button>
+                        <button id="show3BVOn">On</button>
+                    </div>
+                </div>
                 <div class="settingsDiv">
                     <h3>Share settings</h3>
                     <div>

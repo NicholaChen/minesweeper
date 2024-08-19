@@ -6,7 +6,7 @@ function updateStatsAllGames() {
     
     winPercentage = wins/gamesPlayed;
     
-    if (winPercentage == Infinity) winPercentage = 0;
+    if (winPercentage == Infinity || isNaN(winPercentage)) winPercentage = 0;
     document.getElementById("winPercentage").innerText = (winPercentage * 100).toFixed(1) + "%";
     
     localStorage.setItem("wins", wins);
@@ -14,4 +14,15 @@ function updateStatsAllGames() {
     localStorage.setItem("gamesPlayed", gamesPlayed);
 }
 
+function updateStatsBeginner() {
+    
+}
 updateStatsAllGames();
+
+document.getElementById("resetStatsButton").addEventListener("click", (e) => {
+    wins = 0;
+    hours = 0;
+    gamesPlayed = 0;
+    
+    updateStatsAllGames();
+})

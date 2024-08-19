@@ -64,6 +64,7 @@ var showFlags = localStorage.getItem("showFlags") != "false";
 var showPause = localStorage.getItem("showPause") != "false";
 var showRestart = localStorage.getItem("showRestart") != "false";
 
+var show3BV = localStorage.getItem("show3BV") == "true";
 
 // stats
 
@@ -74,6 +75,12 @@ var gamesPlayed = isNaN(Number(localStorage.getItem("gamesPlayed"))) || Number(l
 var winPercentage;
 if (gamesPlayed == 0) winPercentage = 0;
 else winPercentage = wins/gamesPlayed;
+
+
+
+var beginnerWins = isNaN(Number(localStorage.getItem("beginnerWins"))) || Number(localStorage.getItem("beginnerWins")) < 0 ? 0 : Number(localStorage.getItem("beyinnerWins"));
+
+
 
 
 const params = new URLSearchParams(document.location.search);
@@ -138,8 +145,10 @@ function readSetting() {
 
             showTimer = t.st;
             showFlags = t.sf;
-            showPause - t.sp;
+            showPause = t.sp;
             showRestart = t.sr;
+            
+            show3BV = t.tb == true;
 
             document.getElementById("saveImportedSettings").innerText = "Save imported settings";
             document.getElementById("cancelImportedSettings").innerText = "Cancel imported settings";
@@ -147,7 +156,6 @@ function readSetting() {
             document.getElementById("saveImportedSettings").style.display = "inline";
             document.getElementById("cancelImportedSettings").style.display = "inline";
         } catch (e) {
-
         }
     }
 }
@@ -354,12 +362,12 @@ function threeBV() {
                     for (let i = -1; i <= 1; i++) {
                         for (let j = -1; j <= 1; j++) {
                             if (i != 0 || j != 0) {
-            if (x + i >= 0 && x + i < size_x && y + j >= 0 && y + j < size_y) {
-                _exposeTile(m,x+i,y+j);
-            }
-        }
-    }
-}
+                                if (x + i >= 0 && x + i < size_x && y + j >= 0 && y + j < size_y) {
+                                    _exposeTile(m,x+i,y+j);
+                                }
+                            }
+                        }
+                    }
                     
                     i++;
                 }
@@ -406,7 +414,7 @@ function exposeTile(x,y) {
                 }
             }
             document.getElementById("time").style.display = "none";
-            document.getElementById("bestTime").style.display = "none";
+            document.getElementById("3BVSec").style.display = "none";
             document.getElementById("gameEndText").innerText = "Game Over!";
             document.getElementById("gameEnd").style.display = "flex";
         }
@@ -452,7 +460,9 @@ function exposeTile(x,y) {
         updateStatsAllGames();
     
         document.getElementById("time").style.display = "block";
-        document.getElementById("bestTime").style.display = "none";
+        document.getElementById("3BVSec").style.display = show3BV ? "block" : "none";
+        document.getElementById("3BVSec").innerText = "3BV/sec: " + (map3BV / ((elapsedTime - pausedTime) / 1000)).toFixed(1);
+        
         if ((elapsedTime - pausedTime) / 1000 < 60) {
             document.getElementById("time").innerText = "Time: " + timeToText((elapsedTime - pausedTime) / 1000);
         } else {
@@ -1046,4 +1056,5 @@ document.addEventListener('keydown', function(e) {
  X favicon
  X Infinite lives
  X settings page doesn't reset game
+ ~ Stats page for each difficulty
 */

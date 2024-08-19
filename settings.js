@@ -621,29 +621,57 @@ document.getElementById("shareTheme").addEventListener("click", (e) => {
     }, settingsMessageDuration);
 });
 
+if (show3BV) {
+    document.getElementById("show3BVOff").classList.add("unselected");
+} else {
+    document.getElementById("show3BVOn").classList.add("unselected");
+}
+
+
+document.getElementById("show3BVOff").addEventListener("click", (e) => {
+    document.getElementById("show3BVOff").classList.remove("unselected");
+    document.getElementById("show3BVOn").classList.add("unselected");
+
+    show3BV = false;
+
+    localStorage.setItem("show3BV", show3BV);
+});
+
+document.getElementById("show3BVOn").addEventListener("click", (e) => {
+    document.getElementById("show3BVOn").classList.remove("unselected");
+    document.getElementById("show3BVOff").classList.add("unselected");
+
+    show3BV = true;
+
+    localStorage.setItem("show3BV", show3BV);
+});
 
 function resetGameplay() {
-    size_x = 10;
-    size_y = 10;
+    difficulty = "Beginner";
+    size_x = 9;
+    size_y = 9;
 
-    numMines = 15;
+    numMines = 10;
 
     infiniteLives = false;
 
+    document.getElementById("difficulty").selectedIndex = 0;
+    document.getElementById("customMap").style.display = "none";
+    
     document.getElementById("infiniteLivesOff").classList.remove("unselected");
     document.getElementById("infiniteLivesOn").classList.add("unselected");
 
-    
+    localStorage.setItem("difficulty", difficulty);
     localStorage.setItem("infiniteLives", false);
 
-    document.getElementById("width").value = size_x;
-    document.getElementById("height").value = size_y;
+    document.getElementById("width").value = 10;
+    document.getElementById("height").value = 10;
 
-    document.getElementById("numMines").value = numMines;
+    document.getElementById("numMines").value = 15;
 
-    localStorage.setItem("mapX", size_x);
-    localStorage.setItem("mapY", size_y);
-    localStorage.setItem("mines", numMines);
+    localStorage.setItem("mapX", 10);
+    localStorage.setItem("mapY", 10);
+    localStorage.setItem("mines", 15);
 
     document.getElementById("invalidGameplay").innerText = "Reset settings.";
         
@@ -654,6 +682,8 @@ function resetGameplay() {
     gameplayTimeout = setTimeout(function() {
         document.getElementById("invalidGameplay").style.display = "none";
     }, settingsMessageDuration);
+    
+    resetGame();
 }
 
 
@@ -759,15 +789,34 @@ function resetAppearance() {
     }, settingsMessageDuration);
 }
 
+function resetAdvanced() {
+    show3BV = false;
+    
+    document.getElementById("invalidAdvanced").innerText = "Reset settings.";
+
+    document.getElementById("invalidAdvanced").style.display = "block";
+
+    document.getElementById("show3BVOn").classList.add("unselected");
+    document.getElementById("show3BVOff").classList.remove("unselected");
+
+    localStorage.setItem("show3BV", show3BV);
+    if (advancedTimeout != null) clearTimeout(advancedTimeout);
+
+    advancedTimeout = setTimeout(function() {
+        document.getElementById("invalidAdvanced").style.display = "none";
+    }, settingsMessageDuration);
+}
 
 document.getElementById("resetGameplaySettings").addEventListener("click", resetGameplay);
 document.getElementById("resetControlsSettings").addEventListener("click", resetControls);
 document.getElementById("resetAppearanceSettings").addEventListener("click", resetAppearance);
+document.getElementById("resetAdvancedSettings").addEventListener("click", resetAdvanced);
 
 document.getElementById("resetSettingsButton").addEventListener("click", (e) => {
     resetGameplay();
     resetControls();
     resetAppearance();
+    resetAdvanced();
 });
 
 
@@ -831,6 +880,7 @@ document.getElementById("shareSettings").addEventListener("click", (e) => {
         sf: showFlags,
         sp: showPause,
         sr: showRestart,
+        tb: show3BV,
         t: theme
     }));
 

@@ -31,6 +31,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
     - `Custom` - Type the hex color codes for each of the customizable options
         - `Share theme` - Creates and copies a shareable link with the current custom theme
 ### Advanced
+ - `Show 3BV/sec on win screen` - Shows your 3BV/sec stat after winning a game. `Off/On` `Default: Off`
  - `Share settings` - Creates and copies a shareable link with all settings
  - `Reset settings` - Resets **ALL** settings. Doesn't reset Stats
 
