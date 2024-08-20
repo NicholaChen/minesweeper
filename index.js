@@ -1,4 +1,4 @@
-const VERSION = "1.8.0";
+const VERSION = "1.8.1";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -923,6 +923,18 @@ canvas.addEventListener("mousemove", (e) => {
     }
 });
 
+
+canvas.addEventListener("wheel", (e) => {
+    if (panning) {
+        let direction = e.deltaY > 0 ? 1 : -1;
+        scale -= 0.08 * direction * scale;
+    
+        viewChanged();
+        draw(true);
+    }
+}, {passive:true});
+
+
 var touchHold;
 var touchPos;
 var touchHeld = false;
@@ -932,29 +944,44 @@ var touchTimeout;
 var notOneTouch = false;
 document.addEventListener("touchstart", (e) => {
     if (e.touches.length == 1) {
-        touchPos = {
-            x: e.touches[0].clientX,
-            y: e.touches[0].clientY
-        }
-        touchHeld = false;
-        
-        touchHold = true;
-         
-        touchTimeout = setTimeout(function() {
-            if (touchHold) {
-                touchHeld = true;
-                let canvasX = touchPos.x * window.devicePixelRatio;
-                
-                let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
-                let square = overSquare(canvasX, canvasY);
-                
-                if (inGame) flag(square);
+        if (panning) {
+        } else {
+            touchPos = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
             }
-        }, flagHold);
+            touchHeld = false;
+            
+            touchHold = true;
+            
+            touchTimeout = setTimeout(function() {
+                if (touchHold) {
+                    touchHeld = true;
+                    let canvasX = touchPos.x * window.devicePixelRatio;
+                    
+                    let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+                    let square = overSquare(canvasX, canvasY);
+                    
+                    if (inGame) flag(square);
+                }
+            }, flagHold);
+        }
     } else {
     	touchHold = false;
     	
     	notOneTouch = true;
+    }
+});
+
+canvas.addEventListener("touchstart", (e) => {
+    if (e.touches.length == 1) {
+        if (panning) {
+            let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+            let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+            mouseStart = {x: canvasX, y: canvasY};
+            camStart = {x: cam_x, y: cam_y};
+        }
     }
 });
 
@@ -963,31 +990,64 @@ document.addEventListener("touchmove", (e) => {
         x: e.touches[0].clientX,
         y: e.touches[0].clientY
     }
+});
+
+canvas.addEventListener("touchmove", (e) => {
+    if (e.touches.length == 1) {
+        if (panning) {
+            let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+            let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+            cam_x = camStart.x - (canvasX-mouseStart.x);
+            cam_y = camStart.y - (canvasY-mouseStart.y);
+
+            viewChanged();
+
+            draw(true);
+        }
+    }
 })
 
 canvas.addEventListener("touchend", (e) => {
     e.preventDefault();
-    if (e.touches.length == 0) {
-    	if (!notOneTouch) {
-	        let canvasX = touchPos.x * window.devicePixelRatio;
-	        
-	        let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
-	        let square = overSquare(canvasX, canvasY);
-	        
-	        touchHold = false;
-	        clearTimeout(touchTimeout);
-	        
-	        if (!touchHeld) {
-	            if (square) {
-	                if (!map[square.y][square.x].opened) {
-	                    open(square);
-	                } else {
-	                    chord(square);
-	                }
-	            }        
-	        }
-    	}
-    	notOneTouch = false;
+    if (panning) {
+        if (e.touches.length == 0) {
+            if (!notOneTouch) {
+                let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+                let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+                cam_x = camStart.x - (canvasX-mouseStart.x);
+                cam_y = camStart.y - (canvasY-mouseStart.y);
+
+                viewChanged();
+
+                draw(true);
+            }
+            notOneTouch = false;
+        }
+    } else {
+        if (e.touches.length == 0) {
+            if (!notOneTouch) {
+                let canvasX = touchPos.x * window.devicePixelRatio;
+                
+                let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+                let square = overSquare(canvasX, canvasY);
+                
+                touchHold = false;
+                clearTimeout(touchTimeout);
+                
+                if (!touchHeld) {
+                    if (square) {
+                        if (!map[square.y][square.x].opened) {
+                            open(square);
+                        } else {
+                            chord(square);
+                        }
+                    }        
+                }
+            }
+            notOneTouch = false;
+        }
     }
 })
 
