@@ -18,9 +18,13 @@ const margin = 0.03; // percentage of each grid square
 
 const canvasMargin = 16; // pixels
 var scale = 1;
+var cam_x = 0;
+var cam_y = 0;
 
 var settings = false;
 var stats = false;
+
+var panning = false;
 
 var difficulty = localStorage.getItem("difficulty") ?? "Beginner";
 
@@ -576,8 +580,8 @@ function draw(clear=false) {
     }
     
     let squareSize = Math.min((canvas.width-2*canvasMargin)/size_x,(canvas.height-2*canvasMargin)/size_y) * scale;
-    let startx = canvas.width/2 - squareSize * size_x / 2;
-    let starty = canvas.height/2 - squareSize * size_y / 2;
+    let startx = canvas.width/2 - squareSize * size_x / 2 - cam_x;
+    let starty = canvas.height/2 - squareSize * size_y / 2 - cam_y;
 
 
     ctx.font = (squareSize / 1.5).toString() + "px monospace, monospace";
@@ -638,9 +642,9 @@ function draw(clear=false) {
 
 
 function overSquare(canvasX,canvasY) { // gets the square under the canvas at position (x,y)
-    let squareSize = Math.min((canvas.width-2*canvasMargin)/size_x,(canvas.height-2*canvasMargin)/size_y);
-    let startx = canvas.width/2 - squareSize * size_x / 2;
-    let starty = canvas.height/2 - squareSize * size_y / 2;
+    let squareSize = Math.min((canvas.width-2*canvasMargin)/size_x,(canvas.height-2*canvasMargin)/size_y) * scale;
+    let startx = canvas.width/2 - squareSize * size_x / 2 - cam_x;
+    let starty = canvas.height/2 - squareSize * size_y / 2 - cam_y;
 
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
@@ -674,15 +678,39 @@ document.addEventListener("mousemove", (e) => {
     let canvasX = e.clientX;
     let canvasY = e.clientY -  document.getElementById("top").clientHeight;
     
-    if (first && !inGame || inGame) {
-        if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
-            canvas.style.cursor = "pointer";
-        } else {
-            canvas.style.cursor = "default";
+    if (!panning) {
+        if (first && !inGame || inGame) {
+            if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+                canvas.style.cursor = "pointer";
+            } else {
+                canvas.style.cursor = "default";
+            }
         }
-    } 
+    } else {
+        canvas.style.pointer = "move";
+    }
     sessionStorage.setItem("pointer", overSquare(canvasX,canvasY) != null);
 });
+
+
+function viewChanged() {
+    if (cam_x == 0 & cam_y == 0 && scale == 1) {
+        document.getElementById("recenter").style.display = "none";
+    } else {
+        document.getElementById("recenter").style.display = "block";
+    }
+}
+
+document.getElementById("recenter").addEventListener("click", (e) => {
+    cam_x = 0;
+    cam_y = 0;
+    scale = 1;
+
+    draw(true);
+
+    document.getElementById("recenter").style.display = "none";
+});
+
 
 var touch = false;
 
@@ -703,6 +731,7 @@ document.addEventListener("mouseup", function (e) {
     } else if (e.button == 2) {
         rightButtonDown = false;
     }
+    mouseStart = null;
 });
 
 var double = false
@@ -780,14 +809,75 @@ function chord(square) {
     }
 }
 var mouseTimeout;
+var mouseStart;
+var camStart;
 canvas.addEventListener("mousedown", (e) => {
-    if (!onMouseDown) return;
-    let canvasX = e.clientX;
-    let canvasY = e.clientY -  document.getElementById("top").clientHeight;
-    let square = overSquare(canvasX, canvasY);
+    if (panning) {
+        let canvasX = e.clientX;
+        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
 
-    if (mouseTimeout) clearTimeout(mouseTimeout);
-    mouseTimeout = setTimeout(function() {
+        mouseStart = {x: canvasX, y: canvasY};
+        camStart = {x: cam_x, y: cam_y};
+    } else {
+        if (!onMouseDown) return;
+        let canvasX = e.clientX;
+        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
+        let square = overSquare(canvasX, canvasY);
+
+        if (mouseTimeout) clearTimeout(mouseTimeout);
+        mouseTimeout = setTimeout(function() {
+            if (!(leftButtonDown && rightButtonDown)) {
+                if (e.button == 0) {
+                    open(square);
+                } else if (e.button == 2 && inGame) {
+                    flag(square);
+                } else if (e.button == 1) {
+                    if (!chording) return;
+        
+                    chord(square);
+                }
+        
+                // update cursor
+                if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+                    canvas.style.cursor = "pointer";
+                } else {
+                    canvas.style.cursor = "default";
+                }
+            } else {
+                // chording
+                
+                
+                double = true; // fixes a bug where right + left together does two events
+        
+                if (!chording) return;
+        
+                chord(square);
+            }
+        }, 1)
+    }
+})
+canvas.addEventListener("mouseup", (e) => {
+    if (panning) {
+        let canvasX = e.clientX;
+        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
+
+        cam_x = camStart.x - (canvasX-mouseStart.x);
+        cam_y = camStart.y - (canvasY-mouseStart.y);
+
+        viewChanged();
+
+        draw(true);
+    } else {
+        if (onMouseDown) return;
+        if (double) {
+            double = false;
+            return
+        };
+        let canvasX = e.clientX;
+        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
+        let square = overSquare(canvasX, canvasY);
+
+
         if (!(leftButtonDown && rightButtonDown)) {
             if (e.button == 0) {
                 open(square);
@@ -795,10 +885,10 @@ canvas.addEventListener("mousedown", (e) => {
                 flag(square);
             } else if (e.button == 1) {
                 if (!chording) return;
-    
+
                 chord(square);
             }
-    
+
             // update cursor
             if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
                 canvas.style.cursor = "pointer";
@@ -810,51 +900,26 @@ canvas.addEventListener("mousedown", (e) => {
             
             
             double = true; // fixes a bug where right + left together does two events
-    
-            if (!chording) return;
-    
-            chord(square);
-        }
-    }, 1)
-    
-})
-canvas.addEventListener("mouseup", (e) => {
-    if (onMouseDown) return;
-    if (double) {
-        double = false;
-        return
-    };
-    let canvasX = e.clientX;
-    let canvasY = e.clientY -  document.getElementById("top").clientHeight;
-    let square = overSquare(canvasX, canvasY);
 
-
-    if (!(leftButtonDown && rightButtonDown)) {
-        if (e.button == 0) {
-            open(square);
-        } else if (e.button == 2 && inGame) {
-            flag(square);
-        } else if (e.button == 1) {
             if (!chording) return;
 
             chord(square);
         }
+    }
+});
 
-        // update cursor
-        if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
-            canvas.style.cursor = "pointer";
-        } else {
-            canvas.style.cursor = "default";
-        }
-    } else {
-        // chording
-        
-        
-        double = true; // fixes a bug where right + left together does two events
 
-        if (!chording) return;
+canvas.addEventListener("mousemove", (e) => {
+    if (panning && mouseStart) {
+        let canvasX = e.clientX;
+        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
 
-        chord(square);
+        cam_x = camStart.x - (canvasX-mouseStart.x);
+        cam_y = camStart.y - (canvasY-mouseStart.y);
+
+        viewChanged();
+
+        draw(true);
     }
 });
 
@@ -995,6 +1060,25 @@ document.getElementById("restartButton").addEventListener("click", (e) => {
         canvas.style.cursor = "pointer"; 
     }
 });
+
+document.getElementById("moveButton").addEventListener("click", (e) => {
+    if (inGame || (!inGame && first)) {
+        if (panning) {
+            document.getElementById("moveIcon").classList.remove("fa-gamepad");
+            document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
+        
+            mouseStart = null;
+        } else {
+            document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
+            document.getElementById("moveIcon").classList.add("fa-gamepad"); 
+        
+            canvas.style.cursor = "move";
+        }
+
+        panning = !panning;
+    }
+});
+
 
 document.getElementById("statsButton").addEventListener("click", (e) => {
     if (stats) {

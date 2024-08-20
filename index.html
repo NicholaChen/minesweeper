@@ -46,6 +46,9 @@
                     <button class="none" id="restartButton" title="Restart">
                         <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-rotate-right"></i></h2>
                     </button>
+                    <button class="none" id="moveButton" title="Pan and zoom/normal">
+                        <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-up-down-left-right" id="moveIcon"></i></h2>
+                    </button>
                     <button class="none" id="statsButton" title="Stats">
                         <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-chart-simple"></i></h2>
                     </button>
@@ -58,6 +61,7 @@
             <div style="flex-grow: 1; position: relative; margin: 0;" id="game">
                 <canvas id="canvas" style="position:absolute; left:0; top:0; width:100%; height:100%;">
                 </canvas>
+                <button id="recenter" style="display: none; position:absolute; bottom: 8px; right: 8px;">Recenter</button>
                 <div style="position:absolute; left:0; top: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background-color: rgba(0,0,0,0.3); display: none;" id="gameEnd">
                     <div style="background-color: var(--background-color); padding: 16px; text-align:center; min-width: 15%;" onclick="event.stopPropagation();">
                         <h1 style="text-align: center; margin: 0; font-size: 38px;" id="gameEndText">Game Over!</h1>

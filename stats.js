@@ -90,7 +90,17 @@ document.getElementById("resetStatsButton").addEventListener("click", (e) => {
     beginnerWins = 0;
     beginnerGamesPlayed = 0;
     beginnerAverageTime = 0;
+
+	intermediate = 0;
+	intermediateGamesPlayed = 0;
+	intermediateAverageTime = 0;
+
+	expertWins = 0;
+	expertGamesPlayed = 0;
+	expertAverageTime = 0;
     
     updateStatsAllGames();
     updateStatsBeginner();
+	updateStatsIntermediate();
+	updateStatsExpert();
 })
