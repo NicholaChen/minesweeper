@@ -260,7 +260,7 @@ document.getElementById("chordingOn").addEventListener("click", (e) => {
 
 var shortcutID = ""
 
-var shortcuts = ["restartShortcut", "settingsShortcut", "pauseShortcut"];
+var shortcuts = ["restartShortcut", "panZoomShortcut", "statsShortcut", "settingsShortcut", "pauseShortcut"];
 
 for (let i=0;i<shortcuts.length;i++) {
     document.getElementById(shortcuts[i]).innerText = window[shortcuts[i]];

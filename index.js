@@ -60,6 +60,8 @@ var chording = localStorage.getItem("chording") != "false";
 
 var pauseShortcut = localStorage.getItem("pauseShortcut") ?? "SPACE";
 var restartShortcut = localStorage.getItem("restartShortcut") ?? "ESCAPE";
+var panZoomShortcut = localStorage.getItem("panZoomShortcut") ?? "Z";
+var statsShortcut = localStorage.getItem("statsShortcut") ?? "A";
 var settingsShortcut = localStorage.getItem("settingsShortcut") ?? "S";
 
 var flagHold = isNaN(Number(localStorage.getItem("flagHold"))) || Number(localStorage.getItem("flagHold")) < 50 ?  250 : Number(localStorage.getItem("flagHold"));
@@ -675,9 +677,9 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
 });
 
 document.addEventListener("mousemove", (e) => {
-    let canvasX = e.clientX;
-    let canvasY = e.clientY -  document.getElementById("top").clientHeight;
-    
+    let canvasX = e.clientX * window.devicePixelRatio;
+    let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
+
     if (!panning) {
         if (first && !inGame || inGame) {
             if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
@@ -813,15 +815,15 @@ var mouseStart;
 var camStart;
 canvas.addEventListener("mousedown", (e) => {
     if (panning) {
-        let canvasX = e.clientX;
-        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
+        let canvasX = e.clientX * window.devicePixelRatio;
+        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
 
         mouseStart = {x: canvasX, y: canvasY};
         camStart = {x: cam_x, y: cam_y};
     } else {
         if (!onMouseDown) return;
-        let canvasX = e.clientX;
-        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
+        let canvasX = e.clientX * window.devicePixelRatio;
+        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
         let square = overSquare(canvasX, canvasY);
 
         if (mouseTimeout) clearTimeout(mouseTimeout);
@@ -858,8 +860,8 @@ canvas.addEventListener("mousedown", (e) => {
 })
 canvas.addEventListener("mouseup", (e) => {
     if (panning) {
-        let canvasX = e.clientX;
-        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
+        let canvasX = e.clientX * window.devicePixelRatio;
+        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
 
         cam_x = camStart.x - (canvasX-mouseStart.x);
         cam_y = camStart.y - (canvasY-mouseStart.y);
@@ -873,8 +875,8 @@ canvas.addEventListener("mouseup", (e) => {
             double = false;
             return
         };
-        let canvasX = e.clientX;
-        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
+        let canvasX = e.clientX * window.devicePixelRatio;
+        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
         let square = overSquare(canvasX, canvasY);
 
 
@@ -911,8 +913,8 @@ canvas.addEventListener("mouseup", (e) => {
 
 canvas.addEventListener("mousemove", (e) => {
     if (panning && mouseStart) {
-        let canvasX = e.clientX;
-        let canvasY = e.clientY -  document.getElementById("top").clientHeight;
+        let canvasX = e.clientX * window.devicePixelRatio;
+        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
 
         cam_x = camStart.x - (canvasX-mouseStart.x);
         cam_y = camStart.y - (canvasY-mouseStart.y);
@@ -983,6 +985,9 @@ canvas.addEventListener("touchstart", (e) => {
             camStart = {x: cam_x, y: cam_y};
         }
     }
+    if (e.touches.length == 2) {
+        
+    }
 });
 
 document.addEventListener("touchmove", (e) => {
@@ -1012,17 +1017,15 @@ canvas.addEventListener("touchend", (e) => {
     e.preventDefault();
     if (panning) {
         if (e.touches.length == 0) {
-            if (!notOneTouch) {
-                let canvasX = e.touches[0].clientX * window.devicePixelRatio;
-                let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+            let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+            let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-                cam_x = camStart.x - (canvasX-mouseStart.x);
-                cam_y = camStart.y - (canvasY-mouseStart.y);
+            cam_x = camStart.x - (canvasX-mouseStart.x);
+            cam_y = camStart.y - (canvasY-mouseStart.y);
 
-                viewChanged();
+            viewChanged();
 
-                draw(true);
-            }
+            draw(true);
             notOneTouch = false;
         }
     } else {
@@ -1235,6 +1238,43 @@ document.addEventListener('keydown', function(e) {
         
         if (sessionStorage.getItem("pointer") == "true") {
             canvas.style.cursor = "pointer"; 
+        }
+    } else if (heldKeys.join("+") == panZoomShortcut) {
+        if (inGame || (!inGame && first)) {
+            if (panning) {
+                document.getElementById("moveIcon").classList.remove("fa-gamepad");
+                document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
+            
+                mouseStart = null;
+            } else {
+                document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
+                document.getElementById("moveIcon").classList.add("fa-gamepad"); 
+            
+                canvas.style.cursor = "move";
+            }
+    
+            panning = !panning;
+        }
+    } else if (heldKeys.join("+") == statsShortcut) {
+        if (stats) {
+            stats = false;
+            document.getElementById("game").style.display = "block";
+            document.getElementById("stats").style.display = "none";
+    
+            document.getElementById("keybindsScreen").style.display = "none";
+    
+            if (inGame && !lastPause) unpause();
+        } else {
+            settings = false;
+            stats = true;
+            
+            document.getElementById("game").style.display = "none";
+            document.getElementById("settings").style.display = "none";
+            document.getElementById("stats").style.display = "block";
+            
+            document.getElementById("keybindsScreen").style.display = "none";
+            
+            if (inGame) pause();
         }
     } else if (heldKeys.join("+") == settingsShortcut) {
         e.preventDefault();
