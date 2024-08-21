@@ -171,6 +171,8 @@ function readSetting() {
 
             pauseShortcut = t.ps;
             restartShortcut = t.rs;
+            panZoomShortcut = t.pzs;
+            statsShortcut = t.sts;
             settingsShortcut = t.ss;
 
             flagHold = t.fh;
@@ -179,6 +181,7 @@ function readSetting() {
             showFlags = t.sf;
             showPause = t.sp;
             showRestart = t.sr;
+            
             
             show3BV = t.tb == true;
 
@@ -925,17 +928,40 @@ canvas.addEventListener("mousemove", (e) => {
     }
 });
 
+document.addEventListener("wheel", (e) => {
+    if(e.ctrlKey) {
+      e.preventDefault();
+  
+      return false;
+    }
+}, {passive:false});
 
 canvas.addEventListener("wheel", (e) => {
     if (panning) {
         let direction = e.deltaY > 0 ? 1 : -1;
-        scale -= 0.08 * direction * scale;
-    
+        let canvasX = e.clientX * window.devicePixelRatio * scale + cam_x;
+        let canvasY = (e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio) * scale + cam_y;
+
+        //scale -= 0.08 * direction * scale;
+
+        let canvasXA = e.clientX * window.devicePixelRatio * scale + cam_x;
+        let canvasYA = (e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio) * scale + cam_y;
+        
+        cam_x += canvasXA - canvasX;
+        cam_y += canvasYA - canvasY;
+
         viewChanged();
         draw(true);
+
+        console.log(canvasX, canvasY);
+
+        console.log(PosFromCanvasPos(canvasX, canvasY));
     }
 }, {passive:true});
 
+function PosFromCanvasPos(x,y) {
+    return {x: (x / scale) , y: (y / scale) }
+}
 
 var touchHold;
 var touchPos;
@@ -944,6 +970,10 @@ var touchHeld = false;
 var touchTimeout;
 
 var notOneTouch = false;
+
+var lastTouch0;
+var lastTouch1;
+
 document.addEventListener("touchstart", (e) => {
     if (e.touches.length == 1) {
         if (panning) {
@@ -984,9 +1014,17 @@ canvas.addEventListener("touchstart", (e) => {
             mouseStart = {x: canvasX, y: canvasY};
             camStart = {x: cam_x, y: cam_y};
         }
-    }
-    if (e.touches.length == 2) {
-        
+    } else if (e.touches.length == 2) {
+        if (panning) {
+            let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
+            let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+            let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
+            let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+            lastTouch0 = {x: canvasX0, y: canvasY0};
+            lastTouch1 = {x: canvasX1, y: canvasY1};
+        }
     }
 });
 
@@ -1010,6 +1048,19 @@ canvas.addEventListener("touchmove", (e) => {
 
             draw(true);
         }
+    } else if (e.touches.length == 2) {
+        let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
+        let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+        let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
+        let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+        scale *= Math.sqrt(Math.pow(canvasX0-canvasX1, 2) + Math.pow(canvasY0-canvasY1)) / Math.sqrt(Math.pow(lastTouch0.x-lastTouch1.x, 2) + Math.pow(lastTouch0.y-lastTouch1.y));
+
+        viewChanged();
+
+        draw(true);
+
     }
 })
 
@@ -1027,6 +1078,12 @@ canvas.addEventListener("touchend", (e) => {
 
             draw(true);
             notOneTouch = false;
+        } else if (e.touches.length == 1) {
+            let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+            let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+            mouseStart = {x: canvasX, y: canvasY};
+            camStart = {x: cam_x, y: cam_y};
         }
     } else {
         if (e.touches.length == 0) {

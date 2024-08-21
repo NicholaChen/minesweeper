@@ -694,6 +694,8 @@ function resetControls() {
     
     pauseShortcut = "SPACE";
     restartShortcut = "ESCAPE";
+    panZoomShortcut = "Z";
+    statsShortcut = "A";
     settingsShortcut = "S";
     
     for (let i=0;i<shortcuts.length;i++) {
@@ -874,6 +876,8 @@ document.getElementById("shareSettings").addEventListener("click", (e) => {
         c: chording,
         ps: pauseShortcut,
         rs: restartShortcut,
+        pzs: panZoomShortcut,
+        sts: statsShortcut,
         ss: settingsShortcut,
         fh: flagHold,
         st: showTimer,
@@ -906,6 +910,11 @@ document.getElementById("saveImportedSettings").addEventListener("click", (e) =>
 
     localStorage.setItem("onMouseDown", onMouseDown);
     localStorage.setItem("chording", chording);
+    localStorage.setItem("pauseShortcut", pauseShortcut);
+    localStorage.setItem("restartShortcut", restartShortcut);
+    localStorage.setItem("panZoomShortcut", panZoomShortcut);
+    localStorage.setItem("statsShortcut", statsShortcut);
+    localStorage.setItem("settingsShortcut", settingsShortcut);
 
     localStorage.setItem("flagHold", flagHold);
     localStorage.setItem("showTimer", showTimer);
@@ -921,6 +930,7 @@ document.getElementById("saveImportedSettings").addEventListener("click", (e) =>
         }
     }
 
+    localStorage.getItem("show3BV", show3BV);
     document.getElementById("saveImportedSettings").style.display = "none";
     document.getElementById("cancelImportedSettings").style.display = "none";
 });
