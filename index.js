@@ -1,4 +1,4 @@
-const VERSION = "1.9.0";
+const VERSION = "1.9.1";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -76,6 +76,10 @@ var show3BV = localStorage.getItem("show3BV") == "true";
 // stats
 
 var wins = isNaN(Number(localStorage.getItem("wins"))) || Number(localStorage.getItem("wins")) < 0 ? 0 : Number(localStorage.getItem("wins"));
+
+var bestWinStreak = isNaN(Number(localStorage.getItem("bestWinStreak"))) || Number(localStorage.getItem("bestWinStreak")) < 0 ? 0 : Number(localStorage.getItem("bestWinStreak"));
+var currentWinStreak = isNaN(Number(localStorage.getItem("currentWinStreak"))) || Number(localStorage.getItem("currentWinStreak")) < 0 ? 0 : Number(localStorage.getItem("currentWinStreak"));
+
 var hours = isNaN(Number(localStorage.getItem("hours"))) || Number(localStorage.getItem("hours")) < 0 ? 0 : Number(localStorage.getItem("hours")); // in ms
 var gamesPlayed = isNaN(Number(localStorage.getItem("gamesPlayed"))) || Number(localStorage.getItem("gamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("gamesPlayed"));
 
@@ -124,72 +128,106 @@ function readSetting() {
         
             let t = JSON.parse(atob(s));
 
-            if (t.t == null) return;
+            if (t.t != null) {
+                theme = t.t;
+                
+                if (theme.key == "custom") {
+                    themes.custom = theme;
+                }
 
-            theme = t.t;
-            
-            if (theme.key == "custom") {
-                themes.custom = theme;
+                setTheme(theme);
+
+                document.getElementById("saveImportedSettings").innerText = "Save imported theme";
+                document.getElementById("cancelImportedSettings").innerText = "Cancel imported theme";
+
+                document.getElementById("saveImportedSettings").style.display = "inline";
+                document.getElementById("cancelImportedSettings").style.display = "inline";
+            }
+            let more = false;
+            if (typeof(t.w) == "number" && t.w >= 5 && t.w < 100) {
+                size_x = t.w;
+                more = true;
+            }
+            if (typeof(t.h) == "number" && t.h >= 5 && t.h < 100) {
+                size_y = t.h;
+                more = true;
+            }
+            if (typeof(t.n) == "number" || t.n > 0 || t.h <= Math.floor(t.w * t.h / 2)) {
+                numMines = t.n;
+                more = true;
+            }
+            if (typeof(t.il) == "boolean") {
+                infiniteLives = t.il;
+                more = true;
+            }
+            if (typeof(t.md) == "boolean") {
+                onMouseDown = t.md;
+                more = true;
+            }
+            if (typeof(t.c) == "boolean") {
+                chording = t.c;
+                more = true;
             }
 
-            setTheme(theme);
-
-            document.getElementById("saveImportedSettings").innerText = "Save imported theme";
-            document.getElementById("cancelImportedSettings").innerText = "Cancel imported theme";
-
-            document.getElementById("saveImportedSettings").style.display = "inline";
-            document.getElementById("cancelImportedSettings").style.display = "inline";
-
-            if (typeof(t.w) != "number" || t.w < 5 || t.w >= 100) return
-            if (typeof(t.h) != "number" || t.h < 5 || t.h >= 100) return
-            if (typeof(t.n) != "number" || t.n <= 0 || t.h > Math.floor(t.w * t.h / 2)) return
+            if (typeof(t.ps) == "string") {
+                pauseShortcut = t.ps;
+                more = true;
+            }
+            if (typeof(t.pzs) == "string") {
+                panZoomShortcut = t.pzs;
+                more = true;
+            }
+            if (typeof(t.sts) == "string") {
+                statsShortcut = t.sts;
+                more = true;
+            }
             
-            if (typeof(t.il) != "boolean") return;
+            if (typeof(t.rs) == "string") {
+                restartShortcut = t.rs;
+                more = true;
+            }
+            if (typeof(t.ss) == "string") {
+                settingsShortcut = t.ss;
+                more = true;
+            }
+
             
+
+            if (typeof(t.fh) == "number" && t.fh >= 50) {
+                flagHold = t.fh;
+                more = true;
+            }
+
+            if (typeof(t.st) == "boolean") {
+                showTimer = t.st;
+                more = true;
+            }
+            if (typeof(t.sf) == "boolean") {
+                showFlags = t.sf;
+                more = true;
+            }
+            if (typeof(t.sp) == "boolean") {
+                showPause = t.sp;
+                more = true;
+            }
+            if (typeof(t.sr) == "boolean") {
+                showRestart = t.sr;
+                more = true;
+            }
+
+
+            if (typeof(t.tb) == "boolean") {
+                show3BV = t.tb;
+                more = true;
+            }
             
-            if (typeof(t.md) != "boolean") return;
-            if (typeof(t.c) != "boolean") return;
-            if (typeof(t.ps) != "string") return;
-            if (typeof(t.rs) != "string") return;
-            if (typeof(t.ss) != "string") return;
-            if (typeof(t.fh) != "number" || t.fh < 100) return;
+            if (more) {
+                document.getElementById("saveImportedSettings").innerText = "Save imported settings";
+                document.getElementById("cancelImportedSettings").innerText = "Cancel imported settings";
 
-            if (typeof(t.st) != "boolean") return;
-            if (typeof(t.sf) != "boolean") return;
-            if (typeof(t.sp) != "boolean") return;
-            if (typeof(t.sr) != "boolean") return;
-
-
-            size_x = t.w;
-            size_y = t.h;
-
-            numMines = t.n;
-            infiniteLives = t.il;
-
-            onMouseDown = t.md;
-            chording = t.c;
-
-            pauseShortcut = t.ps;
-            restartShortcut = t.rs;
-            panZoomShortcut = t.pzs;
-            statsShortcut = t.sts;
-            settingsShortcut = t.ss;
-
-            flagHold = t.fh;
-
-            showTimer = t.st;
-            showFlags = t.sf;
-            showPause = t.sp;
-            showRestart = t.sr;
-            
-            
-            show3BV = t.tb == true;
-
-            document.getElementById("saveImportedSettings").innerText = "Save imported settings";
-            document.getElementById("cancelImportedSettings").innerText = "Cancel imported settings";
-
-            document.getElementById("saveImportedSettings").style.display = "inline";
-            document.getElementById("cancelImportedSettings").style.display = "inline";
+                document.getElementById("saveImportedSettings").style.display = "inline";
+                document.getElementById("cancelImportedSettings").style.display = "inline";
+            }
         } catch (e) {
         }
     }
@@ -410,8 +448,6 @@ function threeBV() {
         }
     }
     
-    console.log(i)
-    
     return i
 }
 
@@ -435,7 +471,7 @@ function exposeTile(x,y) {
             clearInterval(interval);
             let elapsedTime = Date.now() - startTime;
             document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-    
+            currentWinStreak = 0;
             hours += elapsedTime - pausedTime;
             gamesPlayed += 1;
             
@@ -463,6 +499,7 @@ function exposeTile(x,y) {
                 }
             }
             document.getElementById("time").style.display = "none";
+            document.getElementById("winStreak").style.display = "none";
             document.getElementById("3BVSec").style.display = "none";
             document.getElementById("gameEndText").innerText = "Game Over!";
             document.getElementById("gameEnd").style.display = "flex";
@@ -504,6 +541,7 @@ function exposeTile(x,y) {
     
         hours += elapsedTime - pausedTime;
         wins += 1;
+        currentWinStreak += 1;
         gamesPlayed += 1;
         
         updateStatsAllGames();
@@ -532,6 +570,8 @@ function exposeTile(x,y) {
 		}
     
         document.getElementById("time").style.display = "block";
+        document.getElementById("winStreak").style.display = "block";
+        document.getElementById("winStreak").innerText = "Win streak: " + currentWinStreak;
         document.getElementById("3BVSec").style.display = show3BV ? "block" : "none";
         document.getElementById("3BVSec").innerText = "3BV/sec: " + (map3BV / ((elapsedTime - pausedTime) / 1000)).toFixed(2);
         
@@ -756,7 +796,7 @@ function open(square) {
                         let elapsedTime = Date.now() - startTime;
                         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
                     }
-                }, 1);
+                }, 10);
             }
             exposeTile(square.x, square.y);
             draw(true);
@@ -1052,11 +1092,11 @@ canvas.addEventListener("touchmove", (e) => {
         let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
         let canvasX = (canvasX0 + canvasX1) / 2;
-        let canvasY = (canvasY0 + canvasY1) / 2
+        let canvasY = (canvasY0 + canvasY1) / 2;
 
         let c0 = PosFromCanvasPos(canvasX, canvasY);
 
-        scale *= Math.sqrt(Math.pow(canvasX0-canvasX1, 2) + Math.pow(canvasY0-canvasY1)) / Math.sqrt(Math.pow(lastTouch0.x-lastTouch1.x, 2) + Math.pow(lastTouch0.y-lastTouch1.y));
+        scale *= Math.sqrt(Math.pow(canvasX0-canvasX1, 2) + Math.pow(canvasY0-canvasY1, 2)) / Math.sqrt(Math.pow(lastTouch0.x-lastTouch1.x, 2) + Math.pow(lastTouch0.y-lastTouch1.y,2));
 
         let c1 = PosFromCanvasPos(canvasX, canvasY);
 
@@ -1186,21 +1226,19 @@ document.getElementById("restartButton").addEventListener("click", (e) => {
 });
 
 document.getElementById("moveButton").addEventListener("click", (e) => {
-    if (inGame || (!inGame && first)) {
-        if (panning) {
-            document.getElementById("moveIcon").classList.remove("fa-gamepad");
-            document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
-        
-            lastMouse = null;
-        } else {
-            document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
-            document.getElementById("moveIcon").classList.add("fa-gamepad"); 
-        
-            canvas.style.cursor = "move";
-        }
-
-        panning = !panning;
+    if (panning) {
+        document.getElementById("moveIcon").classList.remove("fa-arrow-pointer");
+        document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
+    
+        lastMouse = null;
+    } else {
+        document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
+        document.getElementById("moveIcon").classList.add("fa-arrow-pointer"); 
+    
+        canvas.style.cursor = "move";
     }
+
+    panning = !panning;
 });
 
 
@@ -1301,21 +1339,19 @@ document.addEventListener('keydown', function(e) {
             canvas.style.cursor = "pointer"; 
         }
     } else if (heldKeys.join("+") == panZoomShortcut) {
-        if (inGame || (!inGame && first)) {
-            if (panning) {
-                document.getElementById("moveIcon").classList.remove("fa-gamepad");
-                document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
-            
-                lastMouse = null;
-            } else {
-                document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
-                document.getElementById("moveIcon").classList.add("fa-gamepad"); 
-            
-                canvas.style.cursor = "move";
-            }
-    
-            panning = !panning;
+        if (panning) {
+            document.getElementById("moveIcon").classList.remove("fa-arrow-pointer");
+            document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
+        
+            lastMouse = null;
+        } else {
+            document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
+            document.getElementById("moveIcon").classList.add("fa-arrow-pointer"); 
+        
+            canvas.style.cursor = "move";
         }
+
+        panning = !panning;
     } else if (heldKeys.join("+") == statsShortcut) {
         if (stats) {
             stats = false;
@@ -1359,6 +1395,11 @@ document.addEventListener('keydown', function(e) {
             if (inGame) pause();
         }
     }
+});
+
+
+window.addEventListener('blur', function() {
+    if (inGame) pause();
 });
 
 /* TODO (not in order)
