@@ -1,4 +1,4 @@
-const VERSION = "1.9.1";
+const VERSION = "1.9.2";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -65,6 +65,8 @@ var statsShortcut = localStorage.getItem("statsShortcut") ?? "A";
 var settingsShortcut = localStorage.getItem("settingsShortcut") ?? "S";
 
 var flagHold = isNaN(Number(localStorage.getItem("flagHold"))) || Number(localStorage.getItem("flagHold")) < 50 ?  250 : Number(localStorage.getItem("flagHold"));
+var easyPanZoom = localStorage.getItem("easyPanZoom") == "true";
+
 
 var showTimer = localStorage.getItem("showTimer") != "false";
 var showFlags = localStorage.getItem("showFlags") != "false";
@@ -181,7 +183,7 @@ function readSetting() {
                 statsShortcut = t.sts;
                 more = true;
             }
-            
+
             if (typeof(t.rs) == "string") {
                 restartShortcut = t.rs;
                 more = true;
@@ -195,6 +197,12 @@ function readSetting() {
 
             if (typeof(t.fh) == "number" && t.fh >= 50) {
                 flagHold = t.fh;
+                more = true;
+            }
+
+
+            if (typeof(t.epz) == "boolean") {
+                easyPanZoom = t.epz;
                 more = true;
             }
 
@@ -1010,6 +1018,9 @@ var notOneTouch = false;
 var lastTouch0;
 var lastTouch1;
 
+var moved = false;
+var moveStart;
+
 document.addEventListener("touchstart", (e) => {
     if (e.touches.length == 1) {
         if (panning) {
@@ -1023,7 +1034,7 @@ document.addEventListener("touchstart", (e) => {
             touchHold = true;
             
             touchTimeout = setTimeout(function() {
-                if (touchHold) {
+                if (touchHold && !moved) {
                     touchHeld = true;
                     let canvasX = touchPos.x * window.devicePixelRatio;
                     
@@ -1034,16 +1045,22 @@ document.addEventListener("touchstart", (e) => {
                 }
             }, flagHold);
         }
+        moved = false;
     } else {
     	touchHold = false;
     	
     	notOneTouch = true;
+
+        let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+        let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+        moveStart = {x: canvasX, y: canvasY};
     }
 });
 
 canvas.addEventListener("touchstart", (e) => {
     if (e.touches.length == 1) {
-        if (panning) {
+        if (panning || easyPanZoom) {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
@@ -1077,61 +1094,72 @@ canvas.addEventListener("touchmove", (e) => {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            cam_x = camStart.x - (canvasX-lastMouse.x);
-            cam_y = camStart.y - (canvasY-lastMouse.y);
+            cam_x -= (canvasX-lastMouse.x);
+            cam_y -= (canvasY-lastMouse.y);
 
             viewChanged();
 
             draw(true);
+        } else {
+            let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+            let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+
+            if (Math.sqrt(Math.pow(moveStart.x-canvasX, 2) + Math.pow(moveStart.y-canvasY, 2)) > 10) {
+                moved = true;
+
+                cam_x = camStart.x - (canvasX-moveStart.x);
+                cam_y = camStart.y - (canvasY-moveStart.y);
+
+                viewChanged();
+
+                draw(true);
+    
+            }
         }
     } else if (e.touches.length == 2) {
-        let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
-        let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+        if (panning || (moved && easyPanZoom)) {
+            let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
+            let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-        let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
-        let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+            let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
+            let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-        let canvasX = (canvasX0 + canvasX1) / 2;
-        let canvasY = (canvasY0 + canvasY1) / 2;
+            let canvasX = (canvasX0 + canvasX1) / 2;
+            let canvasY = (canvasY0 + canvasY1) / 2;
 
-        let c0 = PosFromCanvasPos(canvasX, canvasY);
+            let c0 = PosFromCanvasPos(canvasX, canvasY);
 
-        scale *= Math.sqrt(Math.pow(canvasX0-canvasX1, 2) + Math.pow(canvasY0-canvasY1, 2)) / Math.sqrt(Math.pow(lastTouch0.x-lastTouch1.x, 2) + Math.pow(lastTouch0.y-lastTouch1.y,2));
+            scale *= Math.sqrt(Math.pow(canvasX0-canvasX1, 2) + Math.pow(canvasY0-canvasY1, 2)) / Math.sqrt(Math.pow(lastTouch0.x-lastTouch1.x, 2) + Math.pow(lastTouch0.y-lastTouch1.y,2));
 
-        let c1 = PosFromCanvasPos(canvasX, canvasY);
+            let c1 = PosFromCanvasPos(canvasX, canvasY);
 
-        cam_x -= (c1.x - c0.x) * scale;
-        cam_y -= (c1.y - c0.y) * scale;
+            cam_x -= (c1.x - c0.x) * scale;
+            cam_y -= (c1.y - c0.y) * scale;
 
-        viewChanged();
-        draw(true);
+            lastTouch0 = {x: canvasX0, y: canvasY0};
+            lastTouch1 = {x: canvasX1, y: canvasY1};
+
+            viewChanged();
+            draw(true);
+        }
     }
 })
 
 canvas.addEventListener("touchend", (e) => {
     e.preventDefault();
-    if (panning) {
+    if (panning || easyPanZoom) {
         if (e.touches.length == 0) {
-            let canvasX = e.touches[0].clientX * window.devicePixelRatio;
-            let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
-
-            cam_x = camStart.x - (canvasX-lastMouse.x);
-            cam_y = camStart.y - (canvasY-lastMouse.y);
-
-            viewChanged();
-
-            draw(true);
             notOneTouch = false;
         } else if (e.touches.length == 1) {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
             lastMouse = {x: canvasX, y: canvasY};
-            camStart = {x: cam_x, y: cam_y};
         }
-    } else {
+    }
+    if (!panning) {
         if (e.touches.length == 0) {
-            if (!notOneTouch) {
+            if (!notOneTouch && !moved) {
                 let canvasX = touchPos.x * window.devicePixelRatio;
                 
                 let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
@@ -1323,6 +1351,20 @@ document.addEventListener('keydown', function(e) {
         heldKeys.push(e.key.toUpperCase().replace(" ", "SPACE"));
     }
 
+    if (heldKeys == "ARROWUP") {
+        cam_y += 15;
+        draw(true);
+    } else if (heldKeys == "ARROWDOWN") {
+        cam_y -= 15;
+        draw(true);
+    } else if (heldKeys == "ARROWLEFT") {
+        cam_x += 15;
+        draw(true);
+    } else if (heldKeys == "ARROWRIGHT") {
+        cam_x -= 15;
+        draw(true);
+    }
+
     if (heldKeys.join("+") == pauseShortcut) {
         e.preventDefault();
         pauseUnpause();
@@ -1414,5 +1456,6 @@ window.addEventListener('blur', function() {
  X settings page doesn't reset game
  ~ Stats page for each difficulty
  - Show only mobile settings
- - Zoom and pan for mobile
+ X Zoom and pan for mobile
+ - Cool new gamemodes
 */
