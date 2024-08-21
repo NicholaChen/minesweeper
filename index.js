@@ -1,4 +1,4 @@
-const VERSION = "1.8.1";
+const VERSION = "1.9.0";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -653,10 +653,6 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
 
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (!map[y][x].opened) {
-                ctx.fillStyle = "rgba(50,50,50,0.5)";
-            }
-
             if (canvasX >= startx+x*squareSize && canvasX <= startx+x*squareSize + squareSize*margin + squareSize &&
                 canvasY >= starty+y*squareSize && canvasY <= starty+y*squareSize + squareSize*margin + squareSize) {
                 return {x: x, y: y}
@@ -736,7 +732,7 @@ document.addEventListener("mouseup", function (e) {
     } else if (e.button == 2) {
         rightButtonDown = false;
     }
-    mouseStart = null;
+    lastMouse = null;
 });
 
 var double = false
@@ -814,14 +810,14 @@ function chord(square) {
     }
 }
 var mouseTimeout;
-var mouseStart;
+var lastMouse;
 var camStart;
 canvas.addEventListener("mousedown", (e) => {
     if (panning) {
         let canvasX = e.clientX * window.devicePixelRatio;
         let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
 
-        mouseStart = {x: canvasX, y: canvasY};
+        lastMouse = {x: canvasX, y: canvasY};
         camStart = {x: cam_x, y: cam_y};
     } else {
         if (!onMouseDown) return;
@@ -866,8 +862,8 @@ canvas.addEventListener("mouseup", (e) => {
         let canvasX = e.clientX * window.devicePixelRatio;
         let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
 
-        cam_x = camStart.x - (canvasX-mouseStart.x);
-        cam_y = camStart.y - (canvasY-mouseStart.y);
+        cam_x -= (canvasX-lastMouse.x);
+        cam_y -= (canvasY-lastMouse.y);
 
         viewChanged();
 
@@ -915,14 +911,16 @@ canvas.addEventListener("mouseup", (e) => {
 
 
 canvas.addEventListener("mousemove", (e) => {
-    if (panning && mouseStart) {
+    if (panning && lastMouse) {
         let canvasX = e.clientX * window.devicePixelRatio;
         let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
 
-        cam_x = camStart.x - (canvasX-mouseStart.x);
-        cam_y = camStart.y - (canvasY-mouseStart.y);
+        cam_x -= (canvasX-lastMouse.x);
+        cam_y -= (canvasY-lastMouse.y);
 
         viewChanged();
+
+        lastMouse = {x: canvasX, y: canvasY};
 
         draw(true);
     }
@@ -939,28 +937,26 @@ document.addEventListener("wheel", (e) => {
 canvas.addEventListener("wheel", (e) => {
     if (panning) {
         let direction = e.deltaY > 0 ? 1 : -1;
-        let canvasX = e.clientX * window.devicePixelRatio * scale + cam_x;
-        let canvasY = (e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio) * scale + cam_y;
+        let canvasX = e.clientX * window.devicePixelRatio;
+        let canvasY = (e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio);
 
-        //scale -= 0.08 * direction * scale;
+        let c0 = PosFromCanvasPos(canvasX, canvasY);
 
-        let canvasXA = e.clientX * window.devicePixelRatio * scale + cam_x;
-        let canvasYA = (e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio) * scale + cam_y;
+        scale -= 0.08 * direction * scale;
+
         
-        cam_x += canvasXA - canvasX;
-        cam_y += canvasYA - canvasY;
+        let c1 = PosFromCanvasPos(canvasX, canvasY);
+
+        cam_x -= (c1.x - c0.x) * scale;
+        cam_y -= (c1.y - c0.y) * scale;
 
         viewChanged();
         draw(true);
-
-        console.log(canvasX, canvasY);
-
-        console.log(PosFromCanvasPos(canvasX, canvasY));
     }
 }, {passive:true});
 
 function PosFromCanvasPos(x,y) {
-    return {x: (x / scale) , y: (y / scale) }
+    return {x: (x + cam_x - canvas.width / 2) / scale, y: (y + cam_y - canvas.height / 2) / scale}
 }
 
 var touchHold;
@@ -1011,7 +1007,7 @@ canvas.addEventListener("touchstart", (e) => {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            mouseStart = {x: canvasX, y: canvasY};
+            lastMouse = {x: canvasX, y: canvasY};
             camStart = {x: cam_x, y: cam_y};
         }
     } else if (e.touches.length == 2) {
@@ -1041,8 +1037,8 @@ canvas.addEventListener("touchmove", (e) => {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            cam_x = camStart.x - (canvasX-mouseStart.x);
-            cam_y = camStart.y - (canvasY-mouseStart.y);
+            cam_x = camStart.x - (canvasX-lastMouse.x);
+            cam_y = camStart.y - (canvasY-lastMouse.y);
 
             viewChanged();
 
@@ -1055,12 +1051,20 @@ canvas.addEventListener("touchmove", (e) => {
         let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
         let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
+        let canvasX = (canvasX0 + canvasX1) / 2;
+        let canvasY = (canvasY0 + canvasY1) / 2
+
+        let c0 = PosFromCanvasPos(canvasX, canvasY);
+
         scale *= Math.sqrt(Math.pow(canvasX0-canvasX1, 2) + Math.pow(canvasY0-canvasY1)) / Math.sqrt(Math.pow(lastTouch0.x-lastTouch1.x, 2) + Math.pow(lastTouch0.y-lastTouch1.y));
 
+        let c1 = PosFromCanvasPos(canvasX, canvasY);
+
+        cam_x -= (c1.x - c0.x) * scale;
+        cam_y -= (c1.y - c0.y) * scale;
+
         viewChanged();
-
         draw(true);
-
     }
 })
 
@@ -1071,8 +1075,8 @@ canvas.addEventListener("touchend", (e) => {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            cam_x = camStart.x - (canvasX-mouseStart.x);
-            cam_y = camStart.y - (canvasY-mouseStart.y);
+            cam_x = camStart.x - (canvasX-lastMouse.x);
+            cam_y = camStart.y - (canvasY-lastMouse.y);
 
             viewChanged();
 
@@ -1082,7 +1086,7 @@ canvas.addEventListener("touchend", (e) => {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            mouseStart = {x: canvasX, y: canvasY};
+            lastMouse = {x: canvasX, y: canvasY};
             camStart = {x: cam_x, y: cam_y};
         }
     } else {
@@ -1187,7 +1191,7 @@ document.getElementById("moveButton").addEventListener("click", (e) => {
             document.getElementById("moveIcon").classList.remove("fa-gamepad");
             document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
         
-            mouseStart = null;
+            lastMouse = null;
         } else {
             document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
             document.getElementById("moveIcon").classList.add("fa-gamepad"); 
@@ -1302,7 +1306,7 @@ document.addEventListener('keydown', function(e) {
                 document.getElementById("moveIcon").classList.remove("fa-gamepad");
                 document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
             
-                mouseStart = null;
+                lastMouse = null;
             } else {
                 document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
                 document.getElementById("moveIcon").classList.add("fa-gamepad"); 
