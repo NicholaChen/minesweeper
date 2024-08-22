@@ -1,4 +1,4 @@
-const VERSION = "1.9.2";
+const VERSION = "1.9.3";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -980,7 +980,7 @@ document.addEventListener("wheel", (e) => {
   
       return false;
     }
-}, {passive:false});
+});
 
 canvas.addEventListener("wheel", (e) => {
     if (panning) {
@@ -1021,6 +1021,8 @@ var lastTouch1;
 var moved = false;
 var moveStart;
 
+var lastTouch;
+
 document.addEventListener("touchstart", (e) => {
     if (e.touches.length == 1) {
         if (panning) {
@@ -1045,7 +1047,11 @@ document.addEventListener("touchstart", (e) => {
                 }
             }, flagHold);
         }
-        moved = false;
+
+        let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+        let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+        
+        moveStart = {x: canvasX, y: canvasY};
     } else {
     	touchHold = false;
     	
@@ -1053,8 +1059,6 @@ document.addEventListener("touchstart", (e) => {
 
         let canvasX = e.touches[0].clientX * window.devicePixelRatio;
         let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
-
-        moveStart = {x: canvasX, y: canvasY};
     }
 });
 
@@ -1064,11 +1068,11 @@ canvas.addEventListener("touchstart", (e) => {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            lastMouse = {x: canvasX, y: canvasY};
+            lastTouch = {x: canvasX, y: canvasY};
             camStart = {x: cam_x, y: cam_y};
         }
     } else if (e.touches.length == 2) {
-        if (panning) {
+        if (panning || easyPanZoom) {
             let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
@@ -1079,7 +1083,7 @@ canvas.addEventListener("touchstart", (e) => {
             lastTouch1 = {x: canvasX1, y: canvasY1};
         }
     }
-});
+}, {passive:true});
 
 document.addEventListener("touchmove", (e) => {
     touchPos = {
@@ -1090,21 +1094,23 @@ document.addEventListener("touchmove", (e) => {
 
 canvas.addEventListener("touchmove", (e) => {
     if (e.touches.length == 1) {
-        if (panning) {
+        if (panning || moved) {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            cam_x -= (canvasX-lastMouse.x);
-            cam_y -= (canvasY-lastMouse.y);
+            cam_x -= (canvasX-lastTouch.x);
+            cam_y -= (canvasY-lastTouch.y);
 
             viewChanged();
 
             draw(true);
-        } else {
+
+            lastTouch = {x: canvasX, y: canvasY};
+        } else if (easyPanZoom) {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            if (Math.sqrt(Math.pow(moveStart.x-canvasX, 2) + Math.pow(moveStart.y-canvasY, 2)) > 10) {
+            if (Math.sqrt(Math.pow(moveStart.x-canvasX, 2) + Math.pow(moveStart.y-canvasY, 2)) > 2 * window.devicePixelRatio && !moved) {
                 moved = true;
 
                 cam_x = camStart.x - (canvasX-moveStart.x);
@@ -1115,15 +1121,18 @@ canvas.addEventListener("touchmove", (e) => {
                 draw(true);
     
             }
+            lastTouch = {x: canvasX, y: canvasY};
         }
     } else if (e.touches.length == 2) {
-        if (panning || (moved && easyPanZoom)) {
+        if (panning || easyPanZoom) {
+            moved = true;
             let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
             let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
             let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
-
+            
+            
             let canvasX = (canvasX0 + canvasX1) / 2;
             let canvasY = (canvasY0 + canvasY1) / 2;
 
@@ -1143,7 +1152,7 @@ canvas.addEventListener("touchmove", (e) => {
             draw(true);
         }
     }
-})
+}, {passive:true})
 
 canvas.addEventListener("touchend", (e) => {
     e.preventDefault();
@@ -1154,7 +1163,7 @@ canvas.addEventListener("touchend", (e) => {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            lastMouse = {x: canvasX, y: canvasY};
+            lastTouch = {x: canvasX, y: canvasY};
         }
     }
     if (!panning) {
@@ -1181,7 +1190,10 @@ canvas.addEventListener("touchend", (e) => {
             notOneTouch = false;
         }
     }
-})
+    if (e.touches.length == 0) {
+        moved = false;
+    }
+});
 
 var pauseStart;
 function unpause() {
@@ -1267,6 +1279,7 @@ document.getElementById("moveButton").addEventListener("click", (e) => {
     }
 
     panning = !panning;
+    console.log(panning);
 });
 
 
@@ -1441,7 +1454,10 @@ document.addEventListener('keydown', function(e) {
 
 
 window.addEventListener('blur', function() {
-    if (inGame) pause();
+    if (inGame) {
+        pause();
+        lastPause = true;
+    }
 });
 
 /* TODO (not in order)
@@ -1458,4 +1474,5 @@ window.addEventListener('blur', function() {
  - Show only mobile settings
  X Zoom and pan for mobile
  - Cool new gamemodes
+ - Drop shadow for "floating" buttons
 */

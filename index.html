@@ -7,7 +7,7 @@
         <meta name="description" content="A simple customizable minesweeper game."/>
         <meta name="robots" content="index,follow"/>
         <meta name="google-site-verification" content="RxQrAskRY0MF3xounDwxAz3FUPINcIuYu7gR433u6ko" />
-        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="style.css"/>
         <link rel="stylesheet" href="themes.css">
         <link rel="icon" type="image/x-icon" href="images/favicon.png">
@@ -58,11 +58,11 @@
                 </div>
             </div>
             
-            <div style="flex-grow: 1; position: relative; margin: 0;" id="game">
+            <div style="flex-grow: 1; position: relative; margin: 0; touch-action: none;" id="game">
                 <canvas id="canvas" style="position:absolute; left:0; top:0; width:100%; height:100%;">
                 </canvas>
                 <button id="recenter" style="display: none; position:absolute; bottom: 8px; right: 8px;">Recenter</button>
-                <div style="position:absolute; left:0; top: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background-color: rgba(0,0,0,0.3); display: none;" id="gameEnd">
+                <div style="position:absolute; left:0; top: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background-color: rgba(0,0,0,0.4); display: none;" id="gameEnd">
                     <div style="background-color: var(--background-color); padding: 16px; text-align:center; min-width: 15%;" onclick="event.stopPropagation();">
                         <h1 style="text-align: center; margin: 0; font-size: 38px;" id="gameEndText">Game Over!</h1>
                         <p id="time" style="font-size: 18px; margin: 4px;">Time: </p>
@@ -147,7 +147,7 @@
                 </div>
             </div>
             <div style="flex-grow: 1; padding: 16px 10% 16px 10%; display: none; overflow: auto;" id="settings">
-                <div id="keybindsScreen" style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; flex-direction: column; background-color: rgba(0,0,0,0.3);">
+                <div id="keybindsScreen" style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; flex-direction: column; background-color: rgba(0,0,0,0.4);">
                     <h1 style="display: block; text-align: center; margin: 0;" id="keyList">Press any key</h1>
                     <h3 style="display: block; text-align: center;">Left click anywhere to cancel</h1>
                     <button id="keybindConfirm" style="display: none;">Confirm</button>
