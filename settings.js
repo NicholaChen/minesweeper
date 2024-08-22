@@ -231,7 +231,7 @@ document.getElementById("randomEasy").addEventListener("click", (e) => {
 
     randomMines = "Easy";
 
-    localStorage.setItem("random", easyPanZoom);
+    localStorage.setItem("random", randomMines);
 });
 
 document.getElementById("randomNormal").addEventListener("click", (e) => {
@@ -241,7 +241,7 @@ document.getElementById("randomNormal").addEventListener("click", (e) => {
 
     randomMines = "Normal";
 
-    localStorage.setItem("random", easyPanZoom);
+    localStorage.setItem("random", randomMines);
 });
 
 document.getElementById("randomHard").addEventListener("click", (e) => {
@@ -251,7 +251,7 @@ document.getElementById("randomHard").addEventListener("click", (e) => {
 
     randomMines = "Hard";
 
-    localStorage.setItem("random", easyPanZoom);
+    localStorage.setItem("random", randomMines);
 });
 
 
@@ -713,6 +713,32 @@ document.getElementById("show3BVOn").addEventListener("click", (e) => {
     show3BV = true;
 
     localStorage.setItem("show3BV", show3BV);
+});
+
+
+if (analysis) {
+    document.getElementById("analysisOff").classList.add("unselected");
+} else {
+    document.getElementById("analysisOn").classList.add("unselected");
+}
+
+
+document.getElementById("analysisOff").addEventListener("click", (e) => {
+    document.getElementById("analysisOff").classList.remove("unselected");
+    document.getElementById("analysisOn").classList.add("unselected");
+
+    analysis = false;
+
+    localStorage.setItem("analysis", analysis);
+});
+
+document.getElementById("analysisOn").addEventListener("click", (e) => {
+    document.getElementById("analysisOn").classList.remove("unselected");
+    document.getElementById("analysisOff").classList.add("unselected");
+
+    analysis = true;
+
+    localStorage.setItem("analysis", analysis);
 });
 
 function resetGameplay() {

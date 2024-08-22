@@ -75,6 +75,7 @@ var showPause = localStorage.getItem("showPause") != "false";
 var showRestart = localStorage.getItem("showRestart") != "false";
 
 var show3BV = localStorage.getItem("show3BV") == "true";
+var analysis = localStorage.getItem("analysis") == "true";
 
 // stats
 
@@ -257,6 +258,8 @@ var paused = false;
 
 var map = []; // -1 represents a mine
 
+var analysisMap = [];
+
 var flags = 0;
 
 var startTime;
@@ -357,9 +360,22 @@ function refreshMap() {
         }
     }
 
+    analysisMap = [];
+    for (let i = 0; i < size_y; i++) {
+        analysisMap[i] = [];
+        for (let j = 0; j < size_x; j++) {
+            analysisMap[i][j] = {probability: numMines / (size_x * size_y)};
+        }
+    }
+
     draw(true);
 }
 refreshMap();
+
+
+function update() {
+    analyze();
+}
 
 function generate(mines, firstx, firsty) {
     let mineTiles = [];
@@ -404,7 +420,6 @@ function generate(mines, firstx, firsty) {
             }
         }
     }
-    
     
     map3BV = threeBV();
 }
@@ -660,7 +675,6 @@ function draw(clear=false) {
     let starty = canvas.height/2 - squareSize * size_y / 2 - cam_y;
 
 
-    ctx.font = (squareSize / 1.5).toString() + "px monospace, monospace";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
 
@@ -684,8 +698,15 @@ function draw(clear=false) {
                 ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
                 
                 if (!map[y][x].opened) {
+                    if (analysis) {
+                        ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
+                        ctx.fillStyle = theme.text;
+                        
+                        ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                    }
                 } else {
                     if (map[y][x].value > 0) {
+                        ctx.font = (squareSize / 1.5).toString() + "px monospace, monospace";
                         ctx.fillStyle = theme.text;
                         
                         ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
@@ -830,6 +851,7 @@ function open(square) {
                 }, 10);
             }
             exposeTile(square.x, square.y);
+            update();
             draw(true);
         }
     }
@@ -876,6 +898,7 @@ function chord(square) {
                     }
                 }
             }
+            update();
             draw(true);
         }
     }

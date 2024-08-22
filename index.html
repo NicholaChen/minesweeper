@@ -14,12 +14,13 @@
         <script src="themes.js"></script>
     
         <script defer src="fontawesome/solid.min.js"></script>
+        <script defer src="fontawesome/brands.min.js"></script>
         <script defer src="fontawesome/fontawesome.min.js"></script>
 
     </head>
     <body oncontextmenu="return false;">
         <div style="display: flex; position: absolute; left: 0; right: 0; top: 0; bottom: 0; flex-direction: column;">
-            <div id="top">
+            <div id="top" style="box-shadow: 0px 0px 24px 0 #00000040;">
                 <h1 style="margin: 8px 0 8px 8px; display: inline; font-size: 33px;">minesweeper</h1>
                 <a style="display: inline; color: inherit;" id="logoVersion"></a>
 
@@ -344,6 +345,13 @@
                     </div>
                 </div>
                 <div class="settingsDiv">
+                    <h3>Analysis</h3>
+                    <div>
+                        <button style="margin: 0 8px 0 0;" id="analysisOff">Off</button>
+                        <button id="analysisOn">On</button>
+                    </div>
+                </div>
+                <div class="settingsDiv">
                     <h3>Reset all settings (cannot be undone)</h3>
                     <div>
                         <button style="width: 100%;" id="resetSettingsButton">Reset</button>
@@ -365,5 +373,6 @@
         <script src="index.js"></script>
         <script src="stats.js"></script>
         <script src="settings.js"></script>
+        <script src="analysis.js"></script>
     </body>
 </html
