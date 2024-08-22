@@ -61,9 +61,9 @@
             <div style="flex-grow: 1; position: relative; margin: 0; touch-action: none;" id="game">
                 <canvas id="canvas" style="position:absolute; left:0; top:0; width:100%; height:100%;">
                 </canvas>
-                <button id="recenter" style="display: none; position:absolute; bottom: 8px; right: 8px;">Recenter</button>
+                <button id="recenter" style="display: none; position:absolute; bottom: 8px; right: 8px; box-shadow: 0px 0px 18px 0 #00000040;">Recenter</button>
                 <div style="position:absolute; left:0; top: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background-color: rgba(0,0,0,0.4); display: none;" id="gameEnd">
-                    <div style="background-color: var(--background-color); padding: 16px; text-align:center; min-width: 15%;" onclick="event.stopPropagation();">
+                    <div style="background-color: var(--background-color); padding: 16px; text-align:center; min-width: 15%; box-shadow: 0px 0px 18px 0 #00000040;" onclick="event.stopPropagation();">
                         <h1 style="text-align: center; margin: 0; font-size: 38px;" id="gameEndText">Game Over!</h1>
                         <p id="time" style="font-size: 18px; margin: 4px;">Time: </p>
                         <p id="winStreak" style="font-size: 18px; margin: 4px;">Win Streak </p>
@@ -193,6 +193,14 @@
                                 <i class="fa-solid fa-floppy-disk"></i>
                             </button>
                         </div>
+                    </div>
+                </div>
+                <div class="settingsDiv">
+                    <h3>Mine randomness</h2>
+                    <div>
+                        <button style="margin: 0 8px 0 0;" id="randomEasy">Easy</button>
+                        <button style="margin: 0 8px 0 0;" id="randomNormal">Normal</button>
+                        <button id="randomHard">Hard</button>
                     </div>
                 </div>
                 <div class="settingsDiv">

@@ -1,4 +1,4 @@
-const VERSION = "1.9.3";
+const VERSION = "1.9.4";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -54,6 +54,7 @@ if (difficulty == "Beginner") {
 
 
 var infiniteLives = localStorage.getItem("infiniteLives") == "true";
+var randomMines = localStorage.getItem("random") ?? "Normal";
 
 var onMouseDown = localStorage.getItem("onMouseDown") != "false";
 var chording = localStorage.getItem("chording") != "false";
@@ -162,6 +163,10 @@ function readSetting() {
                 infiniteLives = t.il;
                 more = true;
             }
+            if (typeof(t.r) == "string" && (t.r == "Easy" || t.r == "Normal" || t.r == "Hard")) {
+                randomMines = t.r;
+                more = true;
+            }
             if (typeof(t.md) == "boolean") {
                 onMouseDown = t.md;
                 more = true;
@@ -261,7 +266,7 @@ var interval;
 var first = true;
 
 var map3BV;
-
+var clicks;
 
 function resize(entries) {
     let displayWidth, displayHeight;
@@ -311,6 +316,8 @@ function timeToText(t) {
 }
 
 function refreshMap() {
+    clicks = 0;
+
     document.getElementById("gameEnd").style.display = "none";
 
     paused = false;
@@ -357,9 +364,25 @@ refreshMap();
 function generate(mines, firstx, firsty) {
     let mineTiles = [];
 
-    for (let x=0;x<size_x;x++) { // force first tile to not have a number on it
-        for (let y=0;y<size_y;y++) {
-            if (Math.abs(firstx - x) > 1 || Math.abs(firsty - y) > 1) {
+    if (mines + 8 < size_x * size_y && randomMines == "Easy") {
+        for (let x=0;x<size_x;x++) { // force first tile to not have a number on it or have a bomb on it
+            for (let y=0;y<size_y;y++) {
+                if (Math.abs(firstx - x) > 1 || Math.abs(firsty - y) > 1) {
+                    mineTiles.push([x,y]);
+                }
+            }
+        }
+    } else if (randomMines == "Normal") {
+        for (let x=0;x<size_x;x++) {
+            for (let y=0;y<size_y;y++) {
+                if (x != firstx || y != firsty) {
+                    mineTiles.push([x,y]);
+                }
+            }
+        }
+    } else {
+        for (let x=0;x<size_x;x++) {
+            for (let y=0;y<size_y;y++) {
                 mineTiles.push([x,y]);
             }
         }
@@ -1474,5 +1497,6 @@ window.addEventListener('blur', function() {
  - Show only mobile settings
  X Zoom and pan for mobile
  - Cool new gamemodes
- - Drop shadow for "floating" buttons
+ X Drop shadow for "floating" buttons
+ - Daily puzzle
 */

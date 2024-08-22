@@ -23,6 +23,20 @@ if (infiniteLives) {
 } else {
     document.getElementById("infiniteLivesOn").classList.add("unselected");
 }
+
+
+if (randomMines == "Easy") {
+    document.getElementById("randomNormal").classList.add("unselected");
+    document.getElementById("randomHard").classList.add("unselected");
+} else if (randomMines == "Hard") {
+    document.getElementById("randomEasy").classList.add("unselected");
+    document.getElementById("randomNormal").classList.add("unselected");
+} else {
+    randomMines = "Normal";
+    document.getElementById("randomEasy").classList.add("unselected");
+    document.getElementById("randomHard").classList.add("unselected");
+}
+
 var difficultyIndex = {
     Beginner: 0,
     Intermediate: 1,
@@ -208,6 +222,39 @@ document.getElementById("infiniteLivesOn").addEventListener("click", (e) => {
 
     localStorage.setItem("infiniteLives", infiniteLives);
 });
+
+
+document.getElementById("randomEasy").addEventListener("click", (e) => {
+    document.getElementById("randomEasy").classList.remove("unselected");
+    document.getElementById("randomNormal").classList.add("unselected");
+    document.getElementById("randomHard").classList.add("unselected");
+
+    randomMines = "Easy";
+
+    localStorage.setItem("random", easyPanZoom);
+});
+
+document.getElementById("randomNormal").addEventListener("click", (e) => {
+    document.getElementById("randomEasy").classList.add("unselected");
+    document.getElementById("randomNormal").classList.remove("unselected");
+    document.getElementById("randomHard").classList.add("unselected");
+
+    randomMines = "Normal";
+
+    localStorage.setItem("random", easyPanZoom);
+});
+
+document.getElementById("randomHard").addEventListener("click", (e) => {
+    document.getElementById("randomEasy").classList.add("unselected");
+    document.getElementById("randomNormal").classList.add("unselected");
+    document.getElementById("randomHard").classList.remove("unselected");
+
+    randomMines = "Hard";
+
+    localStorage.setItem("random", easyPanZoom);
+});
+
+
 
 if (onMouseDown) {
     document.getElementById("onMouseDownOff").classList.add("unselected");
@@ -676,6 +723,7 @@ function resetGameplay() {
     numMines = 10;
 
     infiniteLives = false;
+    randomMines = "Normal";
 
     document.getElementById("difficulty").selectedIndex = 0;
     document.getElementById("customMap").style.display = "none";
@@ -683,8 +731,13 @@ function resetGameplay() {
     document.getElementById("infiniteLivesOff").classList.remove("unselected");
     document.getElementById("infiniteLivesOn").classList.add("unselected");
 
+    document.getElementById("randomEasy").classList.add("unselected");
+    document.getElementById("randomHard").classList.add("unselected");
+    document.getElementById("randomNormal").classList.remove("unselected");
+
     localStorage.setItem("difficulty", difficulty);
-    localStorage.setItem("infiniteLives", false);
+    localStorage.setItem("infiniteLives", infiniteLives);
+    localStorage.setItem("random", randomMines);
 
     document.getElementById("width").value = 10;
     document.getElementById("height").value = 10;
@@ -894,6 +947,7 @@ document.getElementById("shareSettings").addEventListener("click", (e) => {
         h: size_y,
         n: numMines,
         il: infiniteLives,
+        r: randomMines,
         md: onMouseDown,
         c: chording,
         ps: pauseShortcut,
@@ -930,6 +984,7 @@ document.getElementById("saveImportedSettings").addEventListener("click", (e) =>
     localStorage.setItem("mapY", size_y);
     localStorage.setItem("mines", numMines);
     localStorage.setItem("infiniteLives", infiniteLives);
+    localStorage.setItem("random", randomMines);
 
     localStorage.setItem("onMouseDown", onMouseDown);
     localStorage.setItem("chording", chording);

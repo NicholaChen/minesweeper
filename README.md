@@ -14,6 +14,10 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - `Map size` - Size of map (width x height). `5x5-99x99` `Default: 10x10`
  - `Number of mines` - Number of mines in map. `1-50% of squares in map` `Default: 15`
  - `Infinite lives` - Makes opening mines not end game. `Off/On` `Default: Off`
+ - `Mine randomness` - Changes how random the mines are generated. `Easy/Normal/100%` `Default: Normal`
+    - `Easy` - Mines can be placed anywhere except the first opened square and its adjacent squares.
+    - `Normal` - Mines can be placed anywhere except the first opened square.
+    - `Hard` - 100% random. Mines can be placed **anywhere**.
 ### Controls
  - `Register clicks` - Selects if mouse clicks are registered when the mouse button is released up or as soon as the mouse button is pressed down. `On mouse up/On mouse down` `Default: On mouse down`
  - `Chording` - Select if chording is enabled. Info about chording in **How to play?**z `Off/On` `Default: On`
@@ -24,7 +28,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - `Settings shortcut` - Selects keybaord shortcut open and close the settings page. `Default: S`
  - `Mobile hold duration to flag` - Minimum time in ms needed to tap and hold on mobile in order to flag a square. `>=50` `Default: 250`
  - `Mobile easy pan/zoom` - Pan and zoom on mobile without the need to turn on pan and zoom mode. `Off/On` `Default: Off`
-### Appearance.
+### Appearance
  - `Show timer` - Selects if the timer should be displayed in the header. `Off/On` `Default: On`
  - `Show number of flags` - Selects if the flag counter should be displayed in the header. `Off/On` `Default: On`
  - `Show pause/unpause button` - Selects if the pause/unpause button should be displayed in the header. Keyboard shortcut will still work if off. `Off/On` `Default: On`
@@ -37,8 +41,3 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - `Show 3BV/sec on win screen` - Shows your 3BV/sec stat after winning a game. `Off/On` `Default: Off`
  - `Share settings` - Creates and copies a shareable link with all settings.
  - `Reset settings` - Resets **ALL** settings. Doesn't reset Stats.
-
-## Branches
-`master` - Main branch with the most up-to-date code. Might have non-working or buggy code.
-
-`release`- Branch with the latest working version. Current version the website is running.
