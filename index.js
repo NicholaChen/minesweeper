@@ -298,7 +298,45 @@ function resize(entries) {
     }
     canvas.width = displayWidth;
     canvas.height = displayHeight;
-    if (!inGame && first) refreshMap();
+
+    if (difficulty != "Custom") {
+        let large = Math.max(size_x, size_y);
+        let small = Math.min(size_x, size_y);
+
+        let rotate = false
+        if (canvas.width > canvas.height) {
+            if (size_x != large) {
+                rotate = true;
+            }
+        } else {
+            if (size_x != small) {
+                rotate = true;
+            }
+        }
+
+        if (rotate) {
+            let m = [];
+            let am = [];
+            for (let i = 0; i < size_x; i++) {
+                m[i] = [];
+                am[i] = [];
+                for (let j = 0; j < size_y; j++) {
+                    m[i][j] = map[j][i];
+                    am[i][j] = analysisMap[j][i];
+                }
+            }
+    
+            map = m;
+            analysisMap = am;
+
+            let old_x = size_x
+            let old_y = size_y
+
+            size_x = old_y;
+            size_y = old_x;
+        }
+    }
+
     draw();
 }
 
@@ -364,7 +402,7 @@ function refreshMap() {
     for (let i = 0; i < size_y; i++) {
         analysisMap[i] = [];
         for (let j = 0; j < size_x; j++) {
-            analysisMap[i][j] = {probability: numMines / (size_x * size_y)};
+            analysisMap[i][j] = {probability: null};
         }
     }
 
@@ -702,7 +740,8 @@ function draw(clear=false) {
                         ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
                         ctx.fillStyle = theme.text;
                         
-                        ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                        if (analysisMap[y][x].probability != null) ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                        else ctx.fillText((numMines / (size_x*size_y) * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
                 } else {
                     if (map[y][x].value > 0) {
