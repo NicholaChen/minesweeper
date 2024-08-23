@@ -58,9 +58,17 @@ function analyze() {
     }
 
 
+    let numMinesAccounted = 0;
+
+    for (let x=0;x<size_x;x++) {
+        for (let y=0;y<size_y;y++) {
+            if (analysisMap[y][x].probability == 1) numMinesAccounted += 1;
+        }
+    }
 
 
-
+    let numMinesNotAccounted = numMines - numMinesAccounted;
+    let unknownSquares = 0;
     let ALL_BORDERS = [];
     let ALL_CONFIGS = [];
 
@@ -72,6 +80,7 @@ function analyze() {
             let y = r[n][q].y;
             let x = r[n][q].x;
             if (!map[y][x].opened &&analysisMap[y][x].probability != 0 && analysisMap[y][x].probability != 1) {
+                let found = false;
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
                         if (i != 0 || j != 0) {
@@ -81,14 +90,21 @@ function analyze() {
                                     else border_knowns[findCoord(border_knowns, x+i, y+j)].a.push({x:x,y:y});
 
                                     if (findCoord(border,x,y) == -1) border.push({x:x,y:y});
+
+                                    found = true;
                                 }
                             }
                         }
                     }
                 }
+                if (!found) {
+                    unknownSquares += 1;
+                }
             }
         }
 
+
+        console.log(unknownSquares, numMinesNotAccounted)
         // let config = [];
         // for (let i = 0; i < size_y; i++) {
         //     config[i] = [];
@@ -170,16 +186,84 @@ function analyze() {
                 }
             }
 
-            ALL_CONFIGS_COMBINED.push(c);
+            let m = count(c, true);
+
+            if (numMinesNotAccounted - m >= 0) ALL_CONFIGS_COMBINED.push(c); // if config uses too many mines
         }
 
 
 
-        console.log("DONE", ALL_BORDERS_COMBINED, ALL_CONFIGS_COMBINED);
+
+        //console.log("DONE", ALL_BORDERS_COMBINED, ALL_CONFIGS_COMBINED);
+        let calculationsDone = {};
+
+        let weights = [];
+        for (let i=0;i<ALL_CONFIGS_COMBINED.length;i++) {
+            let m = count(ALL_CONFIGS_COMBINED[i], true);
+
+            let left = numMinesNotAccounted - m;
+            weights.push(left);
+            if (calculationsDone[left] == null) {
+                calculationsDone[left] = {v: C(unknownSquares, left), n: 1};
+            } else {
+                calculationsDone[left].n += 1;
+            }
+
+            for (let j=0;j<ALL_CONFIGS_COMBINED[i].length;j++) {
+                if (ALL_CONFIGS_COMBINED[i][j]) {
+                    if (ALL_BORDERS_COMBINED[j].w == null) {
+                        ALL_BORDERS_COMBINED[j].w = {}
+                    }
+                    if (ALL_BORDERS_COMBINED[j].w[left] == null) {
+                        ALL_BORDERS_COMBINED[j].w[left] = 0;
+                    }
+                    ALL_BORDERS_COMBINED[j].w[left] += 1;
+                }
+                
+            }
+
+        }
+
+        for (let i=0;i<ALL_BORDERS_COMBINED.length;i++) {
+            if (ALL_BORDERS_COMBINED[i].w != null) {
+                let allcorrect = true;
+                for (let w=0;w<weights.length;w++) {
+                    if (ALL_BORDERS_COMBINED[i].w[weights[w]] == calculationsDone[weights[w]].n) {
+                    } else {
+                        allcorrect = false;
+                    }
+                }
+                if (allcorrect) {
+                    analysisMap[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 1;
+                }
+            } else {
+                analysisMap[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 0;
+            }
+        }
+
+        console.log(ALL_BORDERS_COMBINED, calculationsDone)
     }
+
     //for (let i=0;i<border_squares.length;i++) {
 
     //console.log(border_squares, knowns);
+}
+
+function C(n, k) {
+    let multiply = [];
+    let division = [];
+
+    for (let i=1;i<=n;i++) {
+        multiply.push(i);
+    }
+    for (let i=1;i<=k;i++) {
+        division.push(i);
+    }
+    for (let i=1;i<=n-k;i++) {
+        division.push(i);
+    }
+    //console.log(n,"C",k,"=",multiply,"/",division);
+    return {m:multiply, d:division};
 }
 
 function regions() {
