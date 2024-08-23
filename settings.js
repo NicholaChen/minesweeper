@@ -673,11 +673,9 @@ for (const [key, value] of Object.entries(themeColors)) {
 }
 
 document.getElementById("shareTheme").addEventListener("click", (e) => {
-    let h = btoa(JSON.stringify({
-        t: theme
-    }));
+    let h = btoa(JSON.stringify(theme));
 
-    navigator.clipboard.writeText("nicholachen.github.io/minesweeper?s=" + h);
+    navigator.clipboard.writeText("nicholachen.github.io/minesweeper?t=" + h);
 
     document.getElementById("invalidAppearance").innerText = "Share link copied.";
     document.getElementById("invalidAppearance").style.display = "block";
@@ -967,68 +965,8 @@ document.getElementById("keybindConfirm").addEventListener("click", (e) => {
 });
 
 
-document.getElementById("shareSettings").addEventListener("click", (e) => {
-    let h = btoa(JSON.stringify({
-        w: size_x,
-        h: size_y,
-        n: numMines,
-        il: infiniteLives,
-        r: randomMines,
-        md: onMouseDown,
-        c: chording,
-        ps: pauseShortcut,
-        rs: restartShortcut,
-        pzs: panZoomShortcut,
-        sts: statsShortcut,
-        ss: settingsShortcut,
-        fh: flagHold,
-        epz: easyPanZoom,
-        st: showTimer,
-        sf: showFlags,
-        sp: showPause,
-        sr: showRestart,
-        tb: show3BV,
-        t: theme
-    }));
-
-    navigator.clipboard.writeText("nicholachen.github.io/minesweeper?s=" + h);
-
-    document.getElementById("invalidAdvanced").innerText = "Share link copied.";
-        
-    document.getElementById("invalidAdvanced").style.display = "block";
-    
-    
-    if (advancedTimeout != null) clearTimeout(advancedTimeout);
-    
-    advancedTimeout = setTimeout(function() {
-        document.getElementById("invalidAdvanced").style.display = "none";
-    }, settingsMessageDuration);
-})
 
 document.getElementById("saveImportedSettings").addEventListener("click", (e) => {
-    localStorage.setItem("mapX", size_x);
-    localStorage.setItem("mapY", size_y);
-    localStorage.setItem("mines", numMines);
-    localStorage.setItem("infiniteLives", infiniteLives);
-    localStorage.setItem("random", randomMines);
-
-    localStorage.setItem("onMouseDown", onMouseDown);
-    localStorage.setItem("chording", chording);
-    localStorage.setItem("pauseShortcut", pauseShortcut);
-    localStorage.setItem("restartShortcut", restartShortcut);
-    localStorage.setItem("panZoomShortcut", panZoomShortcut);
-    localStorage.setItem("statsShortcut", statsShortcut);
-    localStorage.setItem("settingsShortcut", settingsShortcut);
-
-    localStorage.setItem("flagHold", flagHold);
-
-    localStorage.setItem("easyPanZoom", easyPanZoom);
-
-    localStorage.setItem("showTimer", showTimer);
-    localStorage.setItem("showFlags", showFlags);
-    localStorage.setItem("showPause", showPause);
-    localStorage.setItem("showRestart", showRestart);
-
     localStorage.setItem("theme", theme.key);
 
     if (theme.key == "custom") {
@@ -1036,10 +974,6 @@ document.getElementById("saveImportedSettings").addEventListener("click", (e) =>
             localStorage.setItem(key, themes.custom[key]);
         }
     }
-
-    localStorage.getItem("show3BV", show3BV);
-    document.getElementById("saveImportedSettings").style.display = "none";
-    document.getElementById("cancelImportedSettings").style.display = "none";
 });
 
 document.getElementById("cancelImportedSettings").addEventListener("click", (e) => {

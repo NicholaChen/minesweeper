@@ -1,4 +1,4 @@
-const VERSION = "1.9.4";
+const VERSION = "1.10.1";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -125,119 +125,20 @@ var expertAverageTime = isNaN(Number(localStorage.getItem("expertAverageTime")))
 
 const params = new URLSearchParams(document.location.search);
 
-function readSetting() {
-    if (params.get("s")) {
+function readTheme() {
+    console.log(params.get("t"));
+    if (params.get("t")) {
         try {
-            let s = params.get("s");
-        
-            let t = JSON.parse(atob(s));
-
-            if (t.t != null) {
-                theme = t.t;
+            let t = JSON.parse(atob(params.get("t")));
+            console.log(t);
+            if (t != null) {
+                theme = t;
                 
                 if (theme.key == "custom") {
                     themes.custom = theme;
                 }
 
                 setTheme(theme);
-
-                document.getElementById("saveImportedSettings").innerText = "Save imported theme";
-                document.getElementById("cancelImportedSettings").innerText = "Cancel imported theme";
-
-                document.getElementById("saveImportedSettings").style.display = "inline";
-                document.getElementById("cancelImportedSettings").style.display = "inline";
-            }
-            let more = false;
-            if (typeof(t.w) == "number" && t.w >= 5 && t.w < 100) {
-                size_x = t.w;
-                more = true;
-            }
-            if (typeof(t.h) == "number" && t.h >= 5 && t.h < 100) {
-                size_y = t.h;
-                more = true;
-            }
-            if (typeof(t.n) == "number" || t.n > 0 || t.h <= Math.floor(t.w * t.h / 2)) {
-                numMines = t.n;
-                more = true;
-            }
-            if (typeof(t.il) == "boolean") {
-                infiniteLives = t.il;
-                more = true;
-            }
-            if (typeof(t.r) == "string" && (t.r == "Easy" || t.r == "Normal" || t.r == "Hard")) {
-                randomMines = t.r;
-                more = true;
-            }
-            if (typeof(t.md) == "boolean") {
-                onMouseDown = t.md;
-                more = true;
-            }
-            if (typeof(t.c) == "boolean") {
-                chording = t.c;
-                more = true;
-            }
-
-            if (typeof(t.ps) == "string") {
-                pauseShortcut = t.ps;
-                more = true;
-            }
-            if (typeof(t.pzs) == "string") {
-                panZoomShortcut = t.pzs;
-                more = true;
-            }
-            if (typeof(t.sts) == "string") {
-                statsShortcut = t.sts;
-                more = true;
-            }
-
-            if (typeof(t.rs) == "string") {
-                restartShortcut = t.rs;
-                more = true;
-            }
-            if (typeof(t.ss) == "string") {
-                settingsShortcut = t.ss;
-                more = true;
-            }
-
-            
-
-            if (typeof(t.fh) == "number" && t.fh >= 50) {
-                flagHold = t.fh;
-                more = true;
-            }
-
-
-            if (typeof(t.epz) == "boolean") {
-                easyPanZoom = t.epz;
-                more = true;
-            }
-
-            if (typeof(t.st) == "boolean") {
-                showTimer = t.st;
-                more = true;
-            }
-            if (typeof(t.sf) == "boolean") {
-                showFlags = t.sf;
-                more = true;
-            }
-            if (typeof(t.sp) == "boolean") {
-                showPause = t.sp;
-                more = true;
-            }
-            if (typeof(t.sr) == "boolean") {
-                showRestart = t.sr;
-                more = true;
-            }
-
-
-            if (typeof(t.tb) == "boolean") {
-                show3BV = t.tb;
-                more = true;
-            }
-            
-            if (more) {
-                document.getElementById("saveImportedSettings").innerText = "Save imported settings";
-                document.getElementById("cancelImportedSettings").innerText = "Cancel imported settings";
 
                 document.getElementById("saveImportedSettings").style.display = "inline";
                 document.getElementById("cancelImportedSettings").style.display = "inline";
@@ -247,7 +148,7 @@ function readSetting() {
     }
 }
 
-readSetting();
+readTheme();
 
 
 
@@ -412,7 +313,7 @@ refreshMap();
 
 
 function update() {
-    analyze();
+    if (analysis) analyze();
 }
 
 function generate(mines, firstx, firsty) {
@@ -1415,7 +1316,7 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
     }
 });
 
-if (params.get("s")) {
+if (params.get("t")) {
     document.getElementById("game").style.display = "none";
     document.getElementById("settings").style.display = "block";
 
