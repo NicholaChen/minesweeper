@@ -3,12 +3,13 @@ function analyze() {
         for (let y=0;y<size_y;y++) {
             if (map[y][x].opened && map[y][x].value >= 0) {
                 analysisMap[y][x].probability = 0;
+            } else {
+                analysisMap[y][x].probability = null;
             }
         }
     }
 
     let r = regions();
-
     // EASY CASES
 
 
@@ -70,16 +71,16 @@ function analyze() {
         for (let q=0;q<r[n].length;q++) {
             let y = r[n][q].y;
             let x = r[n][q].x;
-            if (map[y][x].opened && map[y][x].value != 0) {
+            if (!map[y][x].opened &&analysisMap[y][x].probability != 0 && analysisMap[y][x].probability != 1) {
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
                         if (i != 0 || j != 0) {
                             if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                                if (!map[y+j][x+i].opened && analysisMap[y+j][x+i].probability != 0 && analysisMap[y+j][x+i].probability != 1) {
-                                    if (findCoord(border_knowns, x, y) == -1) border_knowns.push({x:x,y:y,z: adjacent0(x,y), h: adjacent100(x,y), a:[{x:x+i,y:y+j}]});
-                                    else border_knowns[findCoord(border_knowns, x, y)].a.push({x:x+i,y:y+j});
+                                if (map[y+j][x+i].opened) {
+                                    if (findCoord(border_knowns, x+i, y+j) == -1) border_knowns.push({x:x+i,y:y+j,z: adjacent0(x+i,y+j), h: adjacent100(x+i,y+j), a:[{x:x,y:y}]});
+                                    else border_knowns[findCoord(border_knowns, x+i, y+j)].a.push({x:x,y:y});
 
-                                    if (findCoord(border,x+i,y+j) == -1) border.push({x:x+i,y:y+j});
+                                    if (findCoord(border,x,y) == -1) border.push({x:x,y:y});
                                 }
                             }
                         }
@@ -125,7 +126,57 @@ function analyze() {
         }
     }
 
-    console.log(ALL_BORDERS, ALL_CONFIGS);
+
+    let ALL_BORDERS_COMBINED = [];
+    let ALL_CONFIGS_COMBINED = [];
+    if (ALL_BORDERS.length != 0) {
+        for (let i=0;i<ALL_BORDERS.length;i++) {
+            for (let j=0;j<ALL_BORDERS[i].length;j++) {
+                ALL_BORDERS_COMBINED.push(ALL_BORDERS[i][j]);
+            }
+        }
+
+        let config_lengths = [];
+        let current_index = [];
+        let total = 1;
+        let done = false;
+        for (let i=0;i<ALL_CONFIGS.length;i++) {
+            config_lengths.push(ALL_CONFIGS[i].length);
+            current_index.push(0);
+
+            total *= ALL_CONFIGS[i].length;
+            done = true;
+        }
+
+        
+        for (let i=0;i<total;i++) {
+            current_index[0] += 1;
+
+            for (let j=0;j<current_index.length;j++) { // shift over if overflow
+                if (current_index[j] == config_lengths[j]) {
+                    current_index[j] = 0;
+                    if (j+1 == current_index.length) {
+                        break;
+                    }
+                    current_index[j+1] += 1;
+                }
+            }
+
+            let c = [];
+
+            for (let j=0;j<current_index.length;j++) {
+                for (let k=0;k<ALL_CONFIGS[j][current_index[j]].length;k++) {
+                    c.push(ALL_CONFIGS[j][current_index[j]][k]);
+                }
+            }
+
+            ALL_CONFIGS_COMBINED.push(c);
+        }
+
+
+
+        console.log("DONE", ALL_BORDERS_COMBINED, ALL_CONFIGS_COMBINED);
+    }
     //for (let i=0;i<border_squares.length;i++) {
 
     //console.log(border_squares, knowns);
@@ -142,7 +193,7 @@ function regions() {
     let r = [];
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (map[y][x].opened && !m[y][x].done) {
+            if (!map[y][x].opened && !m[y][x].done) {
                 r.push(flood(m,x,y));
             }
         }
@@ -159,7 +210,7 @@ function flood(m,x,y) { // same as _exposeTile but with all tiles within TWO SQU
     while (true) {
         let n_ = [];
         for (let a=0;a<n.length;a++) {
-            if (map[idToTile(n[a]).y][idToTile(n[a]).x].opened) {
+            if (!map[idToTile(n[a]).y][idToTile(n[a]).x].opened) {
                 m[idToTile(n[a]).y][idToTile(n[a]).x].done = true;
                 squares.push({x: idToTile(n[a]).x, y: idToTile(n[a]).y});
                 for (let i=-2;i<=2;i++) {

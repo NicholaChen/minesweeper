@@ -741,7 +741,7 @@ function draw(clear=false) {
                         ctx.fillStyle = theme.text;
                         
                         if (analysisMap[y][x].probability != null) ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
-                        else ctx.fillText((numMines / (size_x*size_y) * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                        //selse ctx.fillText((numMines / (size_x*size_y) * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
                 } else {
                     if (map[y][x].value > 0) {
@@ -805,21 +805,20 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
 
     document.getElementById("gameEnd").style.display = "none";
 });
-
+var cursor;
 document.addEventListener("mousemove", (e) => {
     let canvasX = e.clientX * window.devicePixelRatio;
     let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
 
-    if (!panning) {
-        if (first && !inGame || inGame) {
-            if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
-                canvas.style.cursor = "pointer";
-            } else {
-                canvas.style.cursor = "default";
-            }
+
+    if (first && !inGame || inGame) {
+        if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+            if (!panning) canvas.style.cursor = "pointer";
+            cursor = "pointer";
+        } else {
+            if (!panning) canvas.style.cursor = "default";
+            cursor = "default";
         }
-    } else {
-        canvas.style.pointer = "move";
     }
     sessionStorage.setItem("pointer", overSquare(canvasX,canvasY) != null);
 });
@@ -1346,7 +1345,8 @@ document.getElementById("restartButton").addEventListener("click", (e) => {
     draw(true);
 
     if (sessionStorage.getItem("pointer") == "true") {
-        canvas.style.cursor = "pointer"; 
+        canvas.style.cursor = "pointer";
+        cursor = "pointer";
     }
 });
 
@@ -1356,6 +1356,8 @@ document.getElementById("moveButton").addEventListener("click", (e) => {
         document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
     
         lastMouse = null;
+
+        canvas.style.cursor = cursor;
     } else {
         document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
         document.getElementById("moveIcon").classList.add("fa-arrow-pointer"); 
@@ -1428,6 +1430,8 @@ if (params.get("s")) {
 
 if (sessionStorage.getItem("pointer") == "true") {
     canvas.style.cursor = "pointer"; 
+
+    cursor = "pointer";
 }
 
 document.addEventListener('keydown', function(e) {
@@ -1477,6 +1481,8 @@ document.addEventListener('keydown', function(e) {
         
         if (sessionStorage.getItem("pointer") == "true") {
             canvas.style.cursor = "pointer"; 
+
+            cursor = "pointer";
         }
     } else if (heldKeys.join("+") == panZoomShortcut) {
         if (panning) {
@@ -1484,6 +1490,8 @@ document.addEventListener('keydown', function(e) {
             document.getElementById("moveIcon").classList.add("fa-up-down-left-right"); 
         
             lastMouse = null;
+
+            canvas.style.cursor = cursor;
         } else {
             document.getElementById("moveIcon").classList.remove("fa-up-down-left-right");
             document.getElementById("moveIcon").classList.add("fa-arrow-pointer"); 
