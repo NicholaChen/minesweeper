@@ -318,21 +318,21 @@ function update() {
 }
 
 function generate(mines, firstx, firsty) {
-    let mineTiles = [];
+    let mineSquares = [];
 
-    if (mines + 8 < size_x * size_y && randomMines == "Easy") {
+    if (mines + 8 < size_x * size_y && randomMines != "Normal" ) {
         for (let x=0;x<size_x;x++) { // force first tile to not have a number on it or have a bomb on it
             for (let y=0;y<size_y;y++) {
                 if (Math.abs(firstx - x) > 1 || Math.abs(firsty - y) > 1) {
-                    mineTiles.push([x,y]);
+                    mineSquares.push([x,y]);
                 }
             }
         }
-    } else { // normal and no guess
+    } else {
         for (let x=0;x<size_x;x++) {
             for (let y=0;y<size_y;y++) {
                 if (x != firstx || y != firsty) {
-                    mineTiles.push([x,y]);
+                    mineSquares.push([x,y]);
                 }
             }
         }
@@ -340,10 +340,10 @@ function generate(mines, firstx, firsty) {
 
     if (randomMines != "No guess") {
         for (let i=0;i<mines;i++) {
-            let b= Math.floor(Math.random() * mineTiles.length);
+            let b= Math.floor(Math.random() * mineSquares.length);
 
-            map[mineTiles[b][1]][mineTiles[b][0]].value = -1;
-            mineTiles.splice(b,1);
+            map[mineSquares[b][1]][mineSquares[b][0]].value = -1;
+            mineSquares.splice(b,1);
         }
 
 
@@ -351,49 +351,76 @@ function generate(mines, firstx, firsty) {
         for (let x=0;x<size_x;x++) {
             for (let y=0;y<size_y;y++) {
                 if (map[y][x].value != -1) {
-                    map[y][x].value = adjacentMines(x,y);
+                    map[y][x].value = adjacentMines(map,x,y);
                 }
             }
         }
+
+        exposeTile(map, firstx,firsty);
     } else {
-        m = map;
-
-        for (let i=0;i<mines;i++) {
-            let b= Math.floor(Math.random() * mineTiles.length);
-
-            map[mineTiles[b][1]][mineTiles[b][0]].value = -1;
-            mineTiles.splice(b,1);
-        }
-
-
-
-        for (let x=0;x<size_x;x++) {
-            for (let y=0;y<size_y;y++) {
-                if (map[y][x].value != -1) {
-                    map[y][x].value = adjacentMines(x,y);
+        while (true) {
+            let m = [];
+            for (let i = 0; i < size_y; i++) {
+                m[i] = [];
+                for (let j = 0; j < size_x; j++) {
+                    m[i][j] = {value: NaN, opened: false, flagged: false};
                 }
             }
+            
+
+            let newMineSquares = [...mineSquares];
+
+            for (let i=0;i<mines;i++) {
+                let b = Math.floor(Math.random() * newMineSquares.length);
+
+                m[newMineSquares[b][1]][newMineSquares[b][0]].value = -1;
+                newMineSquares.splice(b,1);
+            }
+
+
+
+            for (let x=0;x<size_x;x++) {
+                for (let y=0;y<size_y;y++) {
+                    if (m[y][x].value != -1) {
+                        m[y][x].value = adjacentMines(m,x,y);
+                    }
+                }
+            }
+
+            exposeTile(m, firstx,firsty);
+
+            if (solve(m)) {
+                map = m;
+                for (let x=0;x<size_x;x++) {
+                    for (let y=0;y<size_y;y++) {
+                        map[y][x].opened = false;
+                    }
+                }
+                exposeTile(map, firstx,firsty);
+                break;
+            }
+            console.log(solve(m));
         }
     }
     
     map3BV = threeBV();
 }
 
-function adjacentMines(x,y) {
-    let m = 0;
+function adjacentMines(m,x,y) {
+    let t = 0;
     for (let i=-1;i<=1;i++) {
         for (let j=-1;j<=1;j++) {
             if (i != 0 || j != 0) {
                 if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                    if (map[y+j][x+i].value == -1) {
-                        m += 1;
+                    if (m[y+j][x+i].value == -1) {
+                        t += 1;
                     }
                 }
             }
         }
     }
 
-    return m;
+    return t;
 }
 
 function adjacentFlags(x,y) { // flags + opened mines on infinite lives
@@ -455,17 +482,20 @@ function threeBV() {
 function idToTile(n) {
     return {x: n%size_x, y: Math.floor(n/size_x)}
 }
-function exposeTile(x,y) {
-    if (!inGame || paused || x < 0 || x >= size_x || y < 0 || y >= size_y) {
-        return
-    }
-    if (map[y][x].opened) return;
+function exposeTile(m,x,y) {
+    if ( x < 0 || x >= size_x || y < 0 || y >= size_y) return;
+
+    if (m[y][x].opened) return;
     
-    if (map[y][x].value == 0) {
-        _exposeTile(map,x,y);
-    } else if (map[y][x].value == -1) {
-        map[y][x].opened = true; // LOSE
-    
+    if (m[y][x].value == 0) {
+        _exposeTile(m,x,y);
+    } else if (m[y][x].value == -1) {
+        m[y][x].opened = true; // LOSE
+        
+        if (!inGame || paused) {
+            return;
+        }
+
         if (!infiniteLives) {
             inGame = false;
 
@@ -498,8 +528,8 @@ function exposeTile(x,y) {
     
             for (let x = 0; x < size_x; x++) {
                 for (let y = 0; y < size_y; y++) {
-                    if (map[y][x].value == -1) {
-                        map[y][x].opened = true;
+                    if (m[y][x].value == -1) {
+                        m[y][x].opened = true;
                     }
                 }
             }
@@ -510,7 +540,7 @@ function exposeTile(x,y) {
             document.getElementById("gameEnd").style.display = "flex";
         }
     } else {
-        map[y][x].opened = true;
+        m[y][x].opened = true;
     }
     
     
@@ -518,7 +548,7 @@ function exposeTile(x,y) {
     
     for (let x = 0; x < size_x; x++) {
         for (let y = 0; y < size_y; y++) {
-            if (map[y][x].flagged) {
+            if (m[y][x].flagged) {
                 f++;
             }
         }
@@ -531,14 +561,18 @@ function exposeTile(x,y) {
     
     for (let x = 0; x < size_x; x++) {
         for (let y = 0; y < size_y; y++) {
-            if (!map[y][x].opened && map[y][x].value != -1) {
+            if (!m[y][x].opened && m[y][x].value != -1) {
                 opened = false;
                 break;
             }
         }
     }
+
+    if (!inGame || paused) {
+        return
+    }
     
-    if (opened) { // WIN (all tiles opened)
+    if (opened) { // WIN (all squares opened)
         inGame = false;
         clearInterval(interval);
         let elapsedTime = Date.now() - startTime;
@@ -796,6 +830,8 @@ var double = false
 
 
 function open(square) {
+    if ((!inGame && !first) || paused) return;
+    
     if (square) {
         if (!map[square.y][square.x].opened && !map[square.y][square.x].flagged) {
             console.log("open",square);
@@ -814,8 +850,9 @@ function open(square) {
                         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
                     }
                 }, 10);
+            } else {
+                exposeTile(map, square.x, square.y);
             }
-            exposeTile(square.x, square.y);
             update();
             draw(true);
         }
@@ -823,6 +860,8 @@ function open(square) {
 }
 
 function flag(square) {
+    if ((!inGame && !first) || paused) return;
+
     if (square) {
         if (!map[square.y][square.x].opened) {
             console.log("flag",square);
@@ -846,6 +885,8 @@ function flag(square) {
 }
 
 function chord(square) {
+    if ((!inGame && !first) || paused) return;
+
     if (square) {
         if (map[square.y][square.x].opened && map[square.y][square.x].value != 0) {
 
@@ -857,7 +898,7 @@ function chord(square) {
                     for (let j=-1;j<=1;j++) {
                         if (i != 0 || j != 0) {
                             if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y && !map[square.y+j][square.x+i].flagged) {
-                                exposeTile(square.x+i, square.y+j);
+                                exposeTile(map, square.x+i, square.y+j);
                             }
                         }
                     }

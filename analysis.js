@@ -1,6 +1,6 @@
 var analysisMap_;
 
-var analysisDebug = true;
+var analysisDebug = false ;
 var analysisDebugVerbose = false;
 
 function analyze(map_, simple=false) {
