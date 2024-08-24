@@ -1,6 +1,10 @@
 var analysisMap_;
 
+var analysisDebug = true;
+var analysisDebugVerbose = false;
+
 function analyze(map_, simple=false) {
+    if (analysisDebug) console.time('analyze');
     analysisMap_ = [];
 
     for (let y=0;y<map_.length;y++) {
@@ -70,8 +74,6 @@ function analyze(map_, simple=false) {
                     }
                 }
             }
-
-            if (analysisMap_[y][x].probability == 1) numMinesAccounted += 1;
         }
     }
 
@@ -104,24 +106,24 @@ function analyze(map_, simple=false) {
     }
 
 
+    for (let x=0;x<size_x;x++) {
+        for (let y=0;y<size_y;y++) {
+            if (analysisMap_[y][x].probability == 1) numMinesAccounted += 1;
+        }
+    }
+
+    let numMinesNotAccounted = numMines - numMinesAccounted;
 
     let r = regions(map_);
 
 
-
-   
-
-    let numMinesNotAccounted = numMines - numMinesAccounted;
     
     let ALL_BORDERS = [];
     let ALL_CONFIGS = [];
-
-    
-    console.log("REGIONS", r);
     
     
     for (let n=0;n<r.length;n++) {
-        console.time(n)
+        if (analysisDebugVerbose && analysisDebug) console.time(n)
 
         let border = [];
         let border_knowns = new Map();
@@ -201,25 +203,36 @@ function analyze(map_, simple=false) {
                     }
                 }
             }
-
+            let remove = [];
             for (let i=0;i<border.length;i++) {
                 if (border[i].one == null) {
                     analysisMap_[border[i].y][border[i].x].probability = 1;
+                    remove.push({x: border[i].x, y: border[i].y});
                 }
                 if (border[i].zero == null) {
                     analysisMap_[border[i].y][border[i].x].probability = 0;
+                    remove.push({x: border[i].x, y: border[i].y});
                 }
             }
-
+            for (let i=0;i<remove.length;i++) { // removes ones that are guaranteed to be mines or not mines
+                let n = findCoord(border, remove[i].x, remove[i].y);
+                border.splice(n, 1);
+                for (let j=0;j<configs.length;j++) {
+                    configs[j].splice(n, 1);
+                }
+            }
             if (!simple) {
                 ALL_BORDERS.push(border);
                 ALL_CONFIGS.push(configs);
             }
         }
-        console.timeEnd(n)
+        if (analysisDebugVerbose && analysisDebug) console.timeEnd(n)
     }
 
-    if (simple) return analysisMap_;
+    if (simple) {
+        if (analysisDebug) console.timeEnd('analyze');
+        return analysisMap_;
+    }
 
 
     let ALL_BORDERS_COMBINED = ALL_BORDERS.flatMap(border => border);
@@ -227,12 +240,14 @@ function analyze(map_, simple=false) {
     let calculationsDone = {};
     let weights = [];
     if (ALL_BORDERS.length != 0) {
-        console.time("calculation")
-        console.time("calculation1")
+        if (analysisDebugVerbose && analysisDebug) {
+            console.time("calculation")
+            console.time("calculation1")
+        }
         let config_lengths = ALL_CONFIGS.map(config => config.length);
         let current_index = new Array(ALL_CONFIGS.length).fill(0);
         let total = config_lengths.reduce((acc, cur) => acc * cur, 1);
-        console.log(total);
+        //console.debug(total);
         for (let i=0;i<total;i++) {
             current_index[0] += 1;
 
@@ -267,6 +282,9 @@ function analyze(map_, simple=false) {
 
                 for (let j=0;j<c.length;j++) {
                     if (c[j]) {
+                        if (ALL_BORDERS_COMBINED[j] == null) {
+                            console.log(j, c, ALL_BORDERS_COMBINED);
+                        }
                         if (ALL_BORDERS_COMBINED[j].w == null) {
                             ALL_BORDERS_COMBINED[j].w = {}
                         }
@@ -280,7 +298,7 @@ function analyze(map_, simple=false) {
             }
         }
 
-        console.timeEnd("calculation1")
+        if (analysisDebugVerbose && analysisDebug) console.timeEnd("calculation1");
 
 
 
@@ -294,30 +312,24 @@ function analyze(map_, simple=false) {
 
         for (let i=0;i<ALL_BORDERS_COMBINED.length;i++) {
             if (ALL_BORDERS_COMBINED[i].w != null) {
-                let allcorrect = true;
                 for (let w=0;w<weights.length;w++) {
-                    if (ALL_BORDERS_COMBINED[i].w[weights[w]] != calculationsDone[weights[w]].n) {
-                        allcorrect = false;
-                    }
+
 
                     if (ALL_BORDERS_COMBINED[i].w[weights[w]] != null) {
                         if (ALL_BORDERS_COMBINED[i].nw == null) { ALL_BORDERS_COMBINED[i].nw = 0; }
                         ALL_BORDERS_COMBINED[i].nw += calculationsDone[weights[w]].v * ALL_BORDERS_COMBINED[i].w[weights[w]];
                     }
                 }
-                
-                if (allcorrect) {
-                    analysisMap_[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 1;
-                } else {
-                    analysisMap_[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = ALL_BORDERS_COMBINED[i].nw/t;
-                }
+
+                analysisMap_[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = ALL_BORDERS_COMBINED[i].nw/t;
             } else {
                 analysisMap_[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 0;
             }
         }
-        console.timeEnd("calculation")
-    }
 
+        if (analysisDebugVerbose && analysisDebug) console.timeEnd("calculation");
+    }
+    if (analysisDebug) console.timeEnd('analyze');
     return analysisMap_;
     //for (let i=0;i<border_squares.length;i++) {
 
@@ -325,8 +337,8 @@ function analyze(map_, simple=false) {
 }
 
 
-function solve(m,d) {
-    console.time('solve')
+function solveFunction(m,d) {
+    if (analysisDebugVerbose && analysisDebug) console.time('solve');
     let s = 1;
 
     let mFreq = new Map();
@@ -352,12 +364,12 @@ function solve(m,d) {
     for (let [k, v] of dFreq) {
         s /= Math.pow(k, v);
     }
-    console.timeEnd('solve')
+    if (analysisDebugVerbose && analysisDebug) console.timeEnd('solve')
     return s;
 }
 
 function C(n, k) {
-    console.time('C')
+    if (analysisDebugVerbose && analysisDebug) console.time('C')
 
     let multiply = [];
     let division = [];
@@ -372,12 +384,12 @@ function C(n, k) {
         division.push(i);
     }
     //console.log(n,"C",k,"=",multiply,"/",division);
-    console.timeEnd('C')
-    return solve(multiply, division);
+    if (analysisDebugVerbose && analysisDebug) console.timeEnd('C')
+    return solveFunction(multiply, division);
 }
 
 function regions(map_) {
-    console.time('regions')
+    if (analysisDebugVerbose && analysisDebug) console.time('regions')
     let m = [];
     for (let i = 0; i < size_y; i++) {
         m[i] = [];
@@ -394,7 +406,7 @@ function regions(map_) {
             }
         }
     }
-    console.timeEnd('regions')
+    if (analysisDebugVerbose && analysisDebug) console.timeEnd('regions')
     return r;
 }
 

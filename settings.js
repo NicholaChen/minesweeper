@@ -27,14 +27,14 @@ if (infiniteLives) {
 
 if (randomMines == "Easy") {
     document.getElementById("randomNormal").classList.add("unselected");
-    document.getElementById("randomHard").classList.add("unselected");
-} else if (randomMines == "Hard") {
+    document.getElementById("randomNoGuess").classList.add("unselected");
+} else if (randomMines == "No guess") {
     document.getElementById("randomEasy").classList.add("unselected");
     document.getElementById("randomNormal").classList.add("unselected");
 } else {
     randomMines = "Normal";
     document.getElementById("randomEasy").classList.add("unselected");
-    document.getElementById("randomHard").classList.add("unselected");
+    document.getElementById("randomNoGuess").classList.add("unselected");
 }
 
 var difficultyIndex = {
@@ -227,7 +227,7 @@ document.getElementById("infiniteLivesOn").addEventListener("click", (e) => {
 document.getElementById("randomEasy").addEventListener("click", (e) => {
     document.getElementById("randomEasy").classList.remove("unselected");
     document.getElementById("randomNormal").classList.add("unselected");
-    document.getElementById("randomHard").classList.add("unselected");
+    document.getElementById("randomNoGuess").classList.add("unselected");
 
     randomMines = "Easy";
 
@@ -237,19 +237,19 @@ document.getElementById("randomEasy").addEventListener("click", (e) => {
 document.getElementById("randomNormal").addEventListener("click", (e) => {
     document.getElementById("randomEasy").classList.add("unselected");
     document.getElementById("randomNormal").classList.remove("unselected");
-    document.getElementById("randomHard").classList.add("unselected");
+    document.getElementById("randomNoGuess").classList.add("unselected");
 
     randomMines = "Normal";
 
     localStorage.setItem("random", randomMines);
 });
 
-document.getElementById("randomHard").addEventListener("click", (e) => {
+document.getElementById("randomNoGuess").addEventListener("click", (e) => {
     document.getElementById("randomEasy").classList.add("unselected");
     document.getElementById("randomNormal").classList.add("unselected");
-    document.getElementById("randomHard").classList.remove("unselected");
+    document.getElementById("randomNoGuess").classList.remove("unselected");
 
-    randomMines = "Hard";
+    randomMines = "No guess";
 
     localStorage.setItem("random", randomMines);
 });
@@ -745,30 +745,46 @@ document.getElementById("showMinesOn").addEventListener("click", (e) => {
 
 
 
-if (analysis) {
+if (analysis == "Advanced") {
     document.getElementById("analysisOff").classList.add("unselected");
+    document.getElementById("analysisSimple").classList.add("unselected");
+} else if (analysis == "Simple") {
+    document.getElementById("analysisOff").classList.add("unselected");
+    document.getElementById("analysisAdvanced").classList.add("unselected");
 } else {
-    document.getElementById("analysisOn").classList.add("unselected");
+    document.getElementById("analysisSimple").classList.add("unselected");
+    document.getElementById("analysisAdvanced").classList.add("unselected");
 }
 
 
 document.getElementById("analysisOff").addEventListener("click", (e) => {
     document.getElementById("analysisOff").classList.remove("unselected");
-    document.getElementById("analysisOn").classList.add("unselected");
+    document.getElementById("analysisSimple").classList.add("unselected");
+    document.getElementById("analysisAdvanced").classList.add("unselected");
 
-    analysis = false;
+    analysis = "Off";
 
     localStorage.setItem("analysis", analysis);
 });
-
-document.getElementById("analysisOn").addEventListener("click", (e) => {
-    document.getElementById("analysisOn").classList.remove("unselected");
+document.getElementById("analysisSimple").addEventListener("click", (e) => {
     document.getElementById("analysisOff").classList.add("unselected");
+    document.getElementById("analysisSimple").classList.remove("unselected");
+    document.getElementById("analysisAdvanced").classList.add("unselected");
 
-    analysis = true;
+    analysis = "Simple";
 
     localStorage.setItem("analysis", analysis);
 });
+document.getElementById("analysisAdvanced").addEventListener("click", (e) => {
+    document.getElementById("analysisOff").classList.add("unselected");
+    document.getElementById("analysisSimple").classList.add("unselected");
+    document.getElementById("analysisAdvanced").classList.remove("unselected");
+
+    analysis = "Advanced";
+
+    localStorage.setItem("analysis", analysis);
+});
+
 
 function resetGameplay() {
     difficulty = "Beginner";
@@ -786,8 +802,8 @@ function resetGameplay() {
     document.getElementById("infiniteLivesOff").classList.remove("unselected");
     document.getElementById("infiniteLivesOn").classList.add("unselected");
 
+    document.getElementById("randomNoGuess").classList.add("unselected");
     document.getElementById("randomEasy").classList.add("unselected");
-    document.getElementById("randomHard").classList.add("unselected");
     document.getElementById("randomNormal").classList.remove("unselected");
 
     localStorage.setItem("difficulty", difficulty);
@@ -923,15 +939,26 @@ function resetAppearance() {
 
 function resetAdvanced() {
     show3BV = false;
-    
+    showMines = false;
+    analysis = "Off";
+
     document.getElementById("invalidAdvanced").innerText = "Reset settings.";
 
     document.getElementById("invalidAdvanced").style.display = "block";
+
+    document.getElementById("showMinesOn").classList.add("unselected");
+    document.getElementById("showMinesOff").classList.remove("unselected");
+
+    document.getElementById("analysisOff").classList.remove("unselected");
+    document.getElementById("analysisSimple").classList.add("unselected");
+    document.getElementById("analysisAdvanced").classList.add("unselected");
 
     document.getElementById("show3BVOn").classList.add("unselected");
     document.getElementById("show3BVOff").classList.remove("unselected");
 
     localStorage.setItem("show3BV", show3BV);
+    localStorage.setItem("showMines", showMines);
+    localStorage.setItem("analysis", analysis);
     if (advancedTimeout != null) clearTimeout(advancedTimeout);
 
     advancedTimeout = setTimeout(function() {

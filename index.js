@@ -76,7 +76,7 @@ var showRestart = localStorage.getItem("showRestart") != "false";
 
 var show3BV = localStorage.getItem("show3BV") == "true";
 var showMines = localStorage.getItem("showMines") == "true";
-var analysis = localStorage.getItem("analysis") == "true";
+var analysis = localStorage.getItem("analysis") ?? "Off";
 
 // stats
 
@@ -127,7 +127,6 @@ var expertAverageTime = isNaN(Number(localStorage.getItem("expertAverageTime")))
 const params = new URLSearchParams(document.location.search);
 
 function readTheme() {
-    console.log(params.get("t"));
     if (params.get("t")) {
         try {
             let t = JSON.parse(atob(params.get("t")));
@@ -314,7 +313,8 @@ refreshMap();
 
 
 function update() {
-    if (analysis) analysisMap = analyze(map);
+    if (analysis == "Simple") analysisMap = analyze(map, true);
+    else if (analysis == "Advanced") analysisMap = analyze(map, false);
 }
 
 function generate(mines, firstx, firsty) {
@@ -328,7 +328,7 @@ function generate(mines, firstx, firsty) {
                 }
             }
         }
-    } else if (randomMines == "Normal") {
+    } else { // normal and no guess
         for (let x=0;x<size_x;x++) {
             for (let y=0;y<size_y;y++) {
                 if (x != firstx || y != firsty) {
@@ -336,27 +336,42 @@ function generate(mines, firstx, firsty) {
                 }
             }
         }
-    } else {
+    }
+
+    if (randomMines != "No guess") {
+        for (let i=0;i<mines;i++) {
+            let b= Math.floor(Math.random() * mineTiles.length);
+
+            map[mineTiles[b][1]][mineTiles[b][0]].value = -1;
+            mineTiles.splice(b,1);
+        }
+
+
+
         for (let x=0;x<size_x;x++) {
             for (let y=0;y<size_y;y++) {
-                mineTiles.push([x,y]);
+                if (map[y][x].value != -1) {
+                    map[y][x].value = adjacentMines(x,y);
+                }
             }
         }
-    }
+    } else {
+        m = map;
 
-    for (let i=0;i<mines;i++) {
-        let b= Math.floor(Math.random() * mineTiles.length);
+        for (let i=0;i<mines;i++) {
+            let b= Math.floor(Math.random() * mineTiles.length);
 
-        map[mineTiles[b][1]][mineTiles[b][0]].value = -1;
-        mineTiles.splice(b,1);
-    }
+            map[mineTiles[b][1]][mineTiles[b][0]].value = -1;
+            mineTiles.splice(b,1);
+        }
 
 
 
-    for (let x=0;x<size_x;x++) {
-        for (let y=0;y<size_y;y++) {
-            if (map[y][x].value != -1) {
-                map[y][x].value = adjacentMines(x,y);
+        for (let x=0;x<size_x;x++) {
+            for (let y=0;y<size_y;y++) {
+                if (map[y][x].value != -1) {
+                    map[y][x].value = adjacentMines(x,y);
+                }
             }
         }
     }
@@ -1312,6 +1327,7 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
 
         document.getElementById("keybindsScreen").style.display = "none";
 
+        update();
         draw(true);
 
         if (inGame && !lastPause) unpause();
@@ -1443,6 +1459,7 @@ document.addEventListener('keydown', function(e) {
 
             document.getElementById("keybindsScreen").style.display = "none";
             
+            update();
             draw(true);
 
             if (inGame && !lastPause) unpause();
