@@ -8,9 +8,12 @@ function analyze() {
             } else {
                 analysisMap[y][x].probability = null;
             }
+
+            analysisMap[y][x].na = numAdjacent(x,y);
         }
     }
 
+    let numMinesAccounted = 0;
 
     // EASY CASES
 
@@ -19,19 +22,19 @@ function analyze() {
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
             if (map[y][x].opened && map[y][x].value > 0) {
-                if (numAdjacent(x,y) - adjacent0(x,y) == map[y][x].value) {
+                if (analysisMap[y][x].na - adjacent0(x,y) == map[y][x].value) {
                     for (let i=-1;i<=1;i++) {
                         for (let j=-1;j<=1;j++) {
-                            if (i != 0 || j != 0) {
-                                if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                                    if (analysisMap[y+j][x+i].probability != 0) {
-                                        analysisMap[y+j][x+i].probability = 1;
-                                    }
+                            if (i == 0 && j == 0) continue;
+                            let newX = x+i;
+                            let newY = y+j;
+                            if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
+                                if (analysisMap[newY][newX].probability != 0) {
+                                    analysisMap[newY][newX].probability = 1;
                                 }
                             }
                         }
                     }
-                
                 }
             }
         }
@@ -44,18 +47,20 @@ function analyze() {
                 if (adjacent100(x,y) == map[y][x].value) {
                     for (let i=-1;i<=1;i++) {
                         for (let j=-1;j<=1;j++) {
-                            if (i != 0 || j != 0) {
-                                if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                                    if (analysisMap[y+j][x+i].probability != 1) {
-                                        analysisMap[y+j][x+i].probability = 0;
-                                    }
+                            if (i == 0 && j == 0) continue;
+                            let newX = x+i;
+                            let newY = y+j;
+                            if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
+                                if (analysisMap[newY][newX].probability != 1) {
+                                    analysisMap[newY][newX].probability = 0;
                                 }
                             }
                         }
                     }
-                
                 }
             }
+
+            if (analysisMap[y][x].probability == 1) numMinesAccounted += 1;
         }
     }
 
@@ -64,17 +69,18 @@ function analyze() {
 
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            let found = false;
             if (!map[y][x].opened) {
+                let found = false;
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
-                        if (i != 0 || j != 0) {
-                            if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                                if (map[y+j][x+i].opened && map[y+j][x+i].value > 0) {
-                                    analysisMap[y][x].border = true;
+                        if (i == 0 && j == 0) continue;
+                        let newX = x+i;
+                        let newY = y+j;
+                        if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
+                            if (map[newY][newX].opened && map[newY][newX].value > 0) {
+                                analysisMap[y][x].border = true;
 
-                                    found = true;
-                                }
+                                found = true;
                             }
                         }
                     }
@@ -92,20 +98,17 @@ function analyze() {
 
 
 
-    let numMinesAccounted = 0;
-
-    for (let x=0;x<size_x;x++) {
-        for (let y=0;y<size_y;y++) {
-            if (analysisMap[y][x].probability == 1) numMinesAccounted += 1;
-        }
-    }
-
+   
 
     let numMinesNotAccounted = numMines - numMinesAccounted;
     
     let ALL_BORDERS = [];
     let ALL_CONFIGS = [];
 
+    
+    console.log("REGIONS", r);
+    
+    
     for (let n=0;n<r.length;n++) {
 
         let border = [];
@@ -117,14 +120,28 @@ function analyze() {
             if (analysisMap[y][x].probability != 0 && analysisMap[y][x].probability != 1) {
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
-                        if (i != 0 || j != 0) {
-                            if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                                if (map[y+j][x+i].opened && map[y+j][x+i].value > 0 ) {
-                                    if (findCoord(border_knowns, x+i, y+j) == -1) border_knowns.push({x:x+i,y:y+j,z: adjacent0(x+i,y+j), h: adjacent100(x+i,y+j), a:[{x:x,y:y}]});
-                                    else border_knowns[findCoord(border_knowns, x+i, y+j)].a.push({x:x,y:y});
+                        if (i == 0 && j == 0) continue;
+                        let newX = x+i;
+                        let newY = y+j;
+                        if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
+                            if (map[newY][newX].opened && map[newY][newX].value > 0 ) {
+                                let n = findCoord(border_knowns, newX, newY);
+                                if (n == -1) border_knowns.push({
+                                    x:newX,
+                                    y:newY,
+                                    z: adjacent0(newX,newY),
+                                    h: adjacent100(newX,newY),
+                                    a:[{x:x,y:y}]
+                                });
+                                else border_knowns[n].a.push({x:x,y:y});
 
-                                    if (findCoord(border,x,y) == -1) border.push({x:x,y:y});
-                                }
+                                n = findCoord(border, x, y);
+                                if (n == -1) border.push({
+                                    x:x,
+                                    y:y,
+                                    a:[{x:newX,y:newY}]
+                                });
+                                else border[n].a.push({x:newX,y:newY});
                             }
                         }
                     }
@@ -148,11 +165,15 @@ function analyze() {
         if (border.length != 0) {
             while (true) {
                 new_configs = [];
+                
                 for (let i=0;i<configs.length;i++) {
-                    new_configs.push([...configs[i]]);
-                    new_configs[new_configs.length-1].push(false);
-                    new_configs.push([...configs[i]]);
-                    new_configs[new_configs.length-1].push(true);
+                    let c1 = [...configs[i]];
+                    let c2 = [...configs[i]];
+
+                    c1.push(false);
+                    c2.push(true);
+                    new_configs.push(c1);
+                    new_configs.push(c2);
                 }
                 configs = [];
                 for (let i=0;i<new_configs.length;i++) {
@@ -408,38 +429,37 @@ function findCoord(a, x, y) {
 }
 
 function configPossible(config, border, border_squares) {
-    
-    let b = [];
-    for (let i=0;i<border.length;i++) {
-        b.push({x: border[i].x, y: border[i].y, mine: null});
-        if (config[i] != null) {
-            b[i].mine = config[i];
-        } else {
-            b[i].mine = null;
-        }
-    }
-
+    let b = new Map();
+    let ids = [];
     for (let i=0;i<border_squares.length;i++) {
-        let numMines = 0;
-        let numNotMines = 0;
-        for (let j=0;j<border_squares[i].a.length;j++) {
-            if (b[findCoord(b, border_squares[i].a[j].x, border_squares[i].a[j].y)].mine == true) {
-                numMines += 1;
-            }
-            if (b[findCoord(b, border_squares[i].a[j].x, border_squares[i].a[j].y)].mine == false) {
-                numNotMines += 1;
-            }
+        b.set(border_squares[i].y*size_x + border_squares[i].x, {z: border_squares[i].z, h: border_squares[i].h});
+        ids.push(border_squares[i].y*size_x + border_squares[i].x);
+    }
 
-        }
-
-        if (numMines + border_squares[i].h > map[border_squares[i].y][border_squares[i].x].value) {
-            return false;
-        }
-        if (numNotMines + border_squares[i].z > numAdjacent(border_squares[i].x, border_squares[i].y) - map[border_squares[i].y][border_squares[i].x].value) {
-            return false;
+    
+    for (let i=0;i<border.length;i++) {
+        if (config[i] != null) {
+            if (config[i]) {
+                for (let j=0;j<border[i].a.length;j++) {
+                    b.get(border[i].a[j].y*size_x+border[i].a[j].x).h += 1;
+               }
+            } else {
+                for (let j=0;j<border[i].a.length;j++) {
+                    b.get(border[i].a[j].y*size_x+border[i].a[j].x).z += 1;
+                }
+            }
         }
     }
 
+
+    for (let i=0;i<ids.length;i++) {
+        if (b.get(ids[i]).h > map[idToTile(ids[i]).y][idToTile(ids[i]).x].value) {
+            return false;
+        }
+        if (b.get(ids[i]).z > analysisMap[idToTile(ids[i]).y][idToTile(ids[i]).x].na - map[idToTile(ids[i]).y][idToTile(ids[i]).x].value) {
+            return false;
+        }
+    }
     return true;
 }
 

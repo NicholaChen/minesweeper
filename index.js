@@ -461,20 +461,24 @@ function exposeTile(x,y) {
             gamesPlayed += 1;
             
             updateStatsAllGames();
+
             
-            if (difficulty == "Beginner") {
-				beginnerGamesPlayed += 1;
-
-				updateStatsBeginner();
-			} else if (difficulty == "Intermediate") {
-				intermediateGamesPlayed += 1;
-
-				updateStatsIntermediate();
-			} else if (difficulty == "Expert") {
- 				expertGamesPlayed += 1;
-
- 				updateStatsExpert();
-			}
+            if (!analysis && infiniteLives) {
+                if (difficulty == "Beginner") {
+                    beginnerGamesPlayed += 1;
+    
+                    updateStatsBeginner();
+                } else if (difficulty == "Intermediate") {
+                    intermediateGamesPlayed += 1;
+    
+                    updateStatsIntermediate();
+                } else if (difficulty == "Expert") {
+                     expertGamesPlayed += 1;
+    
+                     updateStatsExpert();
+                }
+            }
+        
     
             for (let x = 0; x < size_x; x++) {
                 for (let y = 0; y < size_y; y++) {
@@ -523,7 +527,7 @@ function exposeTile(x,y) {
         clearInterval(interval);
         let elapsedTime = Date.now() - startTime;
         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-    
+        
         hours += elapsedTime - pausedTime;
         wins += 1;
         currentWinStreak += 1;
@@ -531,28 +535,30 @@ function exposeTile(x,y) {
         
         updateStatsAllGames();
         
-        if (difficulty == "Beginner") {
-        	beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
-        	
-        	beginnerWins += 1;
-        	beginnerGamesPlayed += 1;
-        	
-        	updateStatsBeginner();
-        } else if (difficulty == "Intermediate") {
-			intermediateAverageTime = (intermediateAverageTime * intermediateWins + (elapsedTime - pausedTime)) / (intermediateWins + 1);
+        if (!analysis && infiniteLives) {
+            if (difficulty == "Beginner") {
+                beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
+                
+                beginnerWins += 1;
+                beginnerGamesPlayed += 1;
+                
+                updateStatsBeginner();
+            } else if (difficulty == "Intermediate") {
+                intermediateAverageTime = (intermediateAverageTime * intermediateWins + (elapsedTime - pausedTime)) / (intermediateWins + 1);
 
-			intermediateWins += 1;
-			intermediateGamesPlayed += 1;
+                intermediateWins += 1;
+                intermediateGamesPlayed += 1;
 
-			updateStatsIntermediate();
-		} else if (difficulty == "Advanced") {
- 			expertAverageTime = (expertAverageTime * expertWins + (elapsedTime - pausedTime)) / (expertWins + 1);
+                updateStatsIntermediate();
+            } else if (difficulty == "Advanced") {
+                expertAverageTime = (expertAverageTime * expertWins + (elapsedTime - pausedTime)) / (expertWins + 1);
 
- 			expertWins += 1;
- 			expertGamesPlayed += 1;
+                expertWins += 1;
+                expertGamesPlayed += 1;
 
- 			updateStatsExpert();
-		}
+                updateStatsExpert();
+            }
+        }
     
         document.getElementById("time").style.display = "block";
         document.getElementById("winStreak").style.display = "block";
