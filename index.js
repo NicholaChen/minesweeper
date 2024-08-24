@@ -75,6 +75,7 @@ var showPause = localStorage.getItem("showPause") != "false";
 var showRestart = localStorage.getItem("showRestart") != "false";
 
 var show3BV = localStorage.getItem("show3BV") == "true";
+var showMines = localStorage.getItem("showMines") == "true";
 var analysis = localStorage.getItem("analysis") == "true";
 
 // stats
@@ -462,8 +463,8 @@ function exposeTile(x,y) {
             
             updateStatsAllGames();
 
-            
-            if (!analysis && infiniteLives) {
+
+            if (!analysis && !infiniteLives && !showMines) {
                 if (difficulty == "Beginner") {
                     beginnerGamesPlayed += 1;
     
@@ -535,7 +536,7 @@ function exposeTile(x,y) {
         
         updateStatsAllGames();
         
-        if (!analysis && infiniteLives) {
+        if (!analysis && !infiniteLives && !showMines) {
             if (difficulty == "Beginner") {
                 beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
                 
@@ -628,6 +629,10 @@ function draw(clear=false) {
             if (!paused) {
                 if (!map[y][x].opened) {
                     ctx.fillStyle = theme.unopened;
+
+                    if (showMines && map[y][x].value == -1) {
+                        ctx.fillStyle = "rgba(200,0,0,0.6)";
+                    }
                 } else {
                     if (map[y][x].value == -1) {
                         ctx.fillStyle = "rgba(200,0,0,0.6)";
@@ -1308,6 +1313,8 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
 
         document.getElementById("keybindsScreen").style.display = "none";
 
+        draw(true);
+
         if (inGame && !lastPause) unpause();
     } else {
         stats = false;
@@ -1436,7 +1443,9 @@ document.addEventListener('keydown', function(e) {
             document.getElementById("settings").style.display = "none";
 
             document.getElementById("keybindsScreen").style.display = "none";
-    
+            
+            draw(true);
+
             if (inGame && !lastPause) unpause();
         } else {
             stats = false;

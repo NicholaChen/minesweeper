@@ -110,9 +110,10 @@ function analyze() {
     
     
     for (let n=0;n<r.length;n++) {
+        console.time(n)
 
         let border = [];
-        let border_knowns = [];
+        let border_knowns = new Map();
         for (let q=0;q<r[n].length;q++) {
             let y = r[n][q].y;
             let x = r[n][q].x;
@@ -125,17 +126,14 @@ function analyze() {
                         let newY = y+j;
                         if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
                             if (map[newY][newX].opened && map[newY][newX].value > 0 ) {
-                                let n = findCoord(border_knowns, newX, newY);
-                                if (n == -1) border_knowns.push({
-                                    x:newX,
-                                    y:newY,
+                                if (!border_knowns.has(newY * size_x + newX)) border_knowns.set(newY * size_x + newX, {
                                     z: adjacent0(newX,newY),
                                     h: adjacent100(newX,newY),
                                     a:[{x:x,y:y}]
                                 });
-                                else border_knowns[n].a.push({x:x,y:y});
+                                else border_knowns.get(newY * size_x + newX).a.push({x:x,y:y});
 
-                                n = findCoord(border, x, y);
+                                let n = findCoord(border, x, y);
                                 if (n == -1) border.push({
                                     x:x,
                                     y:y,
@@ -163,79 +161,59 @@ function analyze() {
         let length = 0 ;
 
         if (border.length != 0) {
-            while (true) {
+            while (length < border.length) {
                 new_configs = [];
                 
                 for (let i=0;i<configs.length;i++) {
-                    let c1 = [...configs[i]];
-                    let c2 = [...configs[i]];
+                    let c1 = [...configs[i], false];
+                    let c2 = [...configs[i], true];
 
-                    c1.push(false);
-                    c2.push(true);
-                    new_configs.push(c1);
-                    new_configs.push(c2);
-                }
-                configs = [];
-                for (let i=0;i<new_configs.length;i++) {
-                    if (configPossible(new_configs[i], border, border_knowns)) {
-                        configs.push(new_configs[i]);
+
+                    if (configPossible(c1, border, border_knowns)) {
+                        new_configs.push(c1);
+                    }
+                    if (configPossible(c2, border, border_knowns)) {
+                        new_configs.push(c2);
                     }
                 }
+                configs = new_configs;
+                if (configs.length == 0) break;
                 length += 1;
-                if (length == border.length) {
-                    break;
-                }
             }
 
             ALL_BORDERS.push(border);
             ALL_CONFIGS.push(configs);
         }
+        console.timeEnd(n)
     }
 
 
-    let ALL_BORDERS_COMBINED = [];
+    let ALL_BORDERS_COMBINED = ALL_BORDERS.flatMap(border => border);
 
     let calculationsDone = {};
     let weights = [];
     if (ALL_BORDERS.length != 0) {
-        for (let i=0;i<ALL_BORDERS.length;i++) {
-            for (let j=0;j<ALL_BORDERS[i].length;j++) {
-                ALL_BORDERS_COMBINED.push(ALL_BORDERS[i][j]);
-            }
-        }
-
-        let config_lengths = [];
-        let current_index = [];
-        let total = 1;
-
-        for (let i=0;i<ALL_CONFIGS.length;i++) {
-            config_lengths.push(ALL_CONFIGS[i].length);
-            current_index.push(0);
-
-            total *= ALL_CONFIGS[i].length;
-        }
-
+        console.time("calculation")
+        console.time("calculation1")
+        let config_lengths = ALL_CONFIGS.map(config => config.length);
+        let current_index = new Array(ALL_CONFIGS.length).fill(0);
+        let total = config_lengths.reduce((acc, cur) => acc * cur, 1);
         
         for (let i=0;i<total;i++) {
             current_index[0] += 1;
 
-            for (let j=0;j<current_index.length;j++) { // shift over if overflow
-                if (current_index[j] == config_lengths[j]) {
+            for (let j = 0; j < current_index.length; j++) {
+                if (current_index[j] >= config_lengths[j]) {
                     current_index[j] = 0;
-                    if (j+1 == current_index.length) {
-                        break;
+                    if (j + 1 < current_index.length) {
+                        current_index[j + 1] += 1;
                     }
-                    current_index[j+1] += 1;
+                } else {
+                    break;
                 }
             }
 
-            let c = [];
-
-            for (let j=0;j<current_index.length;j++) {
-                for (let k=0;k<ALL_CONFIGS[j][current_index[j]].length;k++) {
-                    c.push(ALL_CONFIGS[j][current_index[j]][k]);
-                }
-            }
+            let c = current_index.flatMap((index, j) => ALL_CONFIGS[j][index]);
 
             let m = count(c, true);
 
@@ -249,8 +227,7 @@ function analyze() {
                 }
                 
                 if (calculationsDone[left] == null) {
-                    let x = C(unknownSquares, left);
-                    calculationsDone[left] = {v: solve(x.m,x.d), n: 1};
+                    calculationsDone[left] = {n: 1, v: C(unknownSquares, left)};
                 } else {
                     calculationsDone[left].n += 1;
                 }
@@ -269,6 +246,8 @@ function analyze() {
                 }
             }
         }
+
+        console.timeEnd("calculation1")
 
 
 
@@ -303,6 +282,7 @@ function analyze() {
                 analysisMap[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 0;
             }
         }
+        console.timeEnd("calculation")
     }
 
     //for (let i=0;i<border_squares.length;i++) {
@@ -312,27 +292,39 @@ function analyze() {
 
 
 function solve(m,d) {
+    console.time('solve')
     let s = 1;
-    let toRemove = [];
-    for (let i=0;i<d.length;i++) { // cancel terms 50!/48! = 50*49
-        if (find(m,d[i]) != -1) {
-            m.splice(find(m,d[i]),1);
-            toRemove.push(d[i]);
+
+    let mFreq = new Map();
+    let dFreq = new Map();
+
+    m.forEach(num => mFreq.set(num, (mFreq.get(num) ?? 0) + 1));
+    d.forEach(num => dFreq.set(num, (dFreq.get(num) ?? 0) + 1));
+
+    for (let [k, v] of dFreq) {
+        if (mFreq.has(k)) {
+            let cancelCount = Math.min(mFreq.get(k), v);
+            mFreq.set(k, mFreq.get(k) - cancelCount);
+            dFreq.set(k, v - cancelCount);
+            if (mFreq.get(k) === 0) mFreq.delete(k);
+            if (dFreq.get(k) === 0) dFreq.delete(k);
         }
     }
-    for (let i=0;i<toRemove.length;i++) {
-        d.splice(find(d, toRemove[i]),1);
+
+    for (let [k, v] of mFreq) {
+        s *= Math.pow(k, v);
     }
-    for (let i=0;i<m.length;i++) {
-        s *= m[i];
+
+    for (let [k, v] of dFreq) {
+        s /= Math.pow(k, v);
     }
-    for (let i=0;i<d.length;i++) {
-        s /= d[i];
-    }
+    console.timeEnd('solve')
     return s;
 }
 
 function C(n, k) {
+    console.time('C')
+
     let multiply = [];
     let division = [];
 
@@ -346,10 +338,12 @@ function C(n, k) {
         division.push(i);
     }
     //console.log(n,"C",k,"=",multiply,"/",division);
-    return {m:multiply, d:division};
+    console.timeEnd('C')
+    return solve(multiply, division);
 }
 
 function regions() {
+    console.time('regions')
     let m = [];
     for (let i = 0; i < size_y; i++) {
         m[i] = [];
@@ -365,6 +359,7 @@ function regions() {
             }
         }
     }
+    console.timeEnd('regions')
     return r;
 }
 
@@ -430,12 +425,11 @@ function findCoord(a, x, y) {
 
 function configPossible(config, border, border_squares) {
     let b = new Map();
-    let ids = [];
-    for (let i=0;i<border_squares.length;i++) {
-        b.set(border_squares[i].y*size_x + border_squares[i].x, {z: border_squares[i].z, h: border_squares[i].h});
-        ids.push(border_squares[i].y*size_x + border_squares[i].x);
-    }
 
+
+    for (let [key, value] of border_squares) {
+        b.set(key, {z: value.z, h: value.h});
+    }
     
     for (let i=0;i<border.length;i++) {
         if (config[i] != null) {
@@ -451,12 +445,11 @@ function configPossible(config, border, border_squares) {
         }
     }
 
-
-    for (let i=0;i<ids.length;i++) {
-        if (b.get(ids[i]).h > map[idToTile(ids[i]).y][idToTile(ids[i]).x].value) {
+    for (let [key, value] of b) {
+        if (value.h > map[idToTile(key).y][idToTile(key).x].value) {
             return false;
         }
-        if (b.get(ids[i]).z > analysisMap[idToTile(ids[i]).y][idToTile(ids[i]).x].na - map[idToTile(ids[i]).y][idToTile(ids[i]).x].value) {
+        if (value.z > analysisMap[idToTile(key).y][idToTile(key).x].na - map[idToTile(key).y][idToTile(key).x].value) {
             return false;
         }
     }

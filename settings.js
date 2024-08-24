@@ -714,6 +714,37 @@ document.getElementById("show3BVOn").addEventListener("click", (e) => {
 });
 
 
+
+
+
+if (showMines) {
+    document.getElementById("showMinesOff").classList.add("unselected");
+} else {
+    document.getElementById("showMinesOn").classList.add("unselected");
+}
+
+
+document.getElementById("showMinesOff").addEventListener("click", (e) => {
+    document.getElementById("showMinesOff").classList.remove("unselected");
+    document.getElementById("showMinesOn").classList.add("unselected");
+
+    showMines = false;
+
+    localStorage.setItem("showMines", showMines);
+});
+
+document.getElementById("showMinesOn").addEventListener("click", (e) => {
+    document.getElementById("showMinesOn").classList.remove("unselected");
+    document.getElementById("showMinesOff").classList.add("unselected");
+
+    showMines = true;
+
+    localStorage.setItem("showMines", showMines);
+});
+
+
+
+
 if (analysis) {
     document.getElementById("analysisOff").classList.add("unselected");
 } else {
