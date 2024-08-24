@@ -1,15 +1,26 @@
-function analyze() {
+var analysisMap_;
+
+function analyze(map_, simple=false) {
+    analysisMap_ = [];
+
+    for (let y=0;y<map_.length;y++) {
+        analysisMap_[y] = [];
+        for (let x=0;x<map_[y].length;x++) {
+            analysisMap_[y][x] = {
+                probability: null
+            };
+        }
+    }
+
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (map[y][x].opened && map[y][x].value >= 0) {
-                analysisMap[y][x].probability = 0;
-            } else if (map[y][x].opened && map[y][x].value == -1) {
-                analysisMap[y][x].probability = 1;
-            } else {
-                analysisMap[y][x].probability = null;
+            if (map_[y][x].opened && map_[y][x].value >= 0) {
+                analysisMap_[y][x].probability = 0;
+            } else if (map_[y][x].opened && map_[y][x].value == -1) {
+                analysisMap_[y][x].probability = 1;
             }
 
-            analysisMap[y][x].na = numAdjacent(x,y);
+            analysisMap_[y][x].na = numAdjacent(x,y);
         }
     }
 
@@ -21,16 +32,16 @@ function analyze() {
     // 100%
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (map[y][x].opened && map[y][x].value > 0) {
-                if (analysisMap[y][x].na - adjacent0(x,y) == map[y][x].value) {
+            if (map_[y][x].opened && map_[y][x].value > 0) {
+                if (analysisMap_[y][x].na - adjacent0(x,y) == map_[y][x].value) {
                     for (let i=-1;i<=1;i++) {
                         for (let j=-1;j<=1;j++) {
                             if (i == 0 && j == 0) continue;
                             let newX = x+i;
                             let newY = y+j;
                             if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
-                                if (analysisMap[newY][newX].probability != 0) {
-                                    analysisMap[newY][newX].probability = 1;
+                                if (analysisMap_[newY][newX].probability != 0) {
+                                    analysisMap_[newY][newX].probability = 1;
                                 }
                             }
                         }
@@ -43,16 +54,16 @@ function analyze() {
     // 0%
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (map[y][x].opened && map[y][x].value > 0) {
-                if (adjacent100(x,y) == map[y][x].value) {
+            if (map_[y][x].opened && map_[y][x].value > 0) {
+                if (adjacent100(x,y) == map_[y][x].value) {
                     for (let i=-1;i<=1;i++) {
                         for (let j=-1;j<=1;j++) {
                             if (i == 0 && j == 0) continue;
                             let newX = x+i;
                             let newY = y+j;
                             if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
-                                if (analysisMap[newY][newX].probability != 1) {
-                                    analysisMap[newY][newX].probability = 0;
+                                if (analysisMap_[newY][newX].probability != 1) {
+                                    analysisMap_[newY][newX].probability = 0;
                                 }
                             }
                         }
@@ -60,7 +71,7 @@ function analyze() {
                 }
             }
 
-            if (analysisMap[y][x].probability == 1) numMinesAccounted += 1;
+            if (analysisMap_[y][x].probability == 1) numMinesAccounted += 1;
         }
     }
 
@@ -69,7 +80,7 @@ function analyze() {
 
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (!map[y][x].opened) {
+            if (!map_[y][x].opened) {
                 let found = false;
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
@@ -77,8 +88,8 @@ function analyze() {
                         let newX = x+i;
                         let newY = y+j;
                         if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
-                            if (map[newY][newX].opened && map[newY][newX].value > 0) {
-                                analysisMap[y][x].border = true;
+                            if (map_[newY][newX].opened && map_[newY][newX].value > 0) {
+                                analysisMap_[y][x].border = true;
 
                                 found = true;
                             }
@@ -94,7 +105,7 @@ function analyze() {
 
 
 
-    let r = regions();
+    let r = regions(map_);
 
 
 
@@ -118,14 +129,14 @@ function analyze() {
             let y = r[n][q].y;
             let x = r[n][q].x;
 
-            if (analysisMap[y][x].probability != 0 && analysisMap[y][x].probability != 1) {
+            if (analysisMap_[y][x].probability != 0 && analysisMap_[y][x].probability != 1) {
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
                         if (i == 0 && j == 0) continue;
                         let newX = x+i;
                         let newY = y+j;
                         if (newX >= 0 && newX < size_x && newY >= 0 && newY < size_y) {
-                            if (map[newY][newX].opened && map[newY][newX].value > 0 ) {
+                            if (map_[newY][newX].opened && map_[newY][newX].value > 0 ) {
                                 if (!border_knowns.has(newY * size_x + newX)) border_knowns.set(newY * size_x + newX, {
                                     z: adjacent0(newX,newY),
                                     h: adjacent100(newX,newY),
@@ -169,10 +180,10 @@ function analyze() {
                     let c2 = [...configs[i], true];
 
 
-                    if (configPossible(c1, border, border_knowns)) {
+                    if (configPossible(map_, c1, border, border_knowns)) {
                         new_configs.push(c1);
                     }
-                    if (configPossible(c2, border, border_knowns)) {
+                    if (configPossible(map_, c2, border, border_knowns)) {
                         new_configs.push(c2);
                     }
                 }
@@ -180,12 +191,35 @@ function analyze() {
                 if (configs.length == 0) break;
                 length += 1;
             }
+            
+            for (let i=0;i<configs.length;i++) {
+                for (let j=0;j<border.length;j++) {
+                    if (configs[i][j] == false) {
+                        border[j].one = false;
+                    } else {
+                        border[j].zero = false;
+                    }
+                }
+            }
 
-            ALL_BORDERS.push(border);
-            ALL_CONFIGS.push(configs);
+            for (let i=0;i<border.length;i++) {
+                if (border[i].one == null) {
+                    analysisMap_[border[i].y][border[i].x].probability = 1;
+                }
+                if (border[i].zero == null) {
+                    analysisMap_[border[i].y][border[i].x].probability = 0;
+                }
+            }
+
+            if (!simple) {
+                ALL_BORDERS.push(border);
+                ALL_CONFIGS.push(configs);
+            }
         }
         console.timeEnd(n)
     }
+
+    if (simple) return analysisMap_;
 
 
     let ALL_BORDERS_COMBINED = ALL_BORDERS.flatMap(border => border);
@@ -198,7 +232,7 @@ function analyze() {
         let config_lengths = ALL_CONFIGS.map(config => config.length);
         let current_index = new Array(ALL_CONFIGS.length).fill(0);
         let total = config_lengths.reduce((acc, cur) => acc * cur, 1);
-        
+        console.log(total);
         for (let i=0;i<total;i++) {
             current_index[0] += 1;
 
@@ -218,7 +252,6 @@ function analyze() {
             let m = count(c, true);
 
             if (numMinesNotAccounted - m >= 0) {// if config uses too many mines
-                //ALL_CONFIGS_COMBINED.push(c); 
 
                 let left = numMinesNotAccounted - m;
 
@@ -274,17 +307,18 @@ function analyze() {
                 }
                 
                 if (allcorrect) {
-                    analysisMap[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 1;
+                    analysisMap_[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 1;
                 } else {
-                    analysisMap[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = ALL_BORDERS_COMBINED[i].nw/t;
+                    analysisMap_[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = ALL_BORDERS_COMBINED[i].nw/t;
                 }
             } else {
-                analysisMap[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 0;
+                analysisMap_[ALL_BORDERS_COMBINED[i].y][ALL_BORDERS_COMBINED[i].x].probability = 0;
             }
         }
         console.timeEnd("calculation")
     }
 
+    return analysisMap_;
     //for (let i=0;i<border_squares.length;i++) {
 
     //console.log(border_squares, knowns);
@@ -342,7 +376,7 @@ function C(n, k) {
     return solve(multiply, division);
 }
 
-function regions() {
+function regions(map_) {
     console.time('regions')
     let m = [];
     for (let i = 0; i < size_y; i++) {
@@ -354,8 +388,9 @@ function regions() {
     let r = [];
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (analysisMap[y][x].border && !m[y][x].done) {
-                r.push(flood(m,x,y));
+            if (analysisMap_[y][x].border && !m[y][x].done) {
+                let f = flood(map_,m,x,y);
+                if (f.length > 0) r.push(f);
             }
         }
     }
@@ -364,16 +399,16 @@ function regions() {
 }
 
 
-function flood(m,x,y) { // same as _exposeTile but with all tiles within TWO SQUARES
+function flood(map_,m,x,y) { // same as _exposeTile
     let n = [y*size_x + x];
     let done = [y*size_x + x];
     let squares = [];
     while (true) {
         let n_ = [];
         for (let a=0;a<n.length;a++) {
-            if (analysisMap[idToTile(n[a]).y][idToTile(n[a]).x].border || (map[idToTile(n[a]).y][idToTile(n[a]).x].opened && map[idToTile(n[a]).y][idToTile(n[a]).x].value > 0)) {
+            if ((analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].border || (map_[idToTile(n[a]).y][idToTile(n[a]).x].opened && map_[idToTile(n[a]).y][idToTile(n[a]).x].value > 0)) && analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].probability != 0 && analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].probability != 1) {
                 m[idToTile(n[a]).y][idToTile(n[a]).x].done = true;
-                if (analysisMap[idToTile(n[a]).y][idToTile(n[a]).x].border) squares.push({x: idToTile(n[a]).x, y: idToTile(n[a]).y});
+                if (analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].border) squares.push({x: idToTile(n[a]).x, y: idToTile(n[a]).y});
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
                         if (idToTile(n[a]).x+i>=0 && idToTile(n[a]).x+i<size_x && idToTile(n[a]).y+j>=0 && idToTile(n[a]).y+j<size_y && !done.includes((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i)) {
@@ -423,7 +458,7 @@ function findCoord(a, x, y) {
     return -1;
 }
 
-function configPossible(config, border, border_squares) {
+function configPossible(map_, config, border, border_squares) {
     let b = new Map();
 
 
@@ -446,10 +481,10 @@ function configPossible(config, border, border_squares) {
     }
 
     for (let [key, value] of b) {
-        if (value.h > map[idToTile(key).y][idToTile(key).x].value) {
+        if (value.h > map_[idToTile(key).y][idToTile(key).x].value) {
             return false;
         }
-        if (value.z > analysisMap[idToTile(key).y][idToTile(key).x].na - map[idToTile(key).y][idToTile(key).x].value) {
+        if (value.z > analysisMap_[idToTile(key).y][idToTile(key).x].na - map_[idToTile(key).y][idToTile(key).x].value) {
             return false;
         }
     }
@@ -477,7 +512,7 @@ function adjacent0(x,y) {
         for (let j=-1;j<=1;j++) {
             if (i != 0 || j != 0) {
                 if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                    if (analysisMap[y+j][x+i].probability == 0) {
+                    if (analysisMap_[y+j][x+i].probability == 0) {
                         t += 1;
                     }
                 }
@@ -494,7 +529,7 @@ function adjacent100(x,y) {
         for (let j=-1;j<=1;j++) {
             if (i != 0 || j != 0) {
                 if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
-                    if (analysisMap[y+j][x+i].probability == 1) {
+                    if (analysisMap_[y+j][x+i].probability == 1) {
                         t += 1;
                     }
                 }

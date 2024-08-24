@@ -314,7 +314,7 @@ refreshMap();
 
 
 function update() {
-    if (analysis) analyze();
+    if (analysis) analysisMap = analyze(map);
 }
 
 function generate(mines, firstx, firsty) {
@@ -464,7 +464,7 @@ function exposeTile(x,y) {
             updateStatsAllGames();
 
 
-            if (!analysis && !infiniteLives && !showMines) {
+            if (!analysis && infiniteLives && !showMines) {
                 if (difficulty == "Beginner") {
                     beginnerGamesPlayed += 1;
     
@@ -631,7 +631,7 @@ function draw(clear=false) {
                     ctx.fillStyle = theme.unopened;
 
                     if (showMines && map[y][x].value == -1) {
-                        ctx.fillStyle = "rgba(200,0,0,0.6)";
+                        ctx.fillStyle = "rgba(200,0,0,0.3)";
                     }
                 } else {
                     if (map[y][x].value == -1) {
@@ -1278,7 +1278,6 @@ document.getElementById("moveButton").addEventListener("click", (e) => {
     }
 
     panning = !panning;
-    console.log(panning);
 });
 
 
