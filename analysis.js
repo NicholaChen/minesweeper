@@ -1,20 +1,20 @@
 var analysisMap_;
 
-var analysisDebug = false ;
+var analysisDebug = true ;
 var analysisDebugVerbose = false;
 
-function analyze(map_, simple=false) {
+function analyze(map_, a, simple=false) {
     if (analysisDebug) console.time('analyze');
+
     analysisMap_ = [];
 
     for (let y=0;y<map_.length;y++) {
         analysisMap_[y] = [];
         for (let x=0;x<map_[y].length;x++) {
-            analysisMap_[y][x] = {
-                probability: null
-            };
+            analysisMap_[y][x] = Object.assign({}, a[y][x]);
         }
     }
+
 
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
@@ -23,12 +23,14 @@ function analyze(map_, simple=false) {
             } else if (map_[y][x].opened && map_[y][x].value == -1) {
                 analysisMap_[y][x].probability = 1;
             }
-
-            analysisMap_[y][x].na = numAdjacent(x,y);
+            if (analysisMap_[y][x].probability != 0 && analysisMap_[y][x].probability != 1) {
+                analysisMap_[y][x].probability = null;
+            }
+            if (analysisMap_[y][x].na == null) analysisMap_[y][x].na = numAdjacent(x,y);
         }
     }
 
-    let numMinesAccounted = 0;
+    
 
     // EASY CASES
 
@@ -105,12 +107,8 @@ function analyze(map_, simple=false) {
         }
     }
 
+    let numMinesAccounted = analysisMap.flat().filter(s => s.probability == 1).length;;
 
-    for (let x=0;x<size_x;x++) {
-        for (let y=0;y<size_y;y++) {
-            if (analysisMap_[y][x].probability == 1) numMinesAccounted += 1;
-        }
-    }
 
     let numMinesNotAccounted = numMines - numMinesAccounted;
 
@@ -160,36 +158,77 @@ function analyze(map_, simple=false) {
             }
         }
 
-
-        //console.log(unknownSquares, numMinesNotAccounted)
-        // let config = [];
-        // for (let i = 0; i < size_y; i++) {
-        //     config[i] = [];
-        //     for (let j = 0; j < size_x; j++) {
-        //         config[i][j] = {probability: numMines / (size_x * size_y)};
-        //     }
-        // }
-
         let configs = [[]];
+        let zcounts = [[]];
+        let hcounts = [[]];
+        let ids = [];
+        for (let [key, value] of border_knowns) {
+            zcounts[0].push(value.z);
+            hcounts[0].push(value.h);
+
+            ids.push(key);
+        }
         let length = 0 ;
 
         if (border.length != 0) {
             while (length < border.length) {
-                new_configs = [];
-                
+                let new_configs = [];
+                let new_z = [];
+                let new_h = [];
                 for (let i=0;i<configs.length;i++) {
                     let c1 = [...configs[i], false];
                     let c2 = [...configs[i], true];
 
+                    let z1 = [...zcounts[i]];
+                    let h1 = [...hcounts[i]];
 
-                    if (configPossible(map_, c1, border, border_knowns)) {
-                        new_configs.push(c1);
+                    let z2 = [...zcounts[i]];
+                    let h2 = [...hcounts[i]];
+                    
+                    let oneGood = true;
+                    let twoGood = true;
+
+                    for (let j=0;j<border[length].a.length;j++) {
+                        let x = border[length].a[j].x;
+                        let y = border[length].a[j].y;
+
+
+                        let v = map_[y][x].value;
+
+
+                        z1[find(ids, y*size_x + x)] += 1;
+
+                        
+                       
+                        if (z1[find(ids, y*size_x + x)] > analysisMap_[y][x].na - v) {
+                            oneGood = false;
+                        }
+
+
+                        h2[find(ids, y*size_x + x)] += 1;
+                        
+                        if (h2[find(ids, y*size_x + x)] > v) {
+                            twoGood =  false;
+                        }
                     }
-                    if (configPossible(map_, c2, border, border_knowns)) {
+
+
+
+
+                    if (oneGood) {
+                        new_configs.push(c1);
+                        new_z.push(z1);
+                        new_h.push(h1);
+                    }
+                    if (twoGood) {
                         new_configs.push(c2);
+                        new_z.push(z2);
+                        new_h.push(h2);
                     }
                 }
                 configs = new_configs;
+                zcounts = new_z;
+                hcounts = new_h;
                 if (configs.length == 0) break;
                 length += 1;
             }
@@ -235,7 +274,7 @@ function analyze(map_, simple=false) {
     }
 
 
-    let ALL_BORDERS_COMBINED = ALL_BORDERS.flatMap(border => border);
+    let ALL_BORDERS_COMBINED = ALL_BORDERS.flat();
 
     let calculationsDone = {};
     let weights = [];
@@ -493,10 +532,11 @@ function configPossible(map_, config, border, border_squares) {
     }
 
     for (let [key, value] of b) {
-        if (value.h > map_[idToTile(key).y][idToTile(key).x].value) {
+        let v = map_[idToTile(key).y][idToTile(key).x].value;
+        if (value.h > v) {
             return false;
         }
-        if (value.z > analysisMap_[idToTile(key).y][idToTile(key).x].na - map_[idToTile(key).y][idToTile(key).x].value) {
+        if (value.z > analysisMap_[idToTile(key).y][idToTile(key).x].na - v) {
             return false;
         }
     }

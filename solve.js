@@ -1,6 +1,14 @@
 function solve(_map) {
+    let a = [];
+    for (let i = 0; i < size_y; i++) {
+        a[i] = [];
+        for (let j = 0; j < size_x; j++) {
+            a[i][j] = {probability: null};
+        }
+    }
+
     while (true) {
-        let a = analyze(_map, true);
+        a = analyze(_map, a, true);
         let found = false;
         let opened = true;
     
@@ -28,9 +36,5 @@ function solve(_map) {
         if (opened) {
             return true;
         }
-
-        map =_map;
-
-        draw(true);
     }
 }

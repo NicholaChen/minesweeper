@@ -313,8 +313,8 @@ refreshMap();
 
 
 function update() {
-    if (analysis == "Simple") analysisMap = analyze(map, true);
-    else if (analysis == "Advanced") analysisMap = analyze(map, false);
+    if (analysis == "Simple") analysisMap = analyze(map, analysisMap, true);
+    else if (analysis == "Advanced") analysisMap = analyze(map, analysisMap, false);
 }
 
 function generate(mines, firstx, firsty) {
