@@ -9,8 +9,9 @@ var advancedTimeout;
 document.getElementById("width").value = isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ? 10 : Number(localStorage.getItem("mapX"));;
 document.getElementById("height").value = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ? 10 : Number(localStorage.getItem("mapY"));
 
-document.getElementById("numMines").value = numMines;
+document.getElementById("numMines").value = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > 1000 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ?  15 : Number(localStorage.getItem("mines"));
 
+document.getElementById("mineDensity").innerText = "Mine density: " + (document.getElementById("numMines").value / (document.getElementById("width").value * document.getElementById("height").value) * 100).toFixed(1) + "%";
 document.getElementById("flagHold").value = flagHold;
 
 if (!showTimer) document.getElementById("h2Timer").style.display = "none";
@@ -154,6 +155,8 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
         document.getElementById("width").value = size_x;
         document.getElementById("height").value = size_y;
         
+        document.getElementById("mineDensity").innerText = "Mine density: " + (document.getElementById("numMines").value / (document.getElementById("width").value * document.getElementById("height").value) * 100).toFixed(1) + "%";
+        
         if (gameplayTimeout != null) clearTimeout(gameplayTimeout);
         
         gameplayTimeout = setTimeout(function() {
@@ -195,6 +198,8 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
         localStorage.setItem("mines", numMines);
         
         document.getElementById("numMines").value = numMines;
+
+        document.getElementById("mineDensity").innerText = "Mine density: " + (document.getElementById("numMines").value / (document.getElementById("width").value * document.getElementById("height").value) * 100).toFixed(1) + "%";
         
         if (gameplayTimeout != null) clearTimeout(gameplayTimeout);
         
@@ -202,6 +207,7 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
             document.getElementById("invalidGameplay").style.display = "none";
         }, settingsMessageDuration);
     }
+    
 });
 
 
@@ -814,6 +820,8 @@ function resetGameplay() {
     document.getElementById("height").value = 10;
 
     document.getElementById("numMines").value = 15;
+
+    document.getElementById("mineDensity").innerText = "Mine density: " + (document.getElementById("numMines").value / (document.getElementById("width").value * document.getElementById("height").value) * 100).toFixed(1) + "%";
 
     localStorage.setItem("mapX", 10);
     localStorage.setItem("mapY", 10);

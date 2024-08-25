@@ -1,9 +1,9 @@
 var analysisMap_;
 
-var analysisDebug = true ;
+var analysisDebug = false;
 var analysisDebugVerbose = false;
 
-function analyze(map_, a, simple=false) {
+function analyze(map_, a, simple=false, max) {
     if (analysisDebug) console.time('analyze');
 
     analysisMap_ = [];
@@ -114,7 +114,7 @@ function analyze(map_, a, simple=false) {
 
     let r = regions(map_);
 
-
+    //console.log(r);
     
     let ALL_BORDERS = [];
     let ALL_CONFIGS = [];
@@ -439,7 +439,7 @@ function regions(map_) {
     let r = [];
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
-            if (analysisMap_[y][x].border && !m[y][x].done) {
+            if (analysisMap_[y][x].border && analysisMap_[y][x].probability != 0 && analysisMap_[y][x].probability != 1 && !m[y][x].done) {
                 let f = flood(map_,m,x,y);
                 if (f.length > 0) r.push(f);
             }
@@ -450,19 +450,32 @@ function regions(map_) {
 }
 
 
-function flood(map_,m,x,y) { // same as _exposeTile
+function flood(map_,m,x,y) { // same as _exposeTile but different rules
     let n = [y*size_x + x];
     let done = [y*size_x + x];
     let squares = [];
     while (true) {
         let n_ = [];
         for (let a=0;a<n.length;a++) {
-            if ((analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].border || (map_[idToTile(n[a]).y][idToTile(n[a]).x].opened && map_[idToTile(n[a]).y][idToTile(n[a]).x].value > 0)) && analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].probability != 0 && analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].probability != 1) {
-                m[idToTile(n[a]).y][idToTile(n[a]).x].done = true;
-                if (analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].border) squares.push({x: idToTile(n[a]).x, y: idToTile(n[a]).y});
+            m[idToTile(n[a]).y][idToTile(n[a]).x].done = true;
+            if (analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].border && analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].probability != 0 && analysisMap_[idToTile(n[a]).y][idToTile(n[a]).x].probability != 1) {
+                squares.push({x: idToTile(n[a]).x, y: idToTile(n[a]).y});
+
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
-                        if (idToTile(n[a]).x+i>=0 && idToTile(n[a]).x+i<size_x && idToTile(n[a]).y+j>=0 && idToTile(n[a]).y+j<size_y && !done.includes((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i)) {
+                        if (idToTile(n[a]).x+i>=0 && idToTile(n[a]).x+i<size_x && idToTile(n[a]).y+j>=0 && idToTile(n[a]).y+j<size_y && !done.includes((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i) && map_[idToTile(n[a]).y+j][idToTile(n[a]).x+i].opened && map_[idToTile(n[a]).y+j][idToTile(n[a]).x+i].value > 0) {
+                            n_.push((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i);
+                            done.push((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i);
+                        }
+                    }
+                }
+            } else if (map_[idToTile(n[a]).y][idToTile(n[a]).x].opened && map_[idToTile(n[a]).y][idToTile(n[a]).x].value > 0) {
+                for (let i=-1;i<=1;i++) {
+                    for (let j=-1;j<=1;j++) {
+                        if (idToTile(n[a]).x+i>=0 && idToTile(n[a]).x+i<size_x && idToTile(n[a]).y+j>=0 && idToTile(n[a]).y+j<size_y && !done.includes((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i) && 
+                        analysisMap_[idToTile(n[a]).y+j][idToTile(n[a]).x+i].border && 
+                        analysisMap_[idToTile(n[a]).y+j][idToTile(n[a]).x+i].probability != 0 &&
+                        analysisMap_[idToTile(n[a]).y+j][idToTile(n[a]).x+i].probability != 1) {
                             n_.push((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i);
                             done.push((idToTile(n[a]).y+j)*size_x + idToTile(n[a]).x+i);
                         }

@@ -11,6 +11,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
 
 ## Settings
 ### Gameplay
+ - `Difficulty` - Selects difficulty of map `Beginner/Intermediate/Expert/Custom` `Default: Beginner`
  - `Map size` - Size of map (width x height). `5x5-99x99` `Default: 10x10`
  - `Number of mines` - Number of mines in map. `1-50% of squares in map` `Default: 15`
  - `Infinite lives` - Makes opening mines not end game. `Off/On` `Default: Off`
@@ -41,5 +42,4 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - `Show 3BV/sec on win screen` - Shows your 3BV/sec stat after winning a game. `Off/On` `Default: Off`
  - `Show all mines` - Shows the location of all mines. `Off/On` `Default: Off`
  - `Analysis` - Analyzes the probability of mines at a square. Advanced is more computationally intensive. `Off/Simple/Advanced` `Default: Off`
- - `Share settings` - Creates and copies a shareable link with all settings.
  - `Reset settings` - Resets **ALL** settings. Doesn't reset Stats.
