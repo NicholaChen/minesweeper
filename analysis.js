@@ -526,39 +526,6 @@ function findCoord(a, x, y) {
     return -1;
 }
 
-function configPossible(map_, config, border, border_squares) {
-    let b = new Map();
-
-
-    for (let [key, value] of border_squares) {
-        b.set(key, {z: value.z, h: value.h});
-    }
-    
-    for (let i=0;i<border.length;i++) {
-        if (config[i] != null) {
-            if (config[i]) {
-                for (let j=0;j<border[i].a.length;j++) {
-                    b.get(border[i].a[j].y*size_x+border[i].a[j].x).h += 1;
-               }
-            } else {
-                for (let j=0;j<border[i].a.length;j++) {
-                    b.get(border[i].a[j].y*size_x+border[i].a[j].x).z += 1;
-                }
-            }
-        }
-    }
-
-    for (let [key, value] of b) {
-        let v = map_[idToTile(key).y][idToTile(key).x].value;
-        if (value.h > v) {
-            return false;
-        }
-        if (value.z > analysisMap_[idToTile(key).y][idToTile(key).x].na - v) {
-            return false;
-        }
-    }
-    return true;
-}
 
 function numAdjacent(x,y) {
     let t = 0;

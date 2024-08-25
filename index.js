@@ -76,6 +76,9 @@ var showRestart = localStorage.getItem("showRestart") != "false";
 
 var show3BV = localStorage.getItem("show3BV") == "true";
 var showMines = localStorage.getItem("showMines") == "true";
+
+var mapCreator = localStorage.getItem("mapCreator") == "true";
+
 var analysis = localStorage.getItem("analysis") ?? "Off";
 
 // stats
@@ -130,7 +133,6 @@ function readTheme() {
     if (params.get("t")) {
         try {
             let t = JSON.parse(atob(params.get("t")));
-            console.log(t);
             if (t != null) {
                 theme = t;
                 
@@ -399,7 +401,6 @@ function generate(mines, firstx, firsty) {
                 exposeTile(map, firstx,firsty);
                 break;
             }
-            console.log(solve(m));
         }
     }
     
@@ -509,7 +510,7 @@ function exposeTile(m,x,y) {
             updateStatsAllGames();
 
 
-            if (!analysis && infiniteLives && !showMines) {
+            if (!analysis && infiniteLives && !showMines && !mapCreator) {
                 if (difficulty == "Beginner") {
                     beginnerGamesPlayed += 1;
     
@@ -585,7 +586,7 @@ function exposeTile(m,x,y) {
         
         updateStatsAllGames();
         
-        if (!analysis && !infiniteLives && !showMines) {
+        if (!analysis && !infiniteLives && !showMines && !mapCreator) {
             if (difficulty == "Beginner") {
                 beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
                 
@@ -676,13 +677,7 @@ function draw(clear=false) {
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
             if (!paused) {
-                if (!map[y][x].opened) {
-                    ctx.fillStyle = theme.unopened;
-
-                    if (showMines && map[y][x].value == -1) {
-                        ctx.fillStyle = "rgba(200,0,0,0.3)";
-                    }
-                } else {
+                if (map[y][x].opened || mapCreator) {
                     if (map[y][x].value == -1) {
                         ctx.fillStyle = "rgba(200,0,0,0.6)";
 
@@ -692,23 +687,29 @@ function draw(clear=false) {
                     } else {
                         ctx.fillStyle = theme.opened;
                     }
+                } else {
+                    ctx.fillStyle = theme.unopened;
+
+                    if (showMines && map[y][x].value == -1) {
+                        ctx.fillStyle = "rgba(200,0,0,0.3)";
+                    }
                 }
 
                 ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
                 
-                if (!map[y][x].opened) {
-                    if (analysis) {
-                        ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
-                        ctx.fillStyle = theme.text;
-                        
-                        if (analysis != "Off") if (analysisMap[y][x].probability != null) ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
-                    }
-                } else {
+                if (map[y][x].opened || mapCreator) {
                     if (map[y][x].value > 0) {
                         ctx.font = (squareSize / 1.5).toString() + "px monospace, monospace";
                         ctx.fillStyle = theme.text;
                         
                         ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                    }
+                } else {
+                    if (analysis) {
+                        ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
+                        ctx.fillStyle = theme.text;
+                        
+                        if (analysis != "Off") if (analysisMap[y][x].probability != null) ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
                 }
                 if (map[y][x].flagged) {
@@ -928,9 +929,30 @@ canvas.addEventListener("mousedown", (e) => {
         mouseTimeout = setTimeout(function() {
             if (!(leftButtonDown && rightButtonDown)) {
                 if (e.button == 0) {
-                    open(square);
+                    if (!mapCreator) open(square);
                 } else if (e.button == 2 && inGame) {
-                    flag(square);
+                    if (!mapCreator) flag(square);
+                    else {
+                        if (map[square.y][square.x].value != -1) {
+                            map[square.y][square.x].value = -1;
+                        } else {
+                            map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
+                        }
+    
+                        for (let i=-1;i<=1;i++) {
+                            for (let j=-1;j<=1;j++) {
+                                if (i != 0 || j != 0) {
+                                    if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
+                                        if (map[square.y+j][square.x+i].value != -1) {
+                                            map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+    
+                        draw(true);
+                    }
                 } else if (e.button == 1) {
                     if (!chording) return;
         
@@ -980,9 +1002,30 @@ canvas.addEventListener("mouseup", (e) => {
 
         if (!(leftButtonDown && rightButtonDown)) {
             if (e.button == 0) {
-                open(square);
+                if (!mapCreator) open(square);
             } else if (e.button == 2 && inGame) {
-                flag(square);
+                if (!mapCreator) flag(square);
+                else {
+                    if (map[square.y][square.x].value != -1) {
+                        map[square.y][square.x].value = -1;
+                    } else {
+                        map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
+                    }
+
+                    for (let i=-1;i<=1;i++) {
+                        for (let j=-1;j<=1;j++) {
+                            if (i != 0 || j != 0) {
+                                if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
+                                    if (map[square.y+j][square.x+i].value != -1) {
+                                        map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    draw(true);
+                }
             } else if (e.button == 1) {
                 if (!chording) return;
 

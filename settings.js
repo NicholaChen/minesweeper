@@ -752,6 +752,34 @@ document.getElementById("showMinesOn").addEventListener("click", (e) => {
 
 
 
+if (mapCreator) {
+    document.getElementById("mapCreatorOff").classList.add("unselected");
+} else {
+    document.getElementById("mapCreatorOn").classList.add("unselected");
+}
+
+
+
+document.getElementById("mapCreatorOff").addEventListener("click", (e) => {
+    document.getElementById("mapCreatorOff").classList.remove("unselected");
+    document.getElementById("mapCreatorOn").classList.add("unselected");
+
+    mapCreator = false;
+
+    localStorage.setItem("mapCreator", mapCreator);
+});
+
+document.getElementById("mapCreatorOn").addEventListener("click", (e) => {
+    document.getElementById("mapCreatorOn").classList.remove("unselected");
+    document.getElementById("mapCreatorOff").classList.add("unselected");
+
+    mapCreator = true;
+
+    localStorage.setItem("mapCreator", mapCreator);
+});
+
+
+
 
 if (analysis == "Advanced") {
     document.getElementById("analysisOff").classList.add("unselected");

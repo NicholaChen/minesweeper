@@ -1,4 +1,4 @@
-const solveCalculationLimit = 1e10;
+const solveCalculationLimit = null;
 
 function solve(_map) {
     let a = [];
