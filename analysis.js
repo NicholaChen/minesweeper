@@ -107,7 +107,7 @@ function analyze(map_, a, simple=false, max) {
         }
     }
 
-    let numMinesAccounted = analysisMap.flat().filter(s => s.probability == 1).length;;
+    let numMinesAccounted = analysisMap.flat().filter(s => s.probability == 1).length;
 
 
     let numMinesNotAccounted = numMines - numMinesAccounted;
