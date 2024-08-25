@@ -172,6 +172,8 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
         i = "Invalid " + "('" + document.getElementById("numMines").value + "').";
     } else if (Number(document.getElementById("numMines").value) < 1) {
         i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be at least 1.";
+    } else if (Number(document.getElementById("numMines").value) > 1000) {
+        i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be less than 1000.";
     } else if (Number(document.getElementById("numMines").value) > Math.floor(size_x * size_y / 2)) {
         i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be less than "+Math.floor(size_x * size_y / 2)+" for map size.";
     }

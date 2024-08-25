@@ -114,8 +114,12 @@ function analyze(map_, a, simple=false, max) {
 
     let r = regions(map_);
 
-    //console.log(r);
-    
+    if (max != null) {
+        if (r.reduce((acc, cur) => acc + Math.pow(2, cur.length), 0) > max) {
+            return null;
+        }
+    }
+
     let ALL_BORDERS = [];
     let ALL_CONFIGS = [];
     

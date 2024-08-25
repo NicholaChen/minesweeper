@@ -11,9 +11,13 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
 
 ## Settings
 ### Gameplay
- - `Difficulty` - Selects difficulty of map `Beginner/Intermediate/Expert/Custom` `Default: Beginner`
- - `Map size` - Size of map (width x height). `5x5-99x99` `Default: 10x10`
- - `Number of mines` - Number of mines in map. `1-50% of squares in map` `Default: 15`
+ - `Difficulty` - Selects difficulty of map `Beginner/Intermediate/Expert/Custom` `Default: Beginner
+    - `Beginner` - 9x9, 10 mines
+    - `Intermediate` - 16x16, 40 mines
+    - `Expert` - 30x16, 99 mines
+    - `Custom`
+        - `Map size` - Size of map (width x height). `5x5-99x99` `Default: 10x10`
+        - `Number of mines` - Number of mines in map. `1-50% of squares in map (max 1000)` `Default: 15`
  - `Infinite lives` - Makes opening mines not end game. `Off/On` `Default: Off`
  - `Mine randomness` - Changes how random the mines are generated. `No guess/Easy/Normal` `Default: Normal`
     - `Easy` - Mines can be placed anywhere except the first opened square and its adjacent squares.

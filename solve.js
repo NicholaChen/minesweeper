@@ -1,3 +1,5 @@
+const solveCalculationLimit = 1e10;
+
 function solve(_map) {
     let a = [];
     for (let i = 0; i < size_y; i++) {
@@ -8,7 +10,11 @@ function solve(_map) {
     }
 
     while (true) {
-        a = analyze(_map, a, true);
+        a = analyze(_map, a, true, solveCalculationLimit);
+
+        if (a == null) {
+            return false;
+        }
         let found = false;
         let opened = true;
     
