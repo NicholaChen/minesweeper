@@ -1,4 +1,4 @@
-const VERSION = "1.10.2";
+const VERSION = "1.11.0";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -32,6 +32,14 @@ var size_x = isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.
 var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ? 10 : Number(localStorage.getItem("mapY"));
 
 var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > 1000 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ?  15 : Number(localStorage.getItem("mines"));
+
+
+var new_x;
+var new_y;
+
+var newNumMines;
+
+var mapCustomMade = false;
 
 if (difficulty == "Beginner") {
     size_x = 9;
@@ -260,6 +268,19 @@ function timeToText(t) {
 }
 
 function refreshMap() {
+    if (newNumMines) {
+        numMines = newNumMines;
+        newNumMines = null;
+    }
+    if (new_x) {
+        size_x = new_x;
+        new_x = null;
+    }
+    if (new_y) {
+        size_y = new_y;
+        new_y = null;
+    }
+
     clicks = 0;
 
     document.getElementById("gameEnd").style.display = "none";
@@ -276,7 +297,13 @@ function refreshMap() {
 
     document.getElementById("flags").innerText = "0/" + numMines.toString();
     document.getElementById("timer").innerText = "0.0s";
-    document.getElementById("clickAnywhere").style.display = "flex";
+
+    if (!mapCreator) {
+        document.getElementById("clickAnywhere").style.display = "flex";
+    } else {
+        document.getElementById("clickAnywhere").style.display = "none";
+    }
+    
 
     if (difficulty != "Custom") {
         let large = Math.max(size_x, size_y);
@@ -291,14 +318,31 @@ function refreshMap() {
         }
     }
     
-    first = true;
+    first = !mapCreator;
+    mapCustomMade = mapCreator;
+
     flags = 0;
-    map = [];
-    for (let i = 0; i < size_y; i++) {
-        map[i] = [];
-        for (let j = 0; j < size_x; j++) {
-            map[i][j] = {value: NaN, opened: false, flagged: false};
+    if (!mapCreator) {
+        map = [];
+        for (let i = 0; i < size_y; i++) {
+            map[i] = [];
+            for (let j = 0; j < size_x; j++) {
+                map[i][j] = {value: NaN, opened: false, flagged: false};
+            }
         }
+    } else {
+        if (map.length == 0) {
+            map = [];
+            for (let i = 0; i < size_y; i++) {
+                map[i] = [];
+                for (let j = 0; j < size_x; j++) {
+                    map[i][j] = {value: 0, opened: false, flagged: false};
+                }
+            }
+        }
+        numMines = map.flat().filter(s => s.value == -1).length;
+
+        document.getElementById("flags").innerText = "0/" + numMines.toString();
     }
 
     analysisMap = [];
@@ -510,7 +554,7 @@ function exposeTile(m,x,y) {
             updateStatsAllGames();
 
 
-            if (!analysis && infiniteLives && !showMines && !mapCreator) {
+            if (!analysis && infiniteLives && !showMines && !mapCustomMade) {
                 if (difficulty == "Beginner") {
                     beginnerGamesPlayed += 1;
     
@@ -520,9 +564,9 @@ function exposeTile(m,x,y) {
     
                     updateStatsIntermediate();
                 } else if (difficulty == "Expert") {
-                     expertGamesPlayed += 1;
+                    expertGamesPlayed += 1;
     
-                     updateStatsExpert();
+                    updateStatsExpert();
                 }
             }
         
@@ -677,7 +721,13 @@ function draw(clear=false) {
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
             if (!paused) {
-                if (map[y][x].opened || mapCreator) {
+                if (!map[y][x].opened || mapCreator) {
+                    ctx.fillStyle = theme.unopened;
+
+                    if ((showMines || mapCreator) && map[y][x].value == -1) {
+                        ctx.fillStyle = "rgba(200,0,0,0.3)";
+                    }
+                } else {
                     if (map[y][x].value == -1) {
                         ctx.fillStyle = "rgba(200,0,0,0.6)";
 
@@ -687,13 +737,9 @@ function draw(clear=false) {
                     } else {
                         ctx.fillStyle = theme.opened;
                     }
-                } else {
-                    ctx.fillStyle = theme.unopened;
-
-                    if (showMines && map[y][x].value == -1) {
-                        ctx.fillStyle = "rgba(200,0,0,0.3)";
-                    }
                 }
+
+                
 
                 ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
                 
@@ -830,6 +876,20 @@ var double = false
 
 
 function open(square) {
+    if (mapCustomMade) {
+        inGame = true;
+
+        document.getElementById("clickAnywhere").style.display = "none";
+        pausedTime = 0;
+
+        startTime = Date.now();
+        interval = setInterval(function() {
+            if (!paused) {
+                let elapsedTime = Date.now() - startTime;
+                document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+            }
+        }, 10);
+    }
     if ((!inGame && !first) || paused) return;
     
     if (square) {
@@ -930,28 +990,34 @@ canvas.addEventListener("mousedown", (e) => {
             if (!(leftButtonDown && rightButtonDown)) {
                 if (e.button == 0) {
                     if (!mapCreator) open(square);
-                } else if (e.button == 2 && inGame) {
+                } else if (e.button == 2 && (inGame || mapCreator)) {
                     if (!mapCreator) flag(square);
                     else {
-                        if (map[square.y][square.x].value != -1) {
-                            map[square.y][square.x].value = -1;
-                        } else {
-                            map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
-                        }
-    
-                        for (let i=-1;i<=1;i++) {
-                            for (let j=-1;j<=1;j++) {
-                                if (i != 0 || j != 0) {
-                                    if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
-                                        if (map[square.y+j][square.x+i].value != -1) {
-                                            map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+                        if (square) {
+                            if (map[square.y][square.x].value != -1) {
+                                map[square.y][square.x].value = -1;
+                                numMines += 1;
+                            } else {
+                                map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
+                                numMines -= 1;
+                            }
+
+                            document.getElementById("flags").innerText = "0/" + numMines.toString();
+        
+                            for (let i=-1;i<=1;i++) {
+                                for (let j=-1;j<=1;j++) {
+                                    if (i != 0 || j != 0) {
+                                        if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
+                                            if (map[square.y+j][square.x+i].value != -1) {
+                                                map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+                                            }
                                         }
                                     }
                                 }
                             }
+        
+                            draw(true);
                         }
-    
-                        draw(true);
                     }
                 } else if (e.button == 1) {
                     if (!chording) return;
@@ -1006,25 +1072,31 @@ canvas.addEventListener("mouseup", (e) => {
             } else if (e.button == 2 && inGame) {
                 if (!mapCreator) flag(square);
                 else {
-                    if (map[square.y][square.x].value != -1) {
-                        map[square.y][square.x].value = -1;
-                    } else {
-                        map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
-                    }
+                    if (square) {
+                        if (map[square.y][square.x].value != -1) {
+                            map[square.y][square.x].value = -1;
+                            numMines += 1;
+                        } else {
+                            map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
+                            numMines -= 1;
+                        }
 
-                    for (let i=-1;i<=1;i++) {
-                        for (let j=-1;j<=1;j++) {
-                            if (i != 0 || j != 0) {
-                                if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
-                                    if (map[square.y+j][square.x+i].value != -1) {
-                                        map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+                        document.getElementById("flags").innerText = "0/" + numMines.toString();
+    
+                        for (let i=-1;i<=1;i++) {
+                            for (let j=-1;j<=1;j++) {
+                                if (i != 0 || j != 0) {
+                                    if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
+                                        if (map[square.y+j][square.x+i].value != -1) {
+                                            map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+                                        }
                                     }
                                 }
                             }
                         }
+    
+                        draw(true);
                     }
-
-                    draw(true);
                 }
             } else if (e.button == 1) {
                 if (!chording) return;

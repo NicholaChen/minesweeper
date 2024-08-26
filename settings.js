@@ -50,13 +50,6 @@ if (difficulty == "Custom") {
     document.getElementById("customMap").style.display = "block";
 }
 
-function resetGame() {
-    inGame = false;
-    
-    clearInterval(interval);
-
-    refreshMap();
-}
 
 document.getElementById("difficulty").addEventListener("change", (e) => {
     difficulty = document.getElementById("difficulty").value;
@@ -64,32 +57,30 @@ document.getElementById("difficulty").addEventListener("change", (e) => {
     if (difficulty == "Custom") {
         document.getElementById("customMap").style.display = "block";
         
-        size_x = isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ? 10 : Number(localStorage.getItem("mapX"));
-        size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ? 10 : Number(localStorage.getItem("mapY"));
+        new_x = isNaN(Number(localStorage.getItem("mapX"))) || Number(localStorage.getItem("mapX")) < 5 ? 10 : Number(localStorage.getItem("mapX"));
+        new_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.getItem("mapY")) < 5 ? 10 : Number(localStorage.getItem("mapY"));
 
-        numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ? 15 : Number(localStorage.getItem("mines"));
+        newNumMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ? 15 : Number(localStorage.getItem("mines"));
     } else {
         document.getElementById("customMap").style.display = "none";
         
         if (difficulty == "Beginner") {
-            size_x = 9;
-            size_y = 9;
+            new_x = 9;
+            new_y = 9;
             
-            numMines = 10;
+            newNumMines = 10;
         } else if (difficulty == "Intermediate") {
-            size_x = 16;
-            size_y = 16;
+            new_x = 16;
+            new_y = 16;
             
-            numMines = 40;
+            newNumMines = 40;
         } else if (difficulty == "Expert") {
-            size_x = 30;
-            size_y = 16;
+            new_x = 30;
+            new_y = 16;
     
-            numMines = 99;
+            newNumMines = 99;
         }
     }
-    
-    resetGame();
 })
 
 document.getElementById("saveMapSize").addEventListener("click", (e) => {
@@ -130,15 +121,15 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
             document.getElementById("invalidGameplay").style.display = "none";
         }, settingsMessageDuration);
     } else {
-        size_x = Number(document.getElementById("width").value);
-        size_y = Number(document.getElementById("height").value);
+        new_x = Number(document.getElementById("width").value);
+        new_y = Number(document.getElementById("height").value);
         
-        resetGame();
+       
 
-        if (numMines > Math.floor(size_x * size_y / 2)) {
-            numMines = Math.floor(size_x * size_y / 2);
+        if (numMines > Math.floor(new_x * new_y / 2)) {
+            newNumMines = Math.floor(new_x * new_y / 2);
             
-            document.getElementById("invalidGameplay").innerText = "Successfully saved 'Map size'. Too many mines for map. 'Number of mines' set to '" + numMines + "'.";
+            document.getElementById("invalidGameplay").innerText = "Successfully saved 'Map size'. Too many mines for map. 'Number of mines' set to '" + newNumMines + "'.";
             
             localStorage.setItem("mines", numMines);
             
@@ -149,11 +140,11 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
         
         document.getElementById("invalidGameplay").style.display = "block";
         
-        localStorage.setItem("mapX", size_x);
-        localStorage.setItem("mapY", size_y);
+        localStorage.setItem("mapX", new_x);
+        localStorage.setItem("mapY", new_y);
         
-        document.getElementById("width").value = size_x;
-        document.getElementById("height").value = size_y;
+        document.getElementById("width").value = new_x;
+        document.getElementById("height").value = new_y;
         
         document.getElementById("mineDensity").innerText = "Mine density: " + (document.getElementById("numMines").value / (document.getElementById("width").value * document.getElementById("height").value) * 100).toFixed(1) + "%";
         
@@ -174,8 +165,8 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
         i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be at least 1.";
     } else if (Number(document.getElementById("numMines").value) > 1000) {
         i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be less than 1000.";
-    } else if (Number(document.getElementById("numMines").value) > Math.floor(size_x * size_y / 2)) {
-        i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be less than "+Math.floor(size_x * size_y / 2)+" for map size.";
+    } else if (Number(document.getElementById("numMines").value) > Math.floor(new_x * new_y / 2)) {
+        i = "Invalid " + "('" + document.getElementById("numMines").value + "'). Must be less than "+Math.floor(new_x * new_y / 2)+" for map size.";
     }
     if (i != "") {
         document.getElementById("invalidGameplay").innerText = "Could not save 'Number of mines'. " + i;
@@ -193,13 +184,13 @@ document.getElementById("saveNumMines").addEventListener("click", (e) => {
         
         document.getElementById("invalidGameplay").style.display = "block";
         
-        numMines = Number(document.getElementById("numMines").value);
+        newNumMines = Number(document.getElementById("numMines").value);
         
-        resetGame();
+       
         
-        localStorage.setItem("mines", numMines);
+        localStorage.setItem("mines", newNumMines);
         
-        document.getElementById("numMines").value = numMines;
+        document.getElementById("numMines").value = newNumMines;
 
         document.getElementById("mineDensity").innerText = "Mine density: " + (document.getElementById("numMines").value / (document.getElementById("width").value * document.getElementById("height").value) * 100).toFixed(1) + "%";
         
@@ -766,6 +757,8 @@ document.getElementById("mapCreatorOff").addEventListener("click", (e) => {
 
     mapCreator = false;
 
+    document.getElementById("clickAnywhere").style.display = "flex";
+    document.getElementById("mapCreatorTop").style.display = "none";
     localStorage.setItem("mapCreator", mapCreator);
 });
 
@@ -775,7 +768,18 @@ document.getElementById("mapCreatorOn").addEventListener("click", (e) => {
 
     mapCreator = true;
 
+    for (let i = 0; i < size_y; i++) {
+        for (let j = 0; j < size_x; j++) {
+            if (isNaN(map[i][j].value)) map[i][j].value = 0;
+        }
+    }
+    document.getElementById("mapCreatorTop").style.display = "block";
     localStorage.setItem("mapCreator", mapCreator);
+
+    mapCustomMade = true;
+    
+    clearInterval(interval);
+    refreshMap();
 });
 
 
@@ -824,10 +828,10 @@ document.getElementById("analysisAdvanced").addEventListener("click", (e) => {
 
 function resetGameplay() {
     difficulty = "Beginner";
-    size_x = 9;
-    size_y = 9;
+    new_x = 9;
+    new_y = 9;
 
-    numMines = 10;
+    newNumMines = 10;
 
     infiniteLives = false;
     randomMines = "Normal";
@@ -867,7 +871,7 @@ function resetGameplay() {
         document.getElementById("invalidGameplay").style.display = "none";
     }, settingsMessageDuration);
     
-    resetGame();
+   
 }
 
 
@@ -906,7 +910,7 @@ function resetControls() {
         document.getElementById("invalidControls").style.display = "none";
     }, settingsMessageDuration);
 
-    resetGame();
+   
 }
 
 function resetAppearance() {
@@ -979,6 +983,7 @@ function resetAdvanced() {
     show3BV = false;
     showMines = false;
     analysis = "Off";
+    mapCreator = false;
 
     document.getElementById("invalidAdvanced").innerText = "Reset settings.";
 
@@ -994,9 +999,16 @@ function resetAdvanced() {
     document.getElementById("show3BVOn").classList.add("unselected");
     document.getElementById("show3BVOff").classList.remove("unselected");
 
+    document.getElementById("mapCreatorOn").classList.add("unselected");
+    document.getElementById("mapCreatorOff").classList.remove("unselected");
+
+    document.getElementById("clickAnywhere").style.display = "flex";
+    document.getElementById("mapCreatorTop").style.display = "none";
+
     localStorage.setItem("show3BV", show3BV);
     localStorage.setItem("showMines", showMines);
     localStorage.setItem("analysis", analysis);
+    localStorage.setItem("mapCreator", mapCreator);
     if (advancedTimeout != null) clearTimeout(advancedTimeout);
 
     advancedTimeout = setTimeout(function() {
@@ -1070,8 +1082,16 @@ document.getElementById("saveImportedSettings").addEventListener("click", (e) =>
             localStorage.setItem(key, themes.custom[key]);
         }
     }
+
+    history.pushState(null, 'Minesweeper', 'https://nicholachen.github.io/minesweeper/');
+
+    document.getElementById("saveImportedSettings").style.display = "none";
+    document.getElementById("cancelImportedSettings").style.display = "none";
 });
 
 document.getElementById("cancelImportedSettings").addEventListener("click", (e) => {
-    document.location = document.location.origin;
+    history.pushState(null, 'Minesweeper', 'https://nicholachen.github.io/minesweeper/');
+
+    document.getElementById("saveImportedSettings").style.display = "none";
+    document.getElementById("cancelImportedSettings").style.display = "none";
 });
