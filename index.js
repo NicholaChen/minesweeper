@@ -39,10 +39,7 @@ var new_y;
 
 var newNumMines;
 
-<<<<<<< HEAD
 var mapCustomMade = false;
-=======
->>>>>>> 633ce29e4c00fe1a5c9467ab25993806deff2229
 
 if (difficulty == "Beginner") {
     size_x = 9;
@@ -91,6 +88,14 @@ var showMines = localStorage.getItem("showMines") == "true";
 var mapCreator = localStorage.getItem("mapCreator") == "true";
 
 var analysis = localStorage.getItem("analysis") ?? "Off";
+
+
+if (mapCreator) {
+    document.getElementById("mapCreatorTop").style.display = "block";
+} else {
+    document.getElementById("mapCreatorTop").style.display = "none";
+}
+
 
 // stats
 
@@ -322,11 +327,8 @@ function refreshMap() {
     }
     
     first = !mapCreator;
-<<<<<<< HEAD
     mapCustomMade = mapCreator;
 
-=======
->>>>>>> 633ce29e4c00fe1a5c9467ab25993806deff2229
     flags = 0;
     if (!mapCreator) {
         map = [];
@@ -532,6 +534,9 @@ function threeBV() {
 
 function idToTile(n) {
     return {x: n%size_x, y: Math.floor(n/size_x)}
+}
+function _idToTile(n,_size_x) {
+    return {x: n%_size_x, y: Math.floor(n/_size_x)}
 }
 function exposeTile(m,x,y) {
     if ( x < 0 || x >= size_x || y < 0 || y >= size_y) return;
@@ -999,7 +1004,6 @@ canvas.addEventListener("mousedown", (e) => {
                 } else if (e.button == 2 && (inGame || mapCreator)) {
                     if (!mapCreator) flag(square);
                     else {
-<<<<<<< HEAD
                         if (square) {
                             if (map[square.y][square.x].value != -1) {
                                 map[square.y][square.x].value = -1;
@@ -1018,24 +1022,6 @@ canvas.addEventListener("mousedown", (e) => {
                                             if (map[square.y+j][square.x+i].value != -1) {
                                                 map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
                                             }
-=======
-                        if (map[square.y][square.x].value != -1) {
-                            map[square.y][square.x].value = -1;
-                            numMines += 1;
-                        } else {
-                            map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
-                            numMines -= 1;
-                        }
-
-                        document.getElementById("flags").innerText = "0/" + numMines.toString();
-    
-                        for (let i=-1;i<=1;i++) {
-                            for (let j=-1;j<=1;j++) {
-                                if (i != 0 || j != 0) {
-                                    if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
-                                        if (map[square.y+j][square.x+i].value != -1) {
-                                            map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
->>>>>>> 633ce29e4c00fe1a5c9467ab25993806deff2229
                                         }
                                     }
                                 }
@@ -1097,7 +1083,6 @@ canvas.addEventListener("mouseup", (e) => {
             } else if (e.button == 2 && inGame) {
                 if (!mapCreator) flag(square);
                 else {
-<<<<<<< HEAD
                     if (square) {
                         if (map[square.y][square.x].value != -1) {
                             map[square.y][square.x].value = -1;
@@ -1116,24 +1101,6 @@ canvas.addEventListener("mouseup", (e) => {
                                         if (map[square.y+j][square.x+i].value != -1) {
                                             map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
                                         }
-=======
-                    if (map[square.y][square.x].value != -1) {
-                        map[square.y][square.x].value = -1;
-                        numMines += 1;
-                    } else {
-                        map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
-                        numMines -= 1;
-                    }
-
-                    document.getElementById("flags").innerText = "0/" + numMines.toString();
-
-                    for (let i=-1;i<=1;i++) {
-                        for (let j=-1;j<=1;j++) {
-                            if (i != 0 || j != 0) {
-                                if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
-                                    if (map[square.y+j][square.x+i].value != -1) {
-                                        map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
->>>>>>> 633ce29e4c00fe1a5c9467ab25993806deff2229
                                     }
                                 }
                             }
@@ -1682,6 +1649,63 @@ window.addEventListener('blur', function() {
         pause();
         lastPause = true;
     }
+});
+
+
+document.getElementById("shareMap").addEventListener("click", (e) => {
+    let data = size_x.toString(36) + "," + size_y.toString(36) + ";";
+
+    for (let x=0;x<size_x;x++) {
+        for (let y=0;y<size_y;y++) {
+            if (map[y][x].value == -1) {
+                data += (y * size_x + x).toString(36) + ",";
+            }
+        }
+    }
+
+    let b64 = btoa(data);
+    console.log(b64.length);
+
+    navigator.clipboard.writeText("nicholachen.github.io/minesweeper?m=" + b64);
+});
+
+function getMap(s) {
+    try {
+        let data = atob(s).split(";");
+        let x =  parseInt(data[0].split(",")[0], 36);
+        let y = parseInt(data[0].split(",")[1], 36);
+        let mines = data[1].split(",").filter(i => i != "").map(i => _idToTile(parseInt(i, 36),x));
+
+        console.log(data,x,y,mines)
+
+        let m = [];
+        for (let i = 0; i < size_y; i++) {
+            m[i] = [];
+            for (let j = 0; j < size_x; j++) {
+                m[i][j] = {value: NaN, opened: false, flagged: false};
+            }
+        }
+
+        for (let i = 0; i < mines.length; i++) {
+            m[mines[i].y][mines[i].x].value = -1;
+        }
+
+        return m;
+
+    } catch {
+        
+    }
+}
+
+document.getElementById("resetMap").addEventListener("click", (e) => {
+    for (let i = 0; i < size_y; i++) {
+        for (let j = 0; j < size_x; j++) {
+            map[i][j] = {value: 0, opened: false, flagged: false};
+        }
+    }
+
+    update();
+    draw();
 });
 
 /* TODO (not in order)

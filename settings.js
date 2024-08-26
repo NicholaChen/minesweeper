@@ -93,7 +93,7 @@ document.getElementById("difficulty").addEventListener("change", (e) => {
             newNumMines = 99;
         }
     }
-})
+});
 
 document.getElementById("saveMapSize").addEventListener("click", (e) => {
     let width_issue = "";
@@ -144,7 +144,7 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
             newNumMines = Math.floor(new_x * new_y / 2);
             
             document.getElementById("invalidGameplay").innerText = "Successfully saved 'Map size'. Too many mines for map. 'Number of mines' set to '" + newNumMines + "'.";
-       
+        }
 
         if (numMines > Math.floor(new_x * new_y / 2)) {
             newNumMines = Math.floor(new_x * new_y / 2);
@@ -178,7 +178,7 @@ document.getElementById("saveMapSize").addEventListener("click", (e) => {
             document.getElementById("invalidGameplay").style.display = "none";
         }, settingsMessageDuration);
     }
-})
+});
 
 document.getElementById("saveNumMines").addEventListener("click", (e) => {
     let i = "";

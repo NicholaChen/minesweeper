@@ -57,9 +57,12 @@
                         <h2 style="margin: 0; display: inline; cursor: pointer; font-size: 22px;"><i class="fa-solid fa-gear"></i></h2>
                     </button>
                 </div>
-                <div style="margin: 8px; position: absolute;" id="mapCreatorTop">
-                    <button id="shareMap" title="Settings">
+                <div id="mapCreatorTop" style="margin: 8px; position: absolute; display: none">
+                    <button id="shareMap" title="Share map">
                         Share map
+                    </button>
+                    <button id="resetMap" title="Reset map" style="margin: 0 0 0 8px;">
+                        Reset map
                     </button>
                 </div>
             </div>
@@ -384,11 +387,12 @@
                 <br>
             </div>
         </div>
-        
+
+        <script src="analysis.js"></script>
+        <script src="solve.js"></script>
         <script src="index.js"></script>
         <script src="stats.js"></script>
         <script src="settings.js"></script>
-        <script src="analysis.js"></script>
-        <script src="solve.js"></script>
+        
     </body>
 </html
