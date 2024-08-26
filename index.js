@@ -39,7 +39,10 @@ var new_y;
 
 var newNumMines;
 
+<<<<<<< HEAD
 var mapCustomMade = false;
+=======
+>>>>>>> 633ce29e4c00fe1a5c9467ab25993806deff2229
 
 if (difficulty == "Beginner") {
     size_x = 9;
@@ -319,8 +322,11 @@ function refreshMap() {
     }
     
     first = !mapCreator;
+<<<<<<< HEAD
     mapCustomMade = mapCreator;
 
+=======
+>>>>>>> 633ce29e4c00fe1a5c9467ab25993806deff2229
     flags = 0;
     if (!mapCreator) {
         map = [];
@@ -993,6 +999,7 @@ canvas.addEventListener("mousedown", (e) => {
                 } else if (e.button == 2 && (inGame || mapCreator)) {
                     if (!mapCreator) flag(square);
                     else {
+<<<<<<< HEAD
                         if (square) {
                             if (map[square.y][square.x].value != -1) {
                                 map[square.y][square.x].value = -1;
@@ -1011,6 +1018,24 @@ canvas.addEventListener("mousedown", (e) => {
                                             if (map[square.y+j][square.x+i].value != -1) {
                                                 map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
                                             }
+=======
+                        if (map[square.y][square.x].value != -1) {
+                            map[square.y][square.x].value = -1;
+                            numMines += 1;
+                        } else {
+                            map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
+                            numMines -= 1;
+                        }
+
+                        document.getElementById("flags").innerText = "0/" + numMines.toString();
+    
+                        for (let i=-1;i<=1;i++) {
+                            for (let j=-1;j<=1;j++) {
+                                if (i != 0 || j != 0) {
+                                    if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
+                                        if (map[square.y+j][square.x+i].value != -1) {
+                                            map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+>>>>>>> 633ce29e4c00fe1a5c9467ab25993806deff2229
                                         }
                                     }
                                 }
@@ -1072,6 +1097,7 @@ canvas.addEventListener("mouseup", (e) => {
             } else if (e.button == 2 && inGame) {
                 if (!mapCreator) flag(square);
                 else {
+<<<<<<< HEAD
                     if (square) {
                         if (map[square.y][square.x].value != -1) {
                             map[square.y][square.x].value = -1;
@@ -1090,6 +1116,24 @@ canvas.addEventListener("mouseup", (e) => {
                                         if (map[square.y+j][square.x+i].value != -1) {
                                             map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
                                         }
+=======
+                    if (map[square.y][square.x].value != -1) {
+                        map[square.y][square.x].value = -1;
+                        numMines += 1;
+                    } else {
+                        map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
+                        numMines -= 1;
+                    }
+
+                    document.getElementById("flags").innerText = "0/" + numMines.toString();
+
+                    for (let i=-1;i<=1;i++) {
+                        for (let j=-1;j<=1;j++) {
+                            if (i != 0 || j != 0) {
+                                if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
+                                    if (map[square.y+j][square.x+i].value != -1) {
+                                        map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+>>>>>>> 633ce29e4c00fe1a5c9467ab25993806deff2229
                                     }
                                 }
                             }
