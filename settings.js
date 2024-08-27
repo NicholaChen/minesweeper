@@ -788,6 +788,11 @@ document.getElementById("mapCreatorOff").addEventListener("click", (e) => {
 
     mapCreator = false;
 
+    map3BV = threeBV();
+    inGame = true;
+
+    clearInterval(interval);
+
     document.getElementById("clickAnywhere").style.display = "flex";
     document.getElementById("mapCreatorTop").style.display = "none";
     localStorage.setItem("mapCreator", mapCreator);
@@ -802,11 +807,16 @@ document.getElementById("mapCreatorOn").addEventListener("click", (e) => {
     for (let i = 0; i < size_y; i++) {
         for (let j = 0; j < size_x; j++) {
             if (isNaN(map[i][j].value)) map[i][j].value = 0;
+            if (map[i][j].flagged) map[i][j].flagged = false;
+            if (map[i][j].opened) map[i][j].opened = false;
         }
     }
+
+    oldNumMines = numMines;
+
     document.getElementById("mapCreatorTop").style.display = "block";
     localStorage.setItem("mapCreator", mapCreator);
-
+    inGame = false;
     mapCustomMade = true;
     
     clearInterval(interval);
@@ -1020,8 +1030,9 @@ function resetAdvanced() {
     showMines = false;
     analysis = "Off";
     mapCreator = false;
-    mapCreator = false;
 
+    map3BV = threeBV();
+    inGame= true;
     document.getElementById("invalidAdvanced").innerText = "Reset settings.";
 
     document.getElementById("invalidAdvanced").style.display = "block";

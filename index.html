@@ -58,12 +58,15 @@
                     </button>
                 </div>
                 <div id="mapCreatorTop" style="margin: 8px; position: absolute; display: none">
-                    <button id="shareMap" title="Share map">
+                    <button id="shareMap" title="Share map" style="box-shadow: 0px 0px 18px 0 #00000040;">
                         Share map
                     </button>
-                    <button id="resetMap" title="Reset map" style="margin: 0 0 0 8px;">
+                    <button id="resetMap" title="Reset map" style="margin: 0 0 0 8px;  box-shadow: 0px 0px 18px 0 #00000040;">
                         Reset map
                     </button>
+                    <div style="margin: 8px 0 8px 0;">
+                        <p id="topText" style="color: --text-color; display: none;">Share link copied.</p>
+                    </div>
                 </div>
             </div>
             
@@ -77,6 +80,7 @@
                         <p id="time" style="font-size: 18px; margin: 4px;">Time: </p>
                         <p id="winStreak" style="font-size: 18px; margin: 4px;">Win Streak </p>
                         <p id="3BVSec" style="font-size: 18px; margin: 4px;">3BV/sec: </p>
+                        <button id="playCustomAgainButton">Play again</button>
                         <button id="playAgainButton">Play again</button>
                     </div>
                 </div>

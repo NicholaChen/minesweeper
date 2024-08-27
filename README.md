@@ -25,7 +25,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
     - `Hard` - 100% random. Mines can be placed **anywhere**.
 ### Controls
  - `Register clicks` - Selects if mouse clicks are registered when the mouse button is released up or as soon as the mouse button is pressed down. `On mouse up/On mouse down` `Default: On mouse down`
- - `Chording` - Select if chording is enabled. Info about chording in **How to play?**z `Off/On` `Default: On`
+ - `Chording` - Select if chording is enabled. Info about chording in **How to play?** `Off/On` `Default: On`
  - `Pause/unpause shortcut` - Selects keyboard shortcut to pause and unpause game. `Default: SPACE`
  - `Restart shortcut` - Selects keyboard shortcut to restart game. `Default: ESC`
  - `Pan and zoom shortcut` - Selects keybaord shortcut to toggle pan and zoo mode. `Default: Z`
@@ -46,4 +46,5 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - `Show 3BV/sec on win screen` - Shows your 3BV/sec stat after winning a game. `Off/On` `Default: Off`
  - `Show all mines` - Shows the location of all mines. `Off/On` `Default: Off`
  - `Analysis` - Analyzes the probability of mines at a square. Advanced is more computationally intensive. `Off/Simple/Advanced` `Default: Off`
+ - `Map creator`- Mode that allows the ability to create custom maps. Placing flags now places mines. `Off/On` `Default: Off`
  - `Reset settings` - Resets **ALL** settings. Doesn't reset Stats.

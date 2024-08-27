@@ -33,7 +33,6 @@ var size_y = isNaN(Number(localStorage.getItem("mapY"))) || Number(localStorage.
 
 var numMines = isNaN(Number(localStorage.getItem("mines"))) || Number(localStorage.getItem("mines")) <= 0 || Number(localStorage.getItem("mines")) > 1000 || Number(localStorage.getItem("mines")) > Math.floor(size_x * size_y / 2) ?  15 : Number(localStorage.getItem("mines"));
 
-
 var new_x;
 var new_y;
 
@@ -59,6 +58,10 @@ if (difficulty == "Beginner") {
 } else {
     difficulty = "Custom";
 }
+
+var oldSizeX = size_x;
+var oldSizeY = size_y;
+var oldNumMines = numMines;
 
 
 var infiniteLives = localStorage.getItem("infiniteLives") == "true";
@@ -169,10 +172,19 @@ function readTheme() {
 readTheme();
 
 
+function readMap() {
+    if (params.get("m")) {
+        
+    }
+}
+
+readMap();
+
+
 
 var settingsMessageDuration = 5000;
 
-var inGame = false;
+var inGame = mapCreator;
 var paused = false;
 
 var map = []; // -1 represents a mine
@@ -275,18 +287,20 @@ function timeToText(t) {
     }
 }
 
-function refreshMap() {
-    if (newNumMines) {
-        numMines = newNumMines;
-        newNumMines = null;
-    }
-    if (new_x) {
-        size_x = new_x;
-        new_x = null;
-    }
-    if (new_y) {
-        size_y = new_y;
-        new_y = null;
+function refreshMap(playCustomAgain=false) {
+    if (!playCustomAgain) {
+        if (newNumMines) {
+            numMines = newNumMines;
+            newNumMines = null;
+        }
+        if (new_x) {
+            size_x = new_x;
+            new_x = null;
+        }
+        if (new_y) {
+            size_y = new_y;
+            new_y = null;
+        }
     }
 
     clicks = 0;
@@ -326,16 +340,25 @@ function refreshMap() {
         }
     }
     
-    first = !mapCreator;
-    mapCustomMade = mapCreator;
+    first = true;
+    mapCustomMade = mapCreator || playCustomAgain;
 
     flags = 0;
     if (!mapCreator) {
-        map = [];
-        for (let i = 0; i < size_y; i++) {
-            map[i] = [];
-            for (let j = 0; j < size_x; j++) {
-                map[i][j] = {value: NaN, opened: false, flagged: false};
+        if (!playCustomAgain) {
+            map = [];
+            for (let i = 0; i < size_y; i++) {
+                map[i] = [];
+                for (let j = 0; j < size_x; j++) {
+                    map[i][j] = {value: NaN, opened: false, flagged: false};
+                }
+            }
+        } else {
+            for (let i = 0; i < size_y; i++) {
+                for (let j = 0; j < size_x; j++) {
+                    map[i][j].opened = false;
+                    map[i][j].flagged = false;
+                }
             }
         }
     } else {
@@ -348,9 +371,11 @@ function refreshMap() {
                 }
             }
         }
+
+        flags = map.flat().filter(s => s.flagged).length;
         numMines = map.flat().filter(s => s.value == -1).length;
 
-        document.getElementById("flags").innerText = "0/" + numMines.toString();
+        document.getElementById("flags").innerText = flags.toString() +  "/" + numMines.toString();
     }
 
     analysisMap = [];
@@ -558,27 +583,35 @@ function exposeTile(m,x,y) {
             clearInterval(interval);
             let elapsedTime = Date.now() - startTime;
             document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-            currentWinStreak = 0;
-            hours += elapsedTime - pausedTime;
-            gamesPlayed += 1;
-            
-            updateStatsAllGames();
+
+            if (!mapCustomMade) {
+                currentWinStreak = 0;
+                hours += elapsedTime - pausedTime;
+                gamesPlayed += 1;
+                
+                updateStatsAllGames();
 
 
-            if (!analysis && infiniteLives && !showMines && !mapCustomMade) {
-                if (difficulty == "Beginner") {
-                    beginnerGamesPlayed += 1;
-    
-                    updateStatsBeginner();
-                } else if (difficulty == "Intermediate") {
-                    intermediateGamesPlayed += 1;
-    
-                    updateStatsIntermediate();
-                } else if (difficulty == "Expert") {
-                    expertGamesPlayed += 1;
-    
-                    updateStatsExpert();
+                if (!analysis && infiniteLives && !showMines) {
+                    if (difficulty == "Beginner") {
+                        beginnerGamesPlayed += 1;
+
+                        updateStatsBeginner();
+                    } else if (difficulty == "Intermediate") {
+                        intermediateGamesPlayed += 1;
+
+                        updateStatsIntermediate();
+                    } else if (difficulty == "Expert") {
+                        expertGamesPlayed += 1;
+
+                        updateStatsExpert();
+                    }
                 }
+                document.getElementById("playAgainButton").innerText = "Play again";
+                document.getElementById("playCustomAgainButton").style.display = "block";
+            } else {
+                document.getElementById("playAgainButton").innerText = "Exit custom map";
+                document.getElementById("playCustomAgainButton").style.display = "inline";
             }
         
     
@@ -634,36 +667,43 @@ function exposeTile(m,x,y) {
         let elapsedTime = Date.now() - startTime;
         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
         
-        hours += elapsedTime - pausedTime;
-        wins += 1;
-        currentWinStreak += 1;
-        gamesPlayed += 1;
-        
-        updateStatsAllGames();
-        
-        if (!analysis && !infiniteLives && !showMines && !mapCreator) {
-            if (difficulty == "Beginner") {
-                beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
-                
-                beginnerWins += 1;
-                beginnerGamesPlayed += 1;
-                
-                updateStatsBeginner();
-            } else if (difficulty == "Intermediate") {
-                intermediateAverageTime = (intermediateAverageTime * intermediateWins + (elapsedTime - pausedTime)) / (intermediateWins + 1);
+        if (!mapCustomMade) {
+            hours += elapsedTime - pausedTime;
+            wins += 1;
+            currentWinStreak += 1;
+            gamesPlayed += 1;
+            
+            updateStatsAllGames();
+            
+            if (!analysis && !infiniteLives && !showMines && !mapCreator) {
+                if (difficulty == "Beginner") {
+                    beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
+                    
+                    beginnerWins += 1;
+                    beginnerGamesPlayed += 1;
+                    
+                    updateStatsBeginner();
+                } else if (difficulty == "Intermediate") {
+                    intermediateAverageTime = (intermediateAverageTime * intermediateWins + (elapsedTime - pausedTime)) / (intermediateWins + 1);
 
-                intermediateWins += 1;
-                intermediateGamesPlayed += 1;
+                    intermediateWins += 1;
+                    intermediateGamesPlayed += 1;
 
-                updateStatsIntermediate();
-            } else if (difficulty == "Advanced") {
-                expertAverageTime = (expertAverageTime * expertWins + (elapsedTime - pausedTime)) / (expertWins + 1);
+                    updateStatsIntermediate();
+                } else if (difficulty == "Advanced") {
+                    expertAverageTime = (expertAverageTime * expertWins + (elapsedTime - pausedTime)) / (expertWins + 1);
 
-                expertWins += 1;
-                expertGamesPlayed += 1;
+                    expertWins += 1;
+                    expertGamesPlayed += 1;
 
-                updateStatsExpert();
+                    updateStatsExpert();
+                }
             }
+            document.getElementById("playAgainButton").innerText = "Play again";
+            document.getElementById("playCustomAgainButton").style.display = "block";
+        } else {
+            document.getElementById("playAgainButton").innerText = "Exit custom map";
+            document.getElementById("playCustomAgainButton").style.display = "inline";
         }
     
         document.getElementById("time").style.display = "block";
@@ -819,10 +859,23 @@ document.getElementById("gameEnd").addEventListener("click", (e) => {
 })
 
 document.getElementById("playAgainButton").addEventListener("click", (e) => {
+    if (mapCustomMade) {
+        numMines = oldNumMines;
+        size_x = oldSizeX;
+        size_y = oldSizeY;
+    }
+
     refreshMap();
 
     document.getElementById("gameEnd").style.display = "none";
 });
+
+document.getElementById("playCustomAgainButton").addEventListener("click", (e) => {
+    refreshMap(true);
+
+    document.getElementById("gameEnd").style.display = "none";
+});
+
 var cursor;
 document.addEventListener("mousemove", (e) => {
     let canvasX = e.clientX * window.devicePixelRatio;
@@ -887,13 +940,15 @@ var double = false
 
 
 function open(square) {
-    if (mapCustomMade) {
+    if (mapCustomMade && first) {
         inGame = true;
 
         document.getElementById("clickAnywhere").style.display = "none";
         pausedTime = 0;
-
+        first = false;
+        
         startTime = Date.now();
+        clearInterval(interval);
         interval = setInterval(function() {
             if (!paused) {
                 let elapsedTime = Date.now() - startTime;
@@ -1013,7 +1068,7 @@ canvas.addEventListener("mousedown", (e) => {
                                 numMines -= 1;
                             }
 
-                            document.getElementById("flags").innerText = "0/" + numMines.toString();
+                            document.getElementById("flags").innerText = flags.toString() +  "/" + numMines.toString();
         
                             for (let i=-1;i<=1;i++) {
                                 for (let j=-1;j<=1;j++) {
@@ -1092,7 +1147,7 @@ canvas.addEventListener("mouseup", (e) => {
                             numMines -= 1;
                         }
 
-                        document.getElementById("flags").innerText = "0/" + numMines.toString();
+                        document.getElementById("flags").innerText = flags.toString() +  "/" + numMines.toString();
     
                         for (let i=-1;i<=1;i++) {
                             for (let j=-1;j<=1;j++) {
@@ -1384,10 +1439,10 @@ function unpause() {
         canvas.style.display = "block";
         document.getElementById("pausedScreen").style.display = "none";
 
-         
-        let elapsedTime = Date.now() - startTime;
-        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-
+        if (!mapCreator && startTime != null) {
+            let elapsedTime = Date.now() - startTime;
+            document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+        }
         
         draw(true);
     }
@@ -1405,8 +1460,10 @@ function pause() {
         canvas.style.display = "none"
         document.getElementById("pausedScreen").style.display = "flex";
 
-        let elapsedTime = Date.now() - startTime;
-        document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+        if (!mapCreator) {
+            let elapsedTime = Date.now() - startTime;
+            document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
+        }
 
         draw(true);
     }
@@ -1416,7 +1473,7 @@ function pause() {
 var lastPause = paused;
 
 function pauseUnpause() {
-    if (settings || stats || !inGame) return;
+    if (settings || stats || !inGame || mapCreator || document.getElementById("clickAnywhere").style.display != "none") return;
 
     if (lastPause) {
         unpause();
@@ -1434,7 +1491,7 @@ document.getElementById("restartButton").addEventListener("click", (e) => {
     
     clearInterval(interval);
     
-    refreshMap();
+    refreshMap(mapCustomMade);
     draw(true);
 
     if (sessionStorage.getItem("pointer") == "true") {
@@ -1571,7 +1628,7 @@ document.addEventListener('keydown', function(e) {
     
         clearInterval(interval);
         
-        refreshMap();
+        refreshMap(mapCustomMade);
         draw(true);
         
         if (sessionStorage.getItem("pointer") == "true") {
@@ -1645,12 +1702,14 @@ document.addEventListener('keydown', function(e) {
 
 
 window.addEventListener('blur', function() {
-    if (inGame) {
+    if (inGame && document.getElementById("clickAnywhere").style.display != "none") {
         pause();
         lastPause = true;
     }
 });
 
+
+var topTextInterval;
 
 document.getElementById("shareMap").addEventListener("click", (e) => {
     let data = size_x.toString(36) + "," + size_y.toString(36) + ";";
@@ -1664,9 +1723,15 @@ document.getElementById("shareMap").addEventListener("click", (e) => {
     }
 
     let b64 = btoa(data);
-    console.log(b64.length);
 
     navigator.clipboard.writeText("nicholachen.github.io/minesweeper?m=" + b64);
+    document.getElementById("topText").innerText = "Share link copied.";
+    document.getElementById("topText").style.display = "initial";
+    if (topTextInterval != null) clearTimeout(topTextInterval);
+
+    topTextInterval = setTimeout(function() {
+        document.getElementById("topText").style.display = "none";
+    }, settingsMessageDuration);
 });
 
 function getMap(s) {
@@ -1703,7 +1768,8 @@ document.getElementById("resetMap").addEventListener("click", (e) => {
             map[i][j] = {value: 0, opened: false, flagged: false};
         }
     }
-
+    numMines = 0;
+    
     update();
     draw();
 });
