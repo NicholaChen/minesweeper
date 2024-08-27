@@ -11,7 +11,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
 
 ## Settings
 ### Gameplay
- - `Difficulty` - Selects difficulty of map `Beginner/Intermediate/Expert/Custom` `Default: Beginner
+ - `Difficulty` - Selects difficulty of map `Beginner/Intermediate/Expert/Custom` `Default: Beginner`
     - `Beginner` - 9x9, 10 mines
     - `Intermediate` - 16x16, 40 mines
     - `Expert` - 30x16, 99 mines
@@ -20,9 +20,9 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
         - `Number of mines` - Number of mines in map. `1-50% of squares in map (max 1000)` `Default: 15`
  - `Infinite lives` - Makes opening mines not end game. `Off/On` `Default: Off`
  - `Mine randomness` - Changes how random the mines are generated. `No guess/Easy/Normal` `Default: Normal`
+    - `No guess` - Mines are generated such that the game can be solved without guessing.
     - `Easy` - Mines can be placed anywhere except the first opened square and its adjacent squares.
     - `Normal` - Mines can be placed anywhere except the first opened square.
-    - `Hard` - 100% random. Mines can be placed **anywhere**.
 ### Controls
  - `Register clicks` - Selects if mouse clicks are registered when the mouse button is released up or as soon as the mouse button is pressed down. `On mouse up/On mouse down` `Default: On mouse down`
  - `Chording` - Select if chording is enabled. Info about chording in **How to play?** `Off/On` `Default: On`

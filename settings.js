@@ -730,6 +730,7 @@ document.getElementById("show3BVOff").addEventListener("click", (e) => {
     document.getElementById("show3BVOn").classList.add("unselected");
 
     show3BV = false;
+    document.getElementById("3BVSec").style.display = "none";
 
     localStorage.setItem("show3BV", show3BV);
 });
@@ -739,6 +740,7 @@ document.getElementById("show3BVOn").addEventListener("click", (e) => {
     document.getElementById("show3BVOff").classList.add("unselected");
 
     show3BV = true;
+    document.getElementById("3BVSec").style.display = "block";
 
     localStorage.setItem("show3BV", show3BV);
 });
@@ -1030,6 +1032,7 @@ function resetAdvanced() {
     showMines = false;
     analysis = "Off";
     mapCreator = false;
+    document.getElementById("3BVSec").style.display = "none";
 
     map3BV = threeBV();
     inGame= true;

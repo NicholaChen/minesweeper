@@ -1,4 +1,4 @@
-const VERSION = "1.11.0";
+const VERSION = "1.11.1";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -146,6 +146,14 @@ else expertWinPercentage = expertWins / expertGamesPlayed;
 
 var expertAverageTime = isNaN(Number(localStorage.getItem("expertAverageTime"))) || Number(localStorage.getItem("expertAverageTime")) < 0 ? 0 : Number(localStorage.getItem("expertAverageTime"));
 
+
+
+var map = []; // -1 represents a mine
+
+var analysisMap = [];
+
+
+
 const params = new URLSearchParams(document.location.search);
 
 function readTheme() {
@@ -171,10 +179,28 @@ function readTheme() {
 
 readTheme();
 
+var mapRead = false;
 
 function readMap() {
     if (params.get("m")) {
-        
+        let m = getMap(params.get("m"));
+
+        if (m) {
+            size_x = m.x;
+            size_y = m.y;
+
+            numMines = m.n;
+
+            map = m.m;
+
+            mapCustomMade = true;
+            mapRead = true;
+
+            console.log(map);
+
+            refreshMap(true);
+            
+        }
     }
 }
 
@@ -187,9 +213,6 @@ var settingsMessageDuration = 5000;
 var inGame = mapCreator;
 var paused = false;
 
-var map = []; // -1 represents a mine
-
-var analysisMap = [];
 
 var flags = 0;
 
@@ -288,6 +311,7 @@ function timeToText(t) {
 }
 
 function refreshMap(playCustomAgain=false) {
+    console.log(playCustomAgain)
     if (!playCustomAgain) {
         if (newNumMines) {
             numMines = newNumMines;
@@ -344,7 +368,7 @@ function refreshMap(playCustomAgain=false) {
     mapCustomMade = mapCreator || playCustomAgain;
 
     flags = 0;
-    if (!mapCreator) {
+    if (!mapCreator || mapRead) {
         if (!playCustomAgain) {
             map = [];
             for (let i = 0; i < size_y; i++) {
@@ -360,6 +384,7 @@ function refreshMap(playCustomAgain=false) {
                     map[i][j].flagged = false;
                 }
             }
+            console.log(2,map)
         }
     } else {
         if (map.length == 0) {
@@ -388,7 +413,10 @@ function refreshMap(playCustomAgain=false) {
 
     draw(true);
 }
-refreshMap();
+
+if (!mapCustomMade) {
+    refreshMap();
+}
 
 
 function update() {
@@ -584,31 +612,30 @@ function exposeTile(m,x,y) {
             let elapsedTime = Date.now() - startTime;
             document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
 
-            if (!mapCustomMade) {
+            if (!mapCustomMade && analysis == "Off" && !infiniteLives && !showMines) {
                 currentWinStreak = 0;
                 hours += elapsedTime - pausedTime;
                 gamesPlayed += 1;
                 
                 updateStatsAllGames();
 
+                if (difficulty == "Beginner") {
+                    beginnerGamesPlayed += 1;
 
-                if (!analysis && infiniteLives && !showMines) {
-                    if (difficulty == "Beginner") {
-                        beginnerGamesPlayed += 1;
+                    updateStatsBeginner();
+                } else if (difficulty == "Intermediate") {
+                    intermediateGamesPlayed += 1;
 
-                        updateStatsBeginner();
-                    } else if (difficulty == "Intermediate") {
-                        intermediateGamesPlayed += 1;
+                    updateStatsIntermediate();
+                } else if (difficulty == "Expert") {
+                    expertGamesPlayed += 1;
 
-                        updateStatsIntermediate();
-                    } else if (difficulty == "Expert") {
-                        expertGamesPlayed += 1;
-
-                        updateStatsExpert();
-                    }
+                    updateStatsExpert();
                 }
+            }
+            if (!mapCustomMade) {
                 document.getElementById("playAgainButton").innerText = "Play again";
-                document.getElementById("playCustomAgainButton").style.display = "block";
+                document.getElementById("playCustomAgainButton").style.display = "none";
             } else {
                 document.getElementById("playAgainButton").innerText = "Exit custom map";
                 document.getElementById("playCustomAgainButton").style.display = "inline";
@@ -667,7 +694,7 @@ function exposeTile(m,x,y) {
         let elapsedTime = Date.now() - startTime;
         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
         
-        if (!mapCustomMade) {
+        if (!mapCustomMade && analysis == "Off" && !infiniteLives && !showMines) {
             hours += elapsedTime - pausedTime;
             wins += 1;
             currentWinStreak += 1;
@@ -675,32 +702,32 @@ function exposeTile(m,x,y) {
             
             updateStatsAllGames();
             
-            if (!analysis && !infiniteLives && !showMines && !mapCreator) {
-                if (difficulty == "Beginner") {
-                    beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
-                    
-                    beginnerWins += 1;
-                    beginnerGamesPlayed += 1;
-                    
-                    updateStatsBeginner();
-                } else if (difficulty == "Intermediate") {
-                    intermediateAverageTime = (intermediateAverageTime * intermediateWins + (elapsedTime - pausedTime)) / (intermediateWins + 1);
+            if (difficulty == "Beginner") {
+                beginnerAverageTime = (beginnerAverageTime*beginnerWins + (elapsedTime-pausedTime))/(beginnerWins+1);
+                
+                beginnerWins += 1;
+                beginnerGamesPlayed += 1;
+                
+                updateStatsBeginner();
+            } else if (difficulty == "Intermediate") {
+                intermediateAverageTime = (intermediateAverageTime * intermediateWins + (elapsedTime - pausedTime)) / (intermediateWins + 1);
 
-                    intermediateWins += 1;
-                    intermediateGamesPlayed += 1;
+                intermediateWins += 1;
+                intermediateGamesPlayed += 1;
 
-                    updateStatsIntermediate();
-                } else if (difficulty == "Advanced") {
-                    expertAverageTime = (expertAverageTime * expertWins + (elapsedTime - pausedTime)) / (expertWins + 1);
+                updateStatsIntermediate();
+            } else if (difficulty == "Advanced") {
+                expertAverageTime = (expertAverageTime * expertWins + (elapsedTime - pausedTime)) / (expertWins + 1);
 
-                    expertWins += 1;
-                    expertGamesPlayed += 1;
+                expertWins += 1;
+                expertGamesPlayed += 1;
 
-                    updateStatsExpert();
-                }
+                updateStatsExpert();
             }
+        }
+        if (!mapCustomMade) {
             document.getElementById("playAgainButton").innerText = "Play again";
-            document.getElementById("playCustomAgainButton").style.display = "block";
+            document.getElementById("playCustomAgainButton").style.display = "none";
         } else {
             document.getElementById("playAgainButton").innerText = "Exit custom map";
             document.getElementById("playCustomAgainButton").style.display = "inline";
@@ -772,10 +799,10 @@ function draw(clear=false) {
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
             if (!paused) {
-                if (!map[y][x].opened || mapCreator) {
+                if (!map[y][x].opened || (mapCreator && !mapRead)) {
                     ctx.fillStyle = theme.unopened;
 
-                    if ((showMines || mapCreator) && map[y][x].value == -1) {
+                    if (((showMines || mapCreator) && !mapRead) && map[y][x].value == -1) {
                         ctx.fillStyle = "rgba(200,0,0,0.3)";
                     }
                 } else {
@@ -794,7 +821,7 @@ function draw(clear=false) {
 
                 ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
                 
-                if (map[y][x].opened || mapCreator) {
+                if (map[y][x].opened || (mapCreator && !mapRead)) {
                     if (map[y][x].value > 0) {
                         ctx.font = (squareSize / 1.5).toString() + "px monospace, monospace";
                         ctx.fillStyle = theme.text;
@@ -806,7 +833,7 @@ function draw(clear=false) {
                         ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
                         ctx.fillStyle = theme.text;
                         
-                        if (analysis != "Off") if (analysisMap[y][x].probability != null) ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                        if (analysis != "Off" && !mapRead) if (analysisMap[y][x].probability != null) ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
                 }
                 if (map[y][x].flagged) {
@@ -864,6 +891,8 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
         size_x = oldSizeX;
         size_y = oldSizeY;
     }
+
+    readMap = false;
 
     refreshMap();
 
@@ -1055,9 +1084,9 @@ canvas.addEventListener("mousedown", (e) => {
         mouseTimeout = setTimeout(function() {
             if (!(leftButtonDown && rightButtonDown)) {
                 if (e.button == 0) {
-                    if (!mapCreator) open(square);
+                    if (!mapCreator || mapRead) open(square);
                 } else if (e.button == 2 && (inGame || mapCreator)) {
-                    if (!mapCreator) flag(square);
+                    if (!mapCreator || mapRead) flag(square);
                     else {
                         if (square) {
                             if (map[square.y][square.x].value != -1) {
@@ -1134,9 +1163,9 @@ canvas.addEventListener("mouseup", (e) => {
 
         if (!(leftButtonDown && rightButtonDown)) {
             if (e.button == 0) {
-                if (!mapCreator) open(square);
+                if (!mapCreator || mapRead) open(square);
             } else if (e.button == 2 && inGame) {
-                if (!mapCreator) flag(square);
+                if (!mapCreator || mapRead) flag(square);
                 else {
                     if (square) {
                         if (map[square.y][square.x].value != -1) {
@@ -1439,7 +1468,7 @@ function unpause() {
         canvas.style.display = "block";
         document.getElementById("pausedScreen").style.display = "none";
 
-        if (!mapCreator && startTime != null) {
+        if ((!mapCreator || mapRead) && startTime != null) {
             let elapsedTime = Date.now() - startTime;
             document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
         }
@@ -1460,7 +1489,7 @@ function pause() {
         canvas.style.display = "none"
         document.getElementById("pausedScreen").style.display = "flex";
 
-        if (!mapCreator) {
+        if (!mapCreator || mapRead) {
             let elapsedTime = Date.now() - startTime;
             document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
         }
@@ -1473,7 +1502,7 @@ function pause() {
 var lastPause = paused;
 
 function pauseUnpause() {
-    if (settings || stats || !inGame || mapCreator || document.getElementById("clickAnywhere").style.display != "none") return;
+    if (settings || stats || !inGame || (mapCreator && !mapRead) || document.getElementById("clickAnywhere").style.display != "none") return;
 
     if (lastPause) {
         unpause();
@@ -1554,6 +1583,23 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
         draw(true);
 
         if (inGame && !lastPause) unpause();
+
+        if (!inGame && first && (!mapCreator || mapRead)) {
+            if (newNumMines) {
+                numMines = newNumMines;
+                newNumMines = null;
+            }
+            if (new_x) {
+                size_x = new_x;
+                new_x = null;
+            }
+            if (new_y) {
+                size_y = new_y;
+                new_y = null;
+            }
+
+            refreshMap();
+        }
     } else {
         stats = false;
         settings = true;
@@ -1686,6 +1732,23 @@ document.addEventListener('keydown', function(e) {
             draw(true);
 
             if (inGame && !lastPause) unpause();
+
+            if (!inGame && first && (!mapCreator || mapRead)) {
+                if (newNumMines) {
+                    numMines = newNumMines;
+                    newNumMines = null;
+                }
+                if (new_x) {
+                    size_x = new_x;
+                    new_x = null;
+                }
+                if (new_y) {
+                    size_y = new_y;
+                    new_y = null;
+                }
+    
+                refreshMap();
+            }
         } else {
             stats = false;
             settings = true;
@@ -1754,11 +1817,16 @@ function getMap(s) {
         for (let i = 0; i < mines.length; i++) {
             m[mines[i].y][mines[i].x].value = -1;
         }
+        for (let i = 0; i < size_y; i++) {
+            for (let j = 0; j < size_x; j++) {
+                if (m[i][j].value != -1) m[i][j].value = adjacentMines(m,j,i);
+            }
+        }
 
-        return m;
+        return {m:m, x:x, y:y, n:mines.length};
 
     } catch {
-        
+        return null;
     }
 }
 
