@@ -790,13 +790,15 @@ document.getElementById("mapCreatorOff").addEventListener("click", (e) => {
 
     mapCreator = false;
 
-    map3BV = threeBV();
-    inGame = true;
-    mapCustomMade = true;
+    if (!mapRead) {
+        map3BV = threeBV();
+        inGame = true;
+        mapCustomMade = true;
+        
+        refreshMap(true);
 
-    refreshMap(true);
-
-    clearInterval(interval);
+        clearInterval(interval);
+    }
 
     document.getElementById("clickAnywhere").style.display = "flex";
     document.getElementById("mapCreatorTop").style.display = "none";
@@ -809,23 +811,25 @@ document.getElementById("mapCreatorOn").addEventListener("click", (e) => {
 
     mapCreator = true;
 
-    for (let i = 0; i < size_y; i++) {
-        for (let j = 0; j < size_x; j++) {
-            if (isNaN(map[i][j].value)) map[i][j].value = 0;
-            if (map[i][j].flagged) map[i][j].flagged = false;
-            if (map[i][j].opened) map[i][j].opened = false;
+    if (!mapRead) { 
+        for (let i = 0; i < size_y; i++) {
+            for (let j = 0; j < size_x; j++) {
+                if (isNaN(map[i][j].value)) map[i][j].value = 0;
+                if (map[i][j].flagged) map[i][j].flagged = false;
+                if (map[i][j].opened) map[i][j].opened = false;
+            }
         }
+
+        oldNumMines = numMines;
+
+        document.getElementById("mapCreatorTop").style.display = "block";
+        localStorage.setItem("mapCreator", mapCreator);
+        inGame = false;
+        mapCustomMade = true;
+
+        clearInterval(interval);
+        refreshMap();
     }
-
-    oldNumMines = numMines;
-
-    document.getElementById("mapCreatorTop").style.display = "block";
-    localStorage.setItem("mapCreator", mapCreator);
-    inGame = false;
-    mapCustomMade = true;
-    
-    clearInterval(interval);
-    refreshMap();
 });
 
 
