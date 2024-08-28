@@ -272,6 +272,26 @@ function analyze(map_, a, simple=false, max) {
         if (analysisDebugVerbose && analysisDebug) console.timeEnd(n)
     }
 
+    if (analysisMap_.flat().filter(s => s.probability == 1).length == numMines) {
+        for (let y=0;y<size_y;y++) {
+            for (let x=0;x<size_x;x++) {
+                if (analysisMap_[y][x].probability != 1) {
+                    analysisMap_[y][x].probability = 0;
+                }
+            }
+        }
+    }
+
+    if (analysisMap_.flat().filter(s => s.probability == 0).length == size_x * size_y - numMines) {
+        for (let y=0;y<size_y;y++) {
+            for (let x=0;x<size_x;x++) {
+                if (analysisMap_[y][x].probability != 0) {
+                    analysisMap_[y][x].probability = 1;
+                }
+            }
+        }
+    }
+
     if (simple) {
         if (analysisDebug) console.timeEnd('analyze');
         return analysisMap_;

@@ -792,6 +792,9 @@ document.getElementById("mapCreatorOff").addEventListener("click", (e) => {
 
     map3BV = threeBV();
     inGame = true;
+    mapCustomMade = true;
+
+    refreshMap(true);
 
     clearInterval(interval);
 

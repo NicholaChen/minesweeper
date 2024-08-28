@@ -378,8 +378,8 @@ function refreshMap(playCustomAgain=false) {
                 }
             }
         } else {
-            for (let i = 0; i < size_y; i++) {
-                for (let j = 0; j < size_x; j++) {
+            for (let i = 0; i < map.length; i++) {
+                for (let j = 0; j < map[i].length; j++) {
                     map[i][j].opened = false;
                     map[i][j].flagged = false;
                 }
@@ -404,9 +404,9 @@ function refreshMap(playCustomAgain=false) {
     }
 
     analysisMap = [];
-    for (let i = 0; i < size_y; i++) {
+    for (let i = 0; i < map.length; i++) {
         analysisMap[i] = [];
-        for (let j = 0; j < size_x; j++) {
+        for (let j = 0; j < map[i].length; j++) {
             analysisMap[i][j] = {probability: null};
         }
     }
@@ -517,7 +517,7 @@ function adjacentMines(m,x,y) {
     for (let i=-1;i<=1;i++) {
         for (let j=-1;j<=1;j++) {
             if (i != 0 || j != 0) {
-                if (x+i >= 0 && x+i < size_x && y+j >= 0 && y+j < size_y) {
+                if (x+i >= 0 && x+i < m[0].length && y+j >= 0 && y+j < map.length) {
                     if (m[y+j][x+i].value == -1) {
                         t += 1;
                     }
@@ -788,16 +788,16 @@ function draw(clear=false) {
         ctx.clearRect(0,0,canvas.width,canvas.height);
     }
     
-    let squareSize = Math.min((canvas.width-2*canvasMargin)/size_x,(canvas.height-2*canvasMargin)/size_y) * scale;
-    let startx = canvas.width/2 - squareSize * size_x / 2 - cam_x;
-    let starty = canvas.height/2 - squareSize * size_y / 2 - cam_y;
+    let squareSize = Math.min((canvas.width-2*canvasMargin)/map[0].length,(canvas.height-2*canvasMargin)/map.length) * scale;
+    let startx = canvas.width/2 - squareSize * map[0].length / 2 - cam_x;
+    let starty = canvas.height/2 - squareSize * map.length / 2 - cam_y;
 
 
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
 
-    for (let x=0;x<size_x;x++) {
-        for (let y=0;y<size_y;y++) {
+    for (let x=0;x<map[0].length;x++) {
+        for (let y=0;y<map.length;y++) {
             if (!paused) {
                 if (!map[y][x].opened || (mapCreator && !mapRead)) {
                     ctx.fillStyle = theme.unopened;
@@ -1807,9 +1807,9 @@ function getMap(s) {
         console.log(data,x,y,mines)
 
         let m = [];
-        for (let i = 0; i < size_y; i++) {
+        for (let i = 0; i < y; i++) {
             m[i] = [];
-            for (let j = 0; j < size_x; j++) {
+            for (let j = 0; j < x; j++) {
                 m[i][j] = {value: NaN, opened: false, flagged: false};
             }
         }
@@ -1817,8 +1817,8 @@ function getMap(s) {
         for (let i = 0; i < mines.length; i++) {
             m[mines[i].y][mines[i].x].value = -1;
         }
-        for (let i = 0; i < size_y; i++) {
-            for (let j = 0; j < size_x; j++) {
+        for (let i = 0; i < y; i++) {
+            for (let j = 0; j < x; j++) {
                 if (m[i][j].value != -1) m[i][j].value = adjacentMines(m,j,i);
             }
         }
