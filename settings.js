@@ -795,12 +795,14 @@ document.getElementById("mapCreatorOff").addEventListener("click", (e) => {
         inGame = true;
         mapCustomMade = true;
         
-        refreshMap(true);
+        if (document.getElementById("clickAnywhere").style.display == "flex") {
+            refreshMap(true);
+        }
 
         clearInterval(interval);
     }
 
-    document.getElementById("clickAnywhere").style.display = "flex";
+
     document.getElementById("mapCreatorTop").style.display = "none";
     localStorage.setItem("mapCreator", mapCreator);
 });
@@ -823,13 +825,15 @@ document.getElementById("mapCreatorOn").addEventListener("click", (e) => {
         oldNumMines = numMines;
 
         document.getElementById("mapCreatorTop").style.display = "block";
-        localStorage.setItem("mapCreator", mapCreator);
+        
         inGame = false;
         mapCustomMade = true;
 
         clearInterval(interval);
         refreshMap();
     }
+    
+    localStorage.setItem("mapCreator", mapCreator);
 });
 
 

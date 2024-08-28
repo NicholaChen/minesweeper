@@ -202,6 +202,7 @@ function readMap() {
 
             refreshMap(true);
             
+            map3BV = threeBV();
         }
     }
 }
@@ -314,7 +315,7 @@ function timeToText(t) {
 
 function refreshMap(playCustomAgain=false) {
     console.log(playCustomAgain)
-    if (!playCustomAgain) {
+    if (!playCustomAgain && !mapRead) {
         if (newNumMines) {
             numMines = newNumMines;
             newNumMines = null;
@@ -326,6 +327,16 @@ function refreshMap(playCustomAgain=false) {
         if (new_y) {
             size_y = new_y;
             new_y = null;
+        }
+
+        if (!mapRead) {
+            map = [];
+            for (let i = 0; i < size_y; i++) {
+                map[i] = [];
+                for (let j = 0; j < size_x; j++) {
+                    map[i][j] = {value: 0, opened: false, flagged: false};
+                }
+            }
         }
     }
 
@@ -892,7 +903,7 @@ document.getElementById("gameEnd").addEventListener("click", (e) => {
 })
 
 document.getElementById("playAgainButton").addEventListener("click", (e) => {
-    if (mapCustomMade) {
+    if (mapCustomMade | mapRead) {
         numMines = oldNumMines;
         size_x = oldSizeX;
         size_y = oldSizeY;
@@ -907,17 +918,17 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
             }
         }
 
-        oldNumMines = numMines;
-        numMines = map.flat().filter(s => s.value == -1).length;
-        document.getElementById("mapCreatorTop").style.display = "block";
-        localStorage.setItem("mapCreator", mapCreator);
+        if (mapCreator) {
+            document.getElementById("mapCreatorTop").style.display = "block";
+        }
         inGame = false;
         mapCustomMade = true;
+
+        mapRead = false;
 
         clearInterval(interval);
         refreshMap();
     }
-    mapRead = false;
 
 
     document.getElementById("gameEnd").style.display = "none";
@@ -1109,8 +1120,6 @@ canvas.addEventListener("mousedown", (e) => {
             if (!(leftButtonDown && rightButtonDown)) {
                 if (e.button == 0) {
                     if (!mapCreator || mapRead) open(square);
-                } else if (e.button == 2 && (inGame || mapCreator)) {
-                    if (!mapCreator || mapRead) flag(square);
                     else {
                         if (square) {
                             if (map[square.y][square.x].value != -1) {
@@ -1121,7 +1130,7 @@ canvas.addEventListener("mousedown", (e) => {
                                     document.getElementById("topText").innerText = "Maximum number of mines reached (500).";
                                     document.getElementById("topText").style.display = "initial";
                                     if (topTextInterval != null) clearTimeout(topTextInterval);
-
+    
                                     topTextInterval = setTimeout(function() {
                                         document.getElementById("topText").style.display = "none";
                                     }, settingsMessageDuration);
@@ -1130,7 +1139,7 @@ canvas.addEventListener("mousedown", (e) => {
                                 map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
                                 numMines -= 1;
                             }
-
+    
                             document.getElementById("flags").innerText = flags.toString() +  "/" + numMines.toString();
         
                             for (let i=-1;i<=1;i++) {
@@ -1148,6 +1157,8 @@ canvas.addEventListener("mousedown", (e) => {
                             draw(true);
                         }
                     }
+                } else if (e.button == 2 && (inGame || mapCreator)) {
+                    if (!mapCreator || mapRead) flag(square);
                 } else if (e.button == 1) {
                     if (!chording) return;
         
@@ -1198,8 +1209,6 @@ canvas.addEventListener("mouseup", (e) => {
         if (!(leftButtonDown && rightButtonDown)) {
             if (e.button == 0) {
                 if (!mapCreator || mapRead) open(square);
-            } else if (e.button == 2 && inGame) {
-                if (!mapCreator || mapRead) flag(square);
                 else {
                     if (square) {
                         if (map[square.y][square.x].value != -1) {
@@ -1237,6 +1246,8 @@ canvas.addEventListener("mouseup", (e) => {
                         draw(true);
                     }
                 }
+            } else if (e.button == 2 && inGame) {
+                if (!mapCreator || mapRead) flag(square);
             } else if (e.button == 1) {
                 if (!chording) return;
 
@@ -1348,7 +1359,7 @@ document.addEventListener("touchstart", (e) => {
                     let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
                     let square = overSquare(canvasX, canvasY);
                     
-                    if (inGame) flag(square);
+                    if (inGame && (!mapCreator || mapRead)) flag(square);
                 }
             }, flagHold);
         }
@@ -1361,9 +1372,6 @@ document.addEventListener("touchstart", (e) => {
     	touchHold = false;
     	
     	notOneTouch = true;
-
-        let canvasX = e.touches[0].clientX * window.devicePixelRatio;
-        let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
     }
 });
 
@@ -1415,7 +1423,7 @@ canvas.addEventListener("touchmove", (e) => {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            if (Math.sqrt(Math.pow(moveStart.x-canvasX, 2) + Math.pow(moveStart.y-canvasY, 2)) > 2 * window.devicePixelRatio && !moved) {
+            if (Math.sqrt(Math.pow(moveStart.x-canvasX, 2) + Math.pow(moveStart.y-canvasY, 2)) > 3 * window.devicePixelRatio && !moved) {
                 moved = true;
 
                 cam_x = camStart.x - (canvasX-moveStart.x);
@@ -1484,10 +1492,48 @@ canvas.addEventListener("touchend", (e) => {
                 
                 if (!touchHeld) {
                     if (square) {
-                        if (!map[square.y][square.x].opened) {
-                            open(square);
+                        if (!mapCreator || mapRead) {
+                            if (!map[square.y][square.x].opened) {
+                                open(square);
+                            } else {
+                                chord(square);
+                            }
                         } else {
-                            chord(square);
+                            if (square) {
+                                if (map[square.y][square.x].value != -1) {
+                                    if (numMines < 500) {
+                                        map[square.y][square.x].value = -1;
+                                        numMines += 1;
+                                    } else {
+                                        document.getElementById("topText").innerText = "Maximum number of mines reached (500).";
+                                        document.getElementById("topText").style.display = "initial";
+                                        if (topTextInterval != null) clearTimeout(topTextInterval);
+    
+                                        topTextInterval = setTimeout(function() {
+                                            document.getElementById("topText").style.display = "none";
+                                        }, settingsMessageDuration);
+                                    }
+                                } else {
+                                    map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
+                                    numMines -= 1;
+                                }
+    
+                                document.getElementById("flags").innerText = flags.toString() +  "/" + numMines.toString();
+            
+                                for (let i=-1;i<=1;i++) {
+                                    for (let j=-1;j<=1;j++) {
+                                        if (i != 0 || j != 0) {
+                                            if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
+                                                if (map[square.y+j][square.x+i].value != -1) {
+                                                    map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+            
+                                draw(true);
+                            }
                         }
                     }        
                 }
@@ -1809,7 +1855,7 @@ document.addEventListener('keydown', function(e) {
 
 
 window.addEventListener('blur', function() {
-    if (inGame && document.getElementById("clickAnywhere").style.display != "flex") {
+    if (inGame && document.getElementById("clickAnywhere").style.display != "flex" && (!mapCreator || mapRead)) {
         pause();
         lastPause = true;
     }
@@ -1881,15 +1927,18 @@ document.getElementById("resetMap").addEventListener("click", (e) => {
         }
     }
     numMines = 0;
+
+    document.getElementById("flags").innerText = "0/" + numMines.toString();
     
     update();
     draw();
 });
 
+
 /* TODO (not in order)
  X Pause/unpause shortcut
  ~ More themes
- - Share map+map id
+ X Share map+map id
  X Google SEO, meta, description, etc...
  X Import/export themes
  X Import/export settings
@@ -1902,4 +1951,5 @@ document.getElementById("resetMap").addEventListener("click", (e) => {
  - Cool new gamemodes
  X Drop shadow for "floating" buttons
  - Daily puzzle
+ - Login/account system
 */
