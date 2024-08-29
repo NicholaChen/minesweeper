@@ -11,6 +11,14 @@ fetch("https://api.github.com/repos/nicholachen/minesweeper/releases/tags/"+"v"+
     document.getElementById("versionFooter").href = json.html_url;
 });
 
+var dailycode;
+fetch("./daily.json").then((response) => response.json()).then((json) => {
+    dailycode = json[new Date().toISOString().split('T')[0]];
+
+    console.log(dailycode);
+});
+
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -314,7 +322,6 @@ function timeToText(t) {
 }
 
 function refreshMap(playCustomAgain=false) {
-    console.log(playCustomAgain)
     if (!playCustomAgain && !mapRead) {
         if (newNumMines) {
             numMines = newNumMines;
@@ -658,11 +665,12 @@ function exposeTile(m,x,y) {
                 document.getElementById("playCustomAgainButton").style.display = "inline";
             }
         
-    
-            for (let x = 0; x < size_x; x++) {
-                for (let y = 0; y < size_y; y++) {
-                    if (m[y][x].value == -1) {
-                        m[y][x].opened = true;
+            if (!mapRead) {
+                for (let x = 0; x < size_x; x++) {
+                    for (let y = 0; y < size_y; y++) {
+                        if (m[y][x].value == -1) {
+                            m[y][x].opened = true;
+                        }
                     }
                 }
             }
@@ -1954,6 +1962,77 @@ document.getElementById("resetMap").addEventListener("click", (e) => {
     update();
     draw();
 });
+
+
+function getMapDaily(s) {
+    try {
+        let data = atob(s).split(";");
+        let x =  parseInt(data[0].split(",")[0], 36);
+        let y = parseInt(data[0].split(",")[1], 36);
+        let mines = data[1].split(",").filter(i => i != "").map(i => _idToTile(parseInt(i, 36),30));
+
+        mines = mines.filter(i => i.x >= 0 || i.x < 30 || i.y >= 0 || i.y < 16);
+
+        console.log(data,x,y,mines)
+
+        let m = [];
+        for (let i = 0; i < 16; i++) {
+            m[i] = [];
+            for (let j = 0; j < 30; j++) {
+                m[i][j] = {value: NaN, opened: false, flagged: false};
+            }
+        }
+
+        for (let i = 0; i < mines.length; i++) {
+            m[mines[i].y][mines[i].x].value = -1;
+        }
+        for (let i = 0; i < 16; i++) {
+            for (let j = 0; j < 30; j++) {
+                if (m[i][j].value != -1) m[i][j].value = adjacentMines(m,j,i);
+            }
+        }
+
+        return {m:m, x:x, y:y, n:mines.length};
+
+    } catch {
+        return null;
+    }
+}
+
+
+document.getElementById("dailyIcon").addEventListener("click", (e) => {
+    if (dailycode != null) {
+        console.log(getMapDaily(dailycode));
+    }
+});
+
+// for (let i=0;i<10000;i++) {
+//     for (let i = 0; i < size_y; i++) {
+//         for (let j = 0; j < size_x; j++) {
+//             map[i][j] = {value: NaN, opened: false, flagged: false};
+//         }
+//     }
+
+//     let firstx = Math.floor(Math.random() * size_x);
+//     let firsty = Math.floor(Math.random() * size_y);
+
+//     generate(numMines, firstx, firsty);
+
+//     let data = firstx.toString(36) + "," + firsty.toString(36) + ";";
+
+//     for (let x=0;x<size_x;x++) {
+//         for (let y=0;y<size_y;y++) {
+//             if (map[y][x].value == -1) {
+//                 data += (y * size_x + x).toString(36) + ",";
+//             }
+//         }
+//     }
+
+//     let b64 = btoa(data);
+
+
+//     console.log(b64);
+// }
 
 
 /* TODO (not in order)
