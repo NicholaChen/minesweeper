@@ -1,4 +1,4 @@
-const VERSION = "1.11.1";
+const VERSION = "1.11.2";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -863,11 +863,13 @@ function draw(clear=false) {
                         ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
                 } else {
-                    if (analysis) {
-                        ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
-                        ctx.fillStyle = theme.text;
+                    if (analysis != "Off" && !mapRead) {
+                        if (analysisMap[y][x].probability != null) {
+                            ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
+                            ctx.fillStyle = theme.probability_color;
                         
-                        if (analysis != "Off" && !mapRead) if (analysisMap[y][x].probability != null) ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                            ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                        }
                     }
                 }
                 if (map[y][x].flagged) {
