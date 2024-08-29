@@ -46,5 +46,5 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - `Show 3BV/sec on win screen` - Shows your 3BV/sec stat after winning a game. `Off/On` `Default: Off`
  - `Show all mines` - Shows the location of all mines. `Off/On` `Default: Off`
  - `Analysis` - Analyzes the probability of mines at a square. Advanced is more computationally intensive. `Off/Simple/Advanced` `Default: Off`
- - `Map creator`- Mode that allows the ability to create custom maps. Placing flags now places mines. `Off/On` `Default: Off`
+ - `Map creator`- Mode that allows the ability to create custom maps. Opening squares now places mines. `Off/On` `Default: Off`
  - `Reset settings` - Resets **ALL** settings. Doesn't reset Stats.

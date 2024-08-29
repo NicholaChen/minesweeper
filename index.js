@@ -840,8 +840,28 @@ function draw(clear=false) {
                 
                 if (map[y][x].opened || (mapCreator && !mapRead)) {
                     if (map[y][x].value > 0) {
-                        ctx.font = (squareSize / 1.5).toString() + "px monospace, monospace";
-                        ctx.fillStyle = theme.text;
+                        ctx.font = "bold "+ (squareSize / 1.4).toString() + "px monospace, monospace";
+                        if (theme.key != "classic") {
+                            ctx.fillStyle = theme.text;
+                        } else {
+                            if (map[y][x].value == 1) {
+                                ctx.fillStyle = "#0001FD";
+                            } else if (map[y][x].value == 2) {
+                                ctx.fillStyle = "#017E00";
+                            } else if (map[y][x].value == 3) {
+                                ctx.fillStyle = "#FE0000";
+                            } else if (map[y][x].value == 4) {
+                                ctx.fillStyle = "#00007D";
+                            } else if (map[y][x].value == 5) {
+                                ctx.fillStyle = "#830003";
+                            } else if (map[y][x].value == 6) {
+                                ctx.fillStyle = "#008080";
+                            } else if (map[y][x].value == 7) {
+                                ctx.fillStyle = "#000000";
+                            } else if (map[y][x].value == 8) {
+                                ctx.fillStyle = "#808080";
+                            }
+                        }
                         
                         ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
@@ -1181,7 +1201,7 @@ canvas.addEventListener("mousedown", (e) => {
         
                 chord(square);
             }
-        }, 1)
+        }, 2);
     }
 })
 canvas.addEventListener("mouseup", (e) => {
@@ -1893,6 +1913,8 @@ function getMap(s) {
         let x =  parseInt(data[0].split(",")[0], 36);
         let y = parseInt(data[0].split(",")[1], 36);
         let mines = data[1].split(",").filter(i => i != "").map(i => _idToTile(parseInt(i, 36),x));
+
+        mines = mines.filter(i => i.x >= 0 || i.x < x || i.y >= 0 || i.y < y);
 
         console.log(data,x,y,mines)
 

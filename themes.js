@@ -51,6 +51,27 @@ var themes = {
         flag: "#FF0808",
         flag_stem: "#db0909"
     },
+    classic: {
+        name: "Classic",
+        key: "classic",
+        background_color: "#C0C0C0",
+        text_color: "#000000",
+        top_color: "#C0C0C0",
+        top_text_color: "#000000",
+        accent_color: "#1E8462",
+        accent_hover_color: "#237157",
+        accent_text_color: "#E0E0E0",
+        input_color: "#FFFFFF",
+        input_hover_color: "#E4E4E4",
+        input_text_color: "#000000",
+        unselected_color: "#155540",
+        unselected_text_color: "#B0B0B0",
+        unopened: "#B5B5B5",
+        opened: "#C9C9C9",
+        text: "#151515",
+        flag: "#FF0808",
+        flag_stem: "#db0909"
+    },
     _console: {
         name: "Console",
         key: "_console",
