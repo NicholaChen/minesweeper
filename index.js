@@ -437,8 +437,8 @@ if (!mapCustomMade && !mapRead) {
 
 
 function update() {
-    if (analysis == "Simple") analysisMap = analyze(map, analysisMap, true);
-    else if (analysis == "Advanced") analysisMap = analyze(map, analysisMap, false);
+    if (analysis == "Simple" && !mapRead) analysisMap = analyze(map, analysisMap, true);
+    else if (analysis == "Advanced" && !mapRead) analysisMap = analyze(map, analysisMap, false);
 }
 
 function generate(mines, firstx, firsty) {
@@ -841,26 +841,23 @@ function draw(clear=false) {
                 if (map[y][x].opened || (mapCreator && !mapRead)) {
                     if (map[y][x].value > 0) {
                         ctx.font = "bold "+ (squareSize / 1.4).toString() + "px monospace, monospace";
-                        if (theme.key != "classic") {
-                            ctx.fillStyle = theme.text;
-                        } else {
-                            if (map[y][x].value == 1) {
-                                ctx.fillStyle = "#0001FD";
-                            } else if (map[y][x].value == 2) {
-                                ctx.fillStyle = "#017E00";
-                            } else if (map[y][x].value == 3) {
-                                ctx.fillStyle = "#FE0000";
-                            } else if (map[y][x].value == 4) {
-                                ctx.fillStyle = "#00007D";
-                            } else if (map[y][x].value == 5) {
-                                ctx.fillStyle = "#830003";
-                            } else if (map[y][x].value == 6) {
-                                ctx.fillStyle = "#008080";
-                            } else if (map[y][x].value == 7) {
-                                ctx.fillStyle = "#000000";
-                            } else if (map[y][x].value == 8) {
-                                ctx.fillStyle = "#808080";
-                            }
+
+                        if (map[y][x].value == 1) {
+                            ctx.fillStyle = theme.one_color;
+                        } else if (map[y][x].value == 2) {
+                            ctx.fillStyle = theme.two_color;
+                        } else if (map[y][x].value == 3) {
+                            ctx.fillStyle = theme.three_color;
+                        } else if (map[y][x].value == 4) {
+                            ctx.fillStyle = theme.four_color;
+                        } else if (map[y][x].value == 5) {
+                            ctx.fillStyle = theme.five_color;
+                        } else if (map[y][x].value == 6) {
+                            ctx.fillStyle = theme.six_color;
+                        } else if (map[y][x].value == 7) {
+                            ctx.fillStyle = theme.seven_color;
+                        } else if (map[y][x].value == 8) {
+                            ctx.fillStyle = theme.eight_color;
                         }
                         
                         ctx.fillText(map[y][x].value.toString(), startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
@@ -1024,7 +1021,7 @@ var double = false
 
 
 function open(square) {
-    if (mapCustomMade && first && square) {
+    if ((mapCustomMade || mapRead) && first && square) {
         inGame = true;
 
         document.getElementById("clickAnywhere").style.display = "none";
