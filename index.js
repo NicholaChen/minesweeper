@@ -12,10 +12,21 @@ fetch("https://api.github.com/repos/nicholachen/minesweeper/releases/tags/"+"v"+
 });
 
 var dailycode;
-fetch("./daily.json").then((response) => response.json()).then((json) => {
-    dailycode = json[new Date().toISOString().split('T')[0]];
+var lastDaily = localStorage.getItem("daily");
+var todayPlayed = false;
+var dailyTries = isNaN(Number(localStorage.getItem("dailyTries"))) || Number(localStorage.getItem("dailyTries")) < 0 ? 0 : Number(localStorage.getItem("dailyTries"));
 
-    console.log(dailycode);
+fetch("./daily.json").then((response) => response.json()).then((json) => {
+    let d = new Date().toISOString().split('T')[0];
+    
+    todayPlayed = lastDaily == d;
+
+    if (!todayPlayed) {
+        dailyTries = 0;
+        localStorage.setItem("dailyTries", dailyTries);
+    }
+
+    dailycode = json[d];
 });
 
 
@@ -70,6 +81,7 @@ if (difficulty == "Beginner") {
 var oldSizeX = size_x;
 var oldSizeY = size_y;
 var oldNumMines = numMines;
+var oldDifficulty = difficulty;
 
 
 var infiniteLives = localStorage.getItem("infiniteLives") == "true";
@@ -122,6 +134,9 @@ var winPercentage;
 if (gamesPlayed == 0) winPercentage = 0;
 else winPercentage = wins/gamesPlayed;
 
+var dailyWins = isNaN(Number(localStorage.getItem("dailyWins"))) || Number(localStorage.getItem("dailyWins")) < 0 ? 0 : Number(localStorage.getItem("dailyWins"));
+var dailyGamesPlayed = isNaN(Number(localStorage.getItem("dailyGamesPlayed"))) || Number(localStorage.getItem("dailyGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("dailyGamesPlayed"));
+
 
 
 var beginnerWins = isNaN(Number(localStorage.getItem("beginnerWins"))) || Number(localStorage.getItem("beginnerWins")) < 0 ? 0 : Number(localStorage.getItem("beginnerWins"));
@@ -161,6 +176,7 @@ var map = []; // -1 represents a mine
 var analysisMap = [];
 
 
+var daily = false;
 
 const params = new URLSearchParams(document.location.search);
 
@@ -205,8 +221,6 @@ function readMap() {
 
             mapCustomMade = true;
             mapRead = true;
-
-            console.log(map);
 
             refreshMap(true);
             
@@ -368,6 +382,12 @@ function refreshMap(playCustomAgain=false) {
         document.getElementById("clickAnywhere").style.display = "flex";
     } else {
         document.getElementById("clickAnywhere").style.display = "none";
+    }
+
+    if (daily) {
+        document.getElementById("clickAnywhereText").innerText = "Click the green square to begin";
+    } else {
+        document.getElementById("clickAnywhereText").innerText = "Click any square to begin";
     }
     
 
@@ -664,6 +684,11 @@ function exposeTile(m,x,y) {
                 document.getElementById("playAgainButton").innerText = "Exit custom map";
                 document.getElementById("playCustomAgainButton").style.display = "inline";
             }
+
+            if (daily) {
+                document.getElementById("playAgainButton").innerText = "Exit daily map";
+                document.getElementById("playCustomAgainButton").style.display = "inline";
+            }
         
             if (!mapRead) {
                 for (let x = 0; x < size_x; x++) {
@@ -757,6 +782,11 @@ function exposeTile(m,x,y) {
             document.getElementById("playAgainButton").innerText = "Exit custom map";
             document.getElementById("playCustomAgainButton").style.display = "inline";
         }
+
+        if (daily) {
+            document.getElementById("playAgainButton").innerText = "Exit daily map";
+            document.getElementById("playCustomAgainButton").style.display = "inline";
+        }
     
         document.getElementById("time").style.display = "block";
         document.getElementById("winStreak").style.display = "block";
@@ -829,6 +859,10 @@ function draw(clear=false) {
 
                     if (((showMines || mapCreator) && !mapRead) && map[y][x].value == -1) {
                         ctx.fillStyle = "rgba(200,0,0,0.3)";
+                    }
+
+                    if (map[y][x].first) {
+                        ctx.fillStyle = "rgba(0,200,0,0.3)";
                     }
                 } else {
                     if (map[y][x].value == -1) {
@@ -934,9 +968,12 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
         numMines = oldNumMines;
         size_x = oldSizeX;
         size_y = oldSizeY;
+        difficulty = oldDifficulty;
     }
     refreshMap();
     if (mapRead) {
+        daily = false;
+
         for (let i = 0; i < size_y; i++) {
             for (let j = 0; j < size_x; j++) {
                 if (isNaN(map[i][j].value)) map[i][j].value = 0;
@@ -1923,8 +1960,6 @@ function getMap(s) {
 
         mines = mines.filter(i => i.x >= 0 || i.x < x || i.y >= 0 || i.y < y);
 
-        console.log(data,x,y,mines)
-
         let m = [];
         for (let i = 0; i < y; i++) {
             m[i] = [];
@@ -1973,8 +2008,6 @@ function getMapDaily(s) {
 
         mines = mines.filter(i => i.x >= 0 || i.x < 30 || i.y >= 0 || i.y < 16);
 
-        console.log(data,x,y,mines)
-
         let m = [];
         for (let i = 0; i < 16; i++) {
             m[i] = [];
@@ -1982,6 +2015,8 @@ function getMapDaily(s) {
                 m[i][j] = {value: NaN, opened: false, flagged: false};
             }
         }
+        
+        m[y][x].first = true;
 
         for (let i = 0; i < mines.length; i++) {
             m[mines[i].y][mines[i].x].value = -1;
@@ -2001,8 +2036,37 @@ function getMapDaily(s) {
 
 
 document.getElementById("dailyIcon").addEventListener("click", (e) => {
-    if (dailycode != null) {
-        console.log(getMapDaily(dailycode));
+    if (dailycode != null && !daily) {
+        
+        oldSizeX = size_x;
+        oldSizeY = size_y;
+        oldNumMines = numMines;
+        oldDifficulty = difficulty;
+
+
+        document.getElementById("mapCreatorTop").style.display = "none";
+
+        let m = getMapDaily(dailycode);
+
+        size_x = 30;
+        size_y = 16;
+
+        difficulty = "Expert";
+
+        numMines = m.n;
+
+        daily = true;
+        map = m.m;
+
+        mapRead = true;
+        mapCustomMade = true;
+
+
+        map3BV = threeBV();
+
+
+
+        refreshMap(true);
     }
 });
 

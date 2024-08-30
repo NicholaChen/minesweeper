@@ -25,7 +25,7 @@
                 <a style="display: inline; color: inherit;" id="logoVersion"></a>
 
                 <div style="float: right; margin: 8px; position: absolute; top: 0; right: 0;">
-                    <a style="color: inherit;" id="dailyIcon">
+                    <a style="color: inherit; cursor: pointer;" id="dailyIcon">
                         <h1 style="display: inline; font-size: 25px;">
                             <i class="fa-solid fa-calendar-day"></i>
                         </h1>
@@ -96,7 +96,7 @@
                     <h1 style="text-align: center; margin: 0; vertical-align: middle;">Paused</h1>
                 </div>
                 <div style="position:absolute; left:0; top:0; width:100%; height:100%; display: flex; justify-content: center; align-items: center; pointer-events: none;" id="clickAnywhere">
-                    <h1 style="text-align: center; margin: 0; vertical-align: middle;">Open any tile to begin</h1>
+                    <h1 style="text-align: center; margin: 0; vertical-align: middle;" id="clickAnywhereText">Open any square to begin</h1>
                 </div>
             </div>
             <div style="flex-grow: 1; padding: 16px 10% 16px 10%; display: none; overflow: auto;" id="stats">
@@ -116,6 +116,12 @@
                 </div>
                 <div class="settingsDiv">
                     <h3 style="width: 100%">Win percentage <span style="float: right;" id="winPercentage"></span></h3>
+                </div>
+                <div class="settingsDiv">
+                    <h3 style="width: 100%">Daily wins <span style="float: right;" id="dailyWins"></span></h3>
+                </div>
+                <div class="settingsDiv">
+                    <h3 style="width: 100%">Daily games played <span style="float: right;" id="dailyGamesPlayed"></span></h3>
                 </div>
                 <div class="settingsDiv">
                     <h3 style="width: 100%">Hours played <span style="float: right;" id="hoursPlayed"></span></h3>

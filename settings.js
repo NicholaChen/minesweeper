@@ -795,9 +795,7 @@ document.getElementById("mapCreatorOff").addEventListener("click", (e) => {
         inGame = true;
         mapCustomMade = true;
         
-        if (document.getElementById("clickAnywhere").style.display == "flex") {
-            refreshMap(true);
-        }
+        refreshMap(true);
 
         clearInterval(interval);
     }
