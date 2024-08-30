@@ -7,7 +7,6 @@ function updateStatsAllGames() {
     document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
     document.getElementById("gamesPlayed").innerText = gamesPlayed;
 	
-	document.getElementById("dailyWins").innerText = dailyWins;
     
     winPercentage = wins/gamesPlayed;
     
@@ -19,7 +18,19 @@ function updateStatsAllGames() {
 	localStorage.setItem("bestWinStreak", bestWinStreak);
     localStorage.setItem("hours", hours);
     localStorage.setItem("gamesPlayed", gamesPlayed);
+}
+
+function updateStatsDaily() {
+	document.getElementById("dailyWins").innerText = dailyWins;
 	localStorage.setItem("dailyWins", dailyWins);
+
+	document.getElementById("dailyCurrentWinStreak").innerText = dailyCurrentWinStreak;
+	localStorage.setItem("dailyCurrentWinStreak", dailyCurrentWinStreak);
+
+	if (dailyCurrentWinStreak > dailyBestWinStreak) dailyBestWinStreak = dailyCurrentWinStreak;
+
+	document.getElementById("dailyBestWinStreak").innerText = dailyBestWinStreak;
+	localStorage.setItem("dailyBestWinStreak", dailyBestWinStreak);
 }
 
 function updateStatsBeginner() {
@@ -89,6 +100,7 @@ updateStatsAllGames();
 updateStatsBeginner();
 updateStatsIntermediate();
 updateStatsExpert();
+updateStatsDaily();
 
 document.getElementById("resetStatsButton").addEventListener("click", (e) => {
     wins = 0;
@@ -106,9 +118,14 @@ document.getElementById("resetStatsButton").addEventListener("click", (e) => {
 	expertWins = 0;
 	expertGamesPlayed = 0;
 	expertAverageTime = 0;
+
+	dailyWins = 0;
+	dailyCurrentWinStreak = 0;
+	dailyBestWinStreak = 0;
     
     updateStatsAllGames();
     updateStatsBeginner();
 	updateStatsIntermediate();
 	updateStatsExpert();
+	updateStatsDaily();
 })

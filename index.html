@@ -24,16 +24,16 @@
                 <h1 style="margin: 8px 0 8px 8px; display: inline; font-size: 33px;">minesweeper</h1>
                 <a style="display: inline; color: inherit;" id="logoVersion"></a>
 
-                <div style="float: right; margin: 8px; position: absolute; top: 0; right: 0;">
+                <div style="float: right; margin: 4px; position: absolute; top: 0; right: 0;">
                     <a style="color: inherit; cursor: pointer;" id="dailyIcon">
-                        <h1 style="display: inline; font-size: 25px;">
+                        <h2 style="display: inline;">
                             <i class="fa-solid fa-calendar-day"></i>
-                        </h1>
+                        </h2>
                     </a>
                     <a href="https://github.com/NicholaChen/minesweeper" style="color: inherit;">
-                        <h1 style="display: inline; font-size: 25px;">
+                        <h2 style="display: inline;">
                             <i class="fa-brands fa-github"></i>
-                        </h1>
+                        </h2>
                     </a>  
                 </div>
                 
@@ -85,6 +85,7 @@
                 <div style="position:absolute; left:0; top: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; background-color: rgba(0,0,0,0.4); display: none;" id="gameEnd">
                     <div style="background-color: var(--background-color); padding: 16px; text-align:center; min-width: 15%; box-shadow: 0px 0px 18px 0 #00000040;" onclick="event.stopPropagation();">
                         <h1 style="text-align: center; margin: 0; font-size: 38px;" id="gameEndText">Game Over!</h1>
+                        <p id="notCounted" style="font-size: 16px; margin: 4px;">Not counted towards stats</p>
                         <p id="time" style="font-size: 18px; margin: 4px;">Time: </p>
                         <p id="winStreak" style="font-size: 18px; margin: 4px;">Win Streak </p>
                         <p id="3BVSec" style="font-size: 18px; margin: 4px;">3BV/sec: </p>
@@ -121,10 +122,10 @@
                     <h3 style="width: 100%">Daily map wins <span style="float: right;" id="dailyWins"></span></h3>
                 </div>
                 <div class="settingsDiv">
-                    <h3 style="width: 100%">Current daily map win streak <span style="float: right;" id="dailyGamesPlayed"></span></h3>
+                    <h3 style="width: 100%">Current daily map win streak <span style="float: right;" id="dailyCurrentWinStreak"></span></h3>
                 </div>
                 <div class="settingsDiv">
-                    <h3 style="width: 100%">Best daily map win streak <span style="float: right;" id="dailyGamesPlayed"></span></h3>
+                    <h3 style="width: 100%">Best daily map win streak <span style="float: right;" id="dailyBestWinStreak"></span></h3>
                 </div>
                 <div class="settingsDiv">
                     <h3 style="width: 100%">Hours played <span style="float: right;" id="hoursPlayed"></span></h3>

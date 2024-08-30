@@ -11,24 +11,16 @@ fetch("https://api.github.com/repos/nicholachen/minesweeper/releases/tags/"+"v"+
     document.getElementById("versionFooter").href = json.html_url;
 });
 
-var dailycode;
 var lastDaily = localStorage.getItem("daily");
-var todayPlayed = false;
 var dailyTries = isNaN(Number(localStorage.getItem("dailyTries"))) || Number(localStorage.getItem("dailyTries")) < 0 ? 0 : Number(localStorage.getItem("dailyTries"));
 
+var todayPlayed = false;
+var dailyBestWinStreak = isNaN(Number(localStorage.getItem("dailyBestWinStreak"))) || Number(localStorage.getItem("dailyBestWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyBestWinStreak"));
+var dailyCurrentWinStreak = isNaN(Number(localStorage.getItem("dailyCurrentWinStreak"))) || Number(localStorage.getItem("dailyCurrentWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyCurrentWinStreak"));
+
+var dailyCodes;
 fetch("./daily.json").then((response) => response.json()).then((json) => {
-    let d = new Date().toISOString().split('T')[0];
-
-    console.log("LOADING " + d + ": " + json[d]);
-    
-    todayPlayed = lastDaily == d;
-
-    if (!todayPlayed) {
-        dailyTries = 0;
-        localStorage.setItem("dailyTries", dailyTries);
-    }
-
-    dailycode = json[d];
+    dailyCodes = json;
 });
 
 
@@ -389,6 +381,7 @@ function refreshMap(playCustomAgain=false) {
     } else {
         document.getElementById("clickAnywhereText").innerText = "Click any square to begin";
     }
+    document.getElementById("notCounted").style.display = "none";
     
     if (difficulty != "Custom" && !mapRead) {
         let large = Math.max(size_x, size_y);
@@ -709,6 +702,7 @@ function exposeTile(m,x,y) {
                     updateStatsExpert();
                 }
             }
+            
             if (!mapCustomMade) {
                 document.getElementById("playAgainButton").innerText = "Play again";
                 document.getElementById("playCustomAgainButton").style.display = "none";
@@ -810,7 +804,15 @@ function exposeTile(m,x,y) {
 
                 updateStatsExpert();
             }
+            document.getElementById("notCounted").style.display = "none";
+            document.getElementById("winStreak").style.display = "block";
+        } else {
+            document.getElementById("notCounted").style.display = "initial";
+            document.getElementById("winStreak").style.display = "none";
         }
+        document.getElementById("notCounted").innerText = "Not counted towards stats";
+        document.getElementById("winStreak").innerText = "Win streak: " + currentWinStreak;
+
         if (!mapCustomMade) {
             document.getElementById("playAgainButton").innerText = "Play again";
             document.getElementById("playCustomAgainButton").style.display = "none";
@@ -822,14 +824,23 @@ function exposeTile(m,x,y) {
         if (daily) {
             document.getElementById("playAgainButton").innerText = "Exit daily map";
             document.getElementById("playCustomAgainButton").style.display = "inline";
+            
+            if (!todayPlayed) {
+                localStorage.setItem("daily", new Date().toISOString().split('T')[0]);
+                dailyWins += 1;
+                dailyCurrentWinStreak += 1;
 
-            localStorage.setItem("daily", new Date().toISOString().split('T')[0]);
-            todayPlayed = true;
+                updateStatsDaily();
+            } else {
+                document.getElementById("notCounted").innerText = "Daily map already played";
+            }
+            document.getElementById("winStreak").style.display = "block";
+            document.getElementById("winStreak").innerText = "Daily map win streak: " + currentWinStreak;
         }
     
         document.getElementById("time").style.display = "block";
-        document.getElementById("winStreak").style.display = "block";
-        document.getElementById("winStreak").innerText = "Win streak: " + currentWinStreak;
+
+        
         document.getElementById("3BVSec").style.display = show3BV ? "block" : "none";
         document.getElementById("3BVSec").innerText = "3BV/sec: " + (map3BV / ((elapsedTime - pausedTime) / 1000)).toFixed(2);
         
@@ -2075,8 +2086,38 @@ function getMapDaily(s) {
 
 
 document.getElementById("dailyIcon").addEventListener("click", (e) => {
+    let d = new Date().toISOString().split('T')[0];
+
+    console.log("LOADING " + d + ": " + dailyCodes[d]);
+
+    lastDaily = localStorage.getItem("daily");
+    
+    let todayPlayed = lastDaily == d;
+
+    if (!todayPlayed) {
+        dailyTries = 0;
+        localStorage.setItem("dailyTries", dailyTries);
+    }
+
+    let last = new Date();
+    last.setDate(last.getDate() - 1);
+
+    if (localStorage.getItem("daily") != last.toISOString().split('T')[0]) {
+        dailyCurrentWinStreak = 0;
+        localStorage.setItem("dailyCurrentWinStreak", dailyCurrentWinStreak);
+    } else {
+        dailyCurrentWinStreak = isNaN(Number(localStorage.getItem("dailyCurrentWinStreak"))) || Number(localStorage.getItem("dailyCurrentWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyCurrentWinStreak"));
+    }
+    console.log("LAST: " + last.toISOString().split('T')[0]);
+    console.log(dailyCurrentWinStreak);
+
+    console.log(todayPlayed);
+
+    let dailycode = dailyCodes[d];
+
     if (dailycode != null && !daily) {
         
+        todayPlayed = lastDaily == d;
         oldSizeX = size_x;
         oldSizeY = size_y;
         oldNumMines = numMines;
@@ -2106,6 +2147,37 @@ document.getElementById("dailyIcon").addEventListener("click", (e) => {
 
 
         refreshMap(true);
+    } else if (daily) {
+
+        numMines = oldNumMines;
+        size_x = oldSizeX;
+        size_y = oldSizeY;
+        difficulty = oldDifficulty;
+
+
+        daily = false;
+
+        for (let i = 0; i < size_y; i++) {
+            for (let j = 0; j < size_x; j++) {
+                if (isNaN(map[i][j].value)) map[i][j].value = 0;
+                if (map[i][j].flagged) map[i][j].flagged = false;
+                if (map[i][j].opened) map[i][j].opened = false;
+            }
+        }
+
+        if (mapCreator) {
+            document.getElementById("mapCreatorTop").style.display = "block";
+        }
+        inGame = false;
+        mapCustomMade = true;
+
+        mapRead = false;
+
+        clearInterval(interval);
+        refreshMap();
+        
+    
+        document.getElementById("gameEnd").style.display = "none";
     }
 });
 
