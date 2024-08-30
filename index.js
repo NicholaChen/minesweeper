@@ -1,4 +1,4 @@
-const VERSION = "1.11.2";
+const VERSION = "1.11.3";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -15,8 +15,6 @@ var lastDaily = localStorage.getItem("daily");
 var dailyTries = isNaN(Number(localStorage.getItem("dailyTries"))) || Number(localStorage.getItem("dailyTries")) < 0 ? 0 : Number(localStorage.getItem("dailyTries"));
 
 var todayPlayed = false;
-var dailyBestWinStreak = isNaN(Number(localStorage.getItem("dailyBestWinStreak"))) || Number(localStorage.getItem("dailyBestWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyBestWinStreak"));
-var dailyCurrentWinStreak = isNaN(Number(localStorage.getItem("dailyCurrentWinStreak"))) || Number(localStorage.getItem("dailyCurrentWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyCurrentWinStreak"));
 
 var dailyCodes;
 fetch("./daily.json").then((response) => response.json()).then((json) => {
@@ -128,9 +126,6 @@ var winPercentage;
 if (gamesPlayed == 0) winPercentage = 0;
 else winPercentage = wins/gamesPlayed;
 
-var dailyWins = isNaN(Number(localStorage.getItem("dailyWins"))) || Number(localStorage.getItem("dailyWins")) < 0 ? 0 : Number(localStorage.getItem("dailyWins"));
-
-
 var beginnerWins = isNaN(Number(localStorage.getItem("beginnerWins"))) || Number(localStorage.getItem("beginnerWins")) < 0 ? 0 : Number(localStorage.getItem("beginnerWins"));
 var beginnerGamesPlayed = isNaN(Number(localStorage.getItem("beginnerGamesPlayed"))) || Number(localStorage.getItem("beginnerGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("beginnerGamesPlayed"));
 
@@ -160,6 +155,14 @@ if (expertGamesPlayed == 0) expertWinPercentage = 0;
 else expertWinPercentage = expertWins / expertGamesPlayed;
 
 var expertAverageTime = isNaN(Number(localStorage.getItem("expertAverageTime"))) || Number(localStorage.getItem("expertAverageTime")) < 0 ? 0 : Number(localStorage.getItem("expertAverageTime"));
+
+
+
+var dailyWins = isNaN(Number(localStorage.getItem("dailyWins"))) || Number(localStorage.getItem("dailyWins")) < 0 ? 0 : Number(localStorage.getItem("dailyWins"));
+var dailyBestWinStreak = isNaN(Number(localStorage.getItem("dailyBestWinStreak"))) || Number(localStorage.getItem("dailyBestWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyBestWinStreak"));
+var dailyCurrentWinStreak = isNaN(Number(localStorage.getItem("dailyCurrentWinStreak"))) || Number(localStorage.getItem("dailyCurrentWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyCurrentWinStreak"));
+
+
 
 
 
@@ -675,6 +678,8 @@ function exposeTile(m,x,y) {
         }
 
         if (!infiniteLives) {
+            getStats();
+
             inGame = false;
 
             clearInterval(interval);
@@ -773,7 +778,7 @@ function exposeTile(m,x,y) {
         clearInterval(interval);
         let elapsedTime = Date.now() - startTime;
         document.getElementById("timer").innerText = timeToText((elapsedTime - pausedTime) / 1000);
-        
+        getStats();
         if (!mapCustomMade && analysis == "Off" && !infiniteLives && !showMines) {
             hours += elapsedTime - pausedTime;
             wins += 1;
@@ -835,7 +840,7 @@ function exposeTile(m,x,y) {
                 document.getElementById("notCounted").innerText = "Daily map already played";
             }
             document.getElementById("winStreak").style.display = "block";
-            document.getElementById("winStreak").innerText = "Daily map win streak: " + currentWinStreak;
+            document.getElementById("winStreak").innerText = "Daily map win streak: " + dailyCurrentWinStreak;
         }
     
         document.getElementById("time").style.display = "block";
@@ -962,6 +967,14 @@ function draw(clear=false) {
                         
                             ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                         }
+                    }
+                }
+                if (analysis != "Off" && !mapRead) {
+                    if (analysisMap[y][x].probability != null) {
+                        ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
+                        ctx.fillStyle = theme.probability_color;
+                    
+                        ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
                     }
                 }
                 if (map[y][x].flagged) {
@@ -1095,6 +1108,7 @@ document.getElementById("recenter").addEventListener("click", (e) => {
 var touch = false;
 
 var leftButtonDown = false;
+var middleButtonDown = false;
 var rightButtonDown = false;
 
 document.addEventListener("mousedown", function (e) {
@@ -1102,6 +1116,8 @@ document.addEventListener("mousedown", function (e) {
         leftButtonDown = true;
     } else if (e.button == 2) {
         rightButtonDown = true;
+    } else if (e.button == 1) {
+        middleButtonDown = true;
     }
 });
 
@@ -1110,6 +1126,8 @@ document.addEventListener("mouseup", function (e) {
         leftButtonDown = false;
     } else if (e.button == 2) {
         rightButtonDown = false;
+    } else if (e.button == 1) {
+        middleButtonDown = false;
     }
     lastMouse = null;
 });
@@ -1143,7 +1161,7 @@ function open(square) {
                 document.getElementById("clickAnywhere").style.display = "none";
                 pausedTime = 0;
                 generate(numMines, square.x, square.y);
-
+                update();
                 first = false;
                 inGame = true;
 
@@ -1228,100 +1246,12 @@ canvas.addEventListener("mousedown", (e) => {
         let canvasX = e.clientX * window.devicePixelRatio;
         let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
         let square = overSquare(canvasX, canvasY);
-
+        if (square == null) return;
         if (mouseTimeout) clearTimeout(mouseTimeout);
         mouseTimeout = setTimeout(function() {
-            if (!(leftButtonDown && rightButtonDown)) {
-                if (e.button == 0) {
-                    if (!mapCreator || mapRead) open(square);
-                    else {
-                        if (square) {
-                            if (map[square.y][square.x].value != -1) {
-                                if (numMines < 500) {
-                                    map[square.y][square.x].value = -1;
-                                    numMines += 1;
-                                } else {
-                                    document.getElementById("topText").innerText = "Maximum number of mines reached (500).";
-                                    document.getElementById("topText").style.display = "initial";
-                                    if (topTextInterval != null) clearTimeout(topTextInterval);
-    
-                                    topTextInterval = setTimeout(function() {
-                                        document.getElementById("topText").style.display = "none";
-                                    }, settingsMessageDuration);
-                                }
-                            } else {
-                                map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
-                                numMines -= 1;
-                            }
-    
-                            document.getElementById("flags").innerText = flags.toString() +  "/" + numMines.toString();
-        
-                            for (let i=-1;i<=1;i++) {
-                                for (let j=-1;j<=1;j++) {
-                                    if (i != 0 || j != 0) {
-                                        if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
-                                            if (map[square.y+j][square.x+i].value != -1) {
-                                                map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-        
-                            draw(true);
-                        }
-                    }
-                } else if (e.button == 2 && (inGame || mapCreator)) {
-                    if (!mapCreator || mapRead) flag(square);
-                } else if (e.button == 1) {
-                    if (!chording) return;
-        
-                    chord(square);
-                }
-        
-                // update cursor
-                if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
-                    canvas.style.cursor = "pointer";
-                } else {
-                    canvas.style.cursor = "default";
-                }
-            } else {
-                // chording
-                
-                
-                double = true; // fixes a bug where right + left together does two events
-        
-                if (!chording) return;
-        
-                chord(square);
-            }
-        }, 2);
-    }
-})
-canvas.addEventListener("mouseup", (e) => {
-    if (panning) {
-        let canvasX = e.clientX * window.devicePixelRatio;
-        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
+            console.log(leftButtonDown, middleButtonDown, rightButtonDown);
 
-        cam_x -= (canvasX-lastMouse.x);
-        cam_y -= (canvasY-lastMouse.y);
-
-        viewChanged();
-
-        draw(true);
-    } else {
-        if (onMouseDown) return;
-        if (double) {
-            double = false;
-            return
-        };
-        let canvasX = e.clientX * window.devicePixelRatio;
-        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
-        let square = overSquare(canvasX, canvasY);
-
-
-        if (!(leftButtonDown && rightButtonDown)) {
-            if (e.button == 0) {
+            if (leftButtonDown && !rightButtonDown) {
                 if (!mapCreator || mapRead) open(square);
                 else {
                     if (square) {
@@ -1360,12 +1290,89 @@ canvas.addEventListener("mouseup", (e) => {
                         draw(true);
                     }
                 }
-            } else if (e.button == 2 && inGame) {
+            } else if (rightButtonDown && !leftButtonDown && inGame) {
                 if (!mapCreator || mapRead) flag(square);
-            } else if (e.button == 1) {
+            } else if (leftButtonDown && rightButtonDown) {
                 if (!chording) return;
-
+    
                 chord(square);
+            }
+    
+            // update cursor
+            if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+                canvas.style.cursor = "pointer";
+            } else {
+                canvas.style.cursor = "default";
+            }
+
+        }, 1);
+    }
+})
+canvas.addEventListener("mouseup", (e) => {
+    if (panning) {
+        let canvasX = e.clientX * window.devicePixelRatio;
+        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
+
+        cam_x -= (canvasX-lastMouse.x);
+        cam_y -= (canvasY-lastMouse.y);
+
+        viewChanged();
+
+        draw(true);
+    } else {
+        if (onMouseDown) return;
+        if (double) {
+            double = false;
+            return
+        };
+        let canvasX = e.clientX * window.devicePixelRatio;
+        let canvasY = e.clientY * window.devicePixelRatio -  document.getElementById("top").clientHeight * window.devicePixelRatio;
+        let square = overSquare(canvasX, canvasY);
+
+        if (square == null) return;
+
+        if (!(leftButtonDown && rightButtonDown)) {
+            if (leftButtonDown && !rightButtonDown) {
+                if (!mapCreator || mapRead) open(square);
+                else {
+                    if (square) {
+                        if (map[square.y][square.x].value != -1) {
+                            if (numMines < 500) {
+                                map[square.y][square.x].value = -1;
+                                numMines += 1;
+                            } else {
+                                document.getElementById("topText").innerText = "Maximum number of mines reached (500).";
+                                document.getElementById("topText").style.display = "initial";
+                                if (topTextInterval != null) clearTimeout(topTextInterval);
+
+                                topTextInterval = setTimeout(function() {
+                                    document.getElementById("topText").style.display = "none";
+                                }, settingsMessageDuration);
+                            }
+                        } else {
+                            map[square.y][square.x].value = adjacentMines(map,square.x,square.y);
+                            numMines -= 1;
+                        }
+
+                        document.getElementById("flags").innerText = flags.toString() +  "/" + numMines.toString();
+    
+                        for (let i=-1;i<=1;i++) {
+                            for (let j=-1;j<=1;j++) {
+                                if (i != 0 || j != 0) {
+                                    if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y) {
+                                        if (map[square.y+j][square.x+i].value != -1) {
+                                            map[square.y+j][square.x+i].value = adjacentMines(map,square.x+i,square.y+j);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+    
+                        draw(true);
+                    }
+                }
+            } else if (rightButtonDown && !leftButtonDown && inGame) {
+                if (!mapCreator || mapRead) flag(square);
             }
 
             // update cursor
@@ -1383,6 +1390,12 @@ canvas.addEventListener("mouseup", (e) => {
             if (!chording) return;
 
             chord(square);
+
+            if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
+                canvas.style.cursor = "pointer";
+            } else {
+                canvas.style.cursor = "default";
+            }
         }
     }
 });
@@ -1764,6 +1777,13 @@ document.getElementById("statsButton").addEventListener("click", (e) => {
     } else {
         settings = false;
         stats = true;
+
+        getStats();
+        updateStatsAllGames();
+        updateStatsBeginner();
+        updateStatsIntermediate();
+        updateStatsExpert();
+        updateStatsDaily();
         
         document.getElementById("game").style.display = "none";
         document.getElementById("settings").style.display = "none";
@@ -1914,6 +1934,13 @@ document.addEventListener('keydown', function(e) {
         } else {
             settings = false;
             stats = true;
+
+            getStats();
+            updateStatsAllGames();
+            updateStatsBeginner();
+            updateStatsIntermediate();
+            updateStatsExpert();
+            updateStatsDaily();
             
             document.getElementById("game").style.display = "none";
             document.getElementById("settings").style.display = "none";
@@ -1970,8 +1997,8 @@ document.addEventListener('keydown', function(e) {
 
 window.addEventListener('blur', function() {
     if (inGame && document.getElementById("clickAnywhere").style.display != "flex" && (!mapCreator || mapRead)) {
-        pause();
-        lastPause = true;
+        //pause();
+        //lastPause = true;
     }
 });
 
@@ -2116,7 +2143,8 @@ document.getElementById("dailyIcon").addEventListener("click", (e) => {
     let dailycode = dailyCodes[d];
 
     if (dailycode != null && !daily) {
-        
+        clearInterval(interval);
+
         todayPlayed = lastDaily == d;
         oldSizeX = size_x;
         oldSizeY = size_y;

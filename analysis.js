@@ -4,6 +4,7 @@ var analysisDebug = false;
 var analysisDebugVerbose = false;
 
 function analyze(map_, a, simple=false, max) {
+    console.log(map_, a, simple, max);
     if (analysisDebug) console.time('analyze');
 
     analysisMap_ = [];
@@ -18,14 +19,13 @@ function analyze(map_, a, simple=false, max) {
 
     for (let x=0;x<size_x;x++) {
         for (let y=0;y<size_y;y++) {
+            analysisMap_[y][x].border = false;
             if (map_[y][x].opened && map_[y][x].value >= 0) {
                 analysisMap_[y][x].probability = 0;
             } else if (map_[y][x].opened && map_[y][x].value == -1) {
                 analysisMap_[y][x].probability = 1;
             }
-            if (analysisMap_[y][x].probability != 0 && analysisMap_[y][x].probability != 1) {
-                analysisMap_[y][x].probability = null;
-            }
+        
             if (analysisMap_[y][x].na == null) analysisMap_[y][x].na = numAdjacent(x,y);
         }
     }
@@ -107,7 +107,7 @@ function analyze(map_, a, simple=false, max) {
         }
     }
 
-    let numMinesAccounted = analysisMap.flat().filter(s => s.probability == 1).length;
+    let numMinesAccounted = analysisMap_.flat().filter(s => s.probability == 1).length;
 
 
     let numMinesNotAccounted = numMines - numMinesAccounted;

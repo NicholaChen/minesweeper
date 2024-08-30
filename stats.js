@@ -1,4 +1,53 @@
 
+function getStats() {
+	wins = isNaN(Number(localStorage.getItem("wins"))) || Number(localStorage.getItem("wins")) < 0 ? 0 : Number(localStorage.getItem("wins"));
+
+	bestWinStreak = isNaN(Number(localStorage.getItem("bestWinStreak"))) || Number(localStorage.getItem("bestWinStreak")) < 0 ? 0 : Number(localStorage.getItem("bestWinStreak"));
+	currentWinStreak = isNaN(Number(localStorage.getItem("currentWinStreak"))) || Number(localStorage.getItem("currentWinStreak")) < 0 ? 0 : Number(localStorage.getItem("currentWinStreak"));
+
+	hours = isNaN(Number(localStorage.getItem("hours"))) || Number(localStorage.getItem("hours")) < 0 ? 0 : Number(localStorage.getItem("hours")); // in ms
+	gamesPlayed = isNaN(Number(localStorage.getItem("gamesPlayed"))) || Number(localStorage.getItem("gamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("gamesPlayed"));
+
+	if (gamesPlayed == 0) winPercentage = 0;
+	else winPercentage = wins/gamesPlayed;
+
+	beginnerWins = isNaN(Number(localStorage.getItem("beginnerWins"))) || Number(localStorage.getItem("beginnerWins")) < 0 ? 0 : Number(localStorage.getItem("beginnerWins"));
+	beginnerGamesPlayed = isNaN(Number(localStorage.getItem("beginnerGamesPlayed"))) || Number(localStorage.getItem("beginnerGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("beginnerGamesPlayed"));
+
+	beginnerWinPercentage;
+	if (beginnerGamesPlayed == 0) beginnerWinPercentage = 0;
+	else beginnerWinPercentage = beginnerWins / beginnerGamesPlayed;
+
+	beginnerAverageTime = isNaN(Number(localStorage.getItem("beginnerAverageTime"))) || Number(localStorage.getItem("beginnerAverageTime")) < 0 ? 0 : Number(localStorage.getItem("beginnerAverageTime")); // in ms
+
+
+	intermediateWins = isNaN(Number(localStorage.getItem("intermediateWins"))) || Number(localStorage.getItem("intermediateWins")) < 0 ? 0 : Number(localStorage.getItem("intermediateWins"));
+	intermediateGamesPlayed = isNaN(Number(localStorage.getItem("intermediateGamesPlayed"))) || Number(localStorage.getItem("intermediateGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("intermediateGamesPlayed"));
+
+	intermediateWinPercentage;
+	if (intermediateGamesPlayed == 0) intermediateWinPercentage = 0;
+	else intermediateWinPercentage = intermediateWins / intermediateGamesPlayed;
+
+	intermediateAverageTime = isNaN(Number(localStorage.getItem("intermediateAverageTime"))) || Number(localStorage.getItem("intermediateAverageTime")) < 0 ? 0 : Number(localStorage.getItem("intermediateAverageTime"));
+
+
+
+	expertWins = isNaN(Number(localStorage.getItem("expertWins"))) || Number(localStorage.getItem("expertWins")) < 0 ? 0 : Number(localStorage.getItem("expertWins"));
+	expertGamesPlayed = isNaN(Number(localStorage.getItem("expertGamesPlayed"))) || Number(localStorage.getItem("expertGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("expertGamesPlayed"));
+
+	expertWinPercentage;
+	if (expertGamesPlayed == 0) expertWinPercentage = 0;
+	else expertWinPercentage = expertWins / expertGamesPlayed;
+
+	expertAverageTime = isNaN(Number(localStorage.getItem("expertAverageTime"))) || Number(localStorage.getItem("expertAverageTime")) < 0 ? 0 : Number(localStorage.getItem("expertAverageTime"));
+
+
+
+	dailyWins = isNaN(Number(localStorage.getItem("dailyWins"))) || Number(localStorage.getItem("dailyWins")) < 0 ? 0 : Number(localStorage.getItem("dailyWins"));
+	dailyBestWinStreak = isNaN(Number(localStorage.getItem("dailyBestWinStreak"))) || Number(localStorage.getItem("dailyBestWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyBestWinStreak"));
+	dailyCurrentWinStreak = isNaN(Number(localStorage.getItem("dailyCurrentWinStreak"))) || Number(localStorage.getItem("dailyCurrentWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyCurrentWinStreak"));
+}
+
 function updateStatsAllGames() {
     document.getElementById("wins").innerText = wins;
 	document.getElementById("currentWinStreak").innerText = currentWinStreak;
