@@ -18,6 +18,8 @@ var dailyTries = isNaN(Number(localStorage.getItem("dailyTries"))) || Number(loc
 
 fetch("./daily.json").then((response) => response.json()).then((json) => {
     let d = new Date().toISOString().split('T')[0];
+
+    console.log("LOADING " + d + ": " + json[d]);
     
     todayPlayed = lastDaily == d;
 
@@ -135,8 +137,6 @@ if (gamesPlayed == 0) winPercentage = 0;
 else winPercentage = wins/gamesPlayed;
 
 var dailyWins = isNaN(Number(localStorage.getItem("dailyWins"))) || Number(localStorage.getItem("dailyWins")) < 0 ? 0 : Number(localStorage.getItem("dailyWins"));
-var dailyGamesPlayed = isNaN(Number(localStorage.getItem("dailyGamesPlayed"))) || Number(localStorage.getItem("dailyGamesPlayed")) < 0 ? 0 : Number(localStorage.getItem("dailyGamesPlayed"));
-
 
 
 var beginnerWins = isNaN(Number(localStorage.getItem("beginnerWins"))) || Number(localStorage.getItem("beginnerWins")) < 0 ? 0 : Number(localStorage.getItem("beginnerWins"));
@@ -390,8 +390,7 @@ function refreshMap(playCustomAgain=false) {
         document.getElementById("clickAnywhereText").innerText = "Click any square to begin";
     }
     
-
-    if (difficulty != "Custom") {
+    if (difficulty != "Custom" && !mapRead) {
         let large = Math.max(size_x, size_y);
         let small = Math.min(size_x, size_y);
 
@@ -402,6 +401,39 @@ function refreshMap(playCustomAgain=false) {
             size_x = small;
             size_y = large;
         }
+    } 
+    if (daily) {
+        let large = Math.max(size_x, size_y);
+        let small = Math.min(size_x, size_y);
+
+        let rotate = false
+        if (canvas.width > canvas.height) {
+            if (size_x != large) {
+                rotate = true;
+            }
+        } else {
+            if (size_x != small) {
+                rotate = true;
+            }
+        }
+
+        if (rotate) {
+            let m = [];
+            for (let i = 0; i < size_x; i++) {
+                m[i] = [];
+                for (let j = 0; j < size_y; j++) {
+                    m[i][j] = map[j][i];
+                }
+            }
+    
+            map = m;
+
+            let old_x = size_x
+            let old_y = size_y
+
+            size_x = old_y;
+            size_y = old_x;
+        };
     }
     
     first = true;
@@ -561,7 +593,7 @@ function adjacentMines(m,x,y) {
     for (let i=-1;i<=1;i++) {
         for (let j=-1;j<=1;j++) {
             if (i != 0 || j != 0) {
-                if (x+i >= 0 && x+i < m[0].length && y+j >= 0 && y+j < map.length) {
+                if (x+i >= 0 && x+i < m[0].length && y+j >= 0 && y+j < m.length) {
                     if (m[y+j][x+i].value == -1) {
                         t += 1;
                     }
@@ -688,6 +720,10 @@ function exposeTile(m,x,y) {
             if (daily) {
                 document.getElementById("playAgainButton").innerText = "Exit daily map";
                 document.getElementById("playCustomAgainButton").style.display = "inline";
+
+                dailyTries += 1;
+
+                localStorage.setItem("dailyTries", dailyTries);
             }
         
             if (!mapRead) {
@@ -786,6 +822,9 @@ function exposeTile(m,x,y) {
         if (daily) {
             document.getElementById("playAgainButton").innerText = "Exit daily map";
             document.getElementById("playCustomAgainButton").style.display = "inline";
+
+            localStorage.setItem("daily", new Date().toISOString().split('T')[0]);
+            todayPlayed = true;
         }
     
         document.getElementById("time").style.display = "block";

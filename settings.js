@@ -1062,7 +1062,6 @@ function resetAdvanced() {
     document.getElementById("mapCreatorOn").classList.add("unselected");
     document.getElementById("mapCreatorOff").classList.remove("unselected");
 
-    document.getElementById("clickAnywhere").style.display = "flex";
     document.getElementById("mapCreatorTop").style.display = "none";
 
     localStorage.setItem("show3BV", show3BV);

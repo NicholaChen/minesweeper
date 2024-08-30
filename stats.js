@@ -6,6 +6,8 @@ function updateStatsAllGames() {
 	document.getElementById("bestWinStreak").innerText = bestWinStreak;
     document.getElementById("hoursPlayed").innerText = (hours / (1000 * 60 * 60)).toFixed(2);
     document.getElementById("gamesPlayed").innerText = gamesPlayed;
+	
+	document.getElementById("dailyWins").innerText = dailyWins;
     
     winPercentage = wins/gamesPlayed;
     
@@ -17,6 +19,7 @@ function updateStatsAllGames() {
 	localStorage.setItem("bestWinStreak", bestWinStreak);
     localStorage.setItem("hours", hours);
     localStorage.setItem("gamesPlayed", gamesPlayed);
+	localStorage.setItem("dailyWins", dailyWins);
 }
 
 function updateStatsBeginner() {
