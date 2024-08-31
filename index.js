@@ -1,4 +1,4 @@
-const VERSION = "1.11.3";
+const VERSION = "1.11.4";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -97,7 +97,8 @@ var showFlags = localStorage.getItem("showFlags") != "false";
 var showPause = localStorage.getItem("showPause") != "false";
 var showRestart = localStorage.getItem("showRestart") != "false";
 
-var show3BV = localStorage.getItem("show3BV") == "true";
+var show3BVSec = localStorage.getItem("show3BVSec") == "true";
+var showCPS = localStorage.getItem("showCPS") == "true";
 var showMines = localStorage.getItem("showMines") == "true";
 
 var mapCreator = localStorage.getItem("mapCreator") == "true";
@@ -356,7 +357,14 @@ function refreshMap(playCustomAgain=false) {
         }
     }
 
-    clicks = 0;
+    clicks = {
+        chord: 0,
+        left: 0,
+        right: 0,
+        w_chord: 0,
+        w_left: 0,
+        w_right: 0
+    };
 
     document.getElementById("gameEnd").style.display = "none";
 
@@ -737,6 +745,7 @@ function exposeTile(m,x,y) {
             document.getElementById("time").style.display = "none";
             document.getElementById("winStreak").style.display = "none";
             document.getElementById("3BVSec").style.display = "none";
+            document.getElementById("CPS").style.display = "none";
             document.getElementById("gameEndText").innerText = "Game Over!";
             document.getElementById("gameEnd").style.display = "flex";
         }
@@ -812,7 +821,7 @@ function exposeTile(m,x,y) {
             document.getElementById("notCounted").style.display = "none";
             document.getElementById("winStreak").style.display = "block";
         } else {
-            document.getElementById("notCounted").style.display = "initial";
+            document.getElementById("notCounted").style.display = "block";
             document.getElementById("winStreak").style.display = "none";
         }
         document.getElementById("notCounted").innerText = "Not counted towards stats";
@@ -845,9 +854,12 @@ function exposeTile(m,x,y) {
                 dailyWins += 1;
                 dailyCurrentWinStreak += 1;
 
+                todayPlayed = true;
+
                 updateStatsDaily();
             } else {
                 document.getElementById("notCounted").innerText = "Daily map already played";
+                document.getElementById("notCounted").style.display = "block";
             }
             document.getElementById("winStreak").style.display = "block";
             document.getElementById("winStreak").innerText = "Daily map win streak: " + dailyCurrentWinStreak;
@@ -855,10 +867,20 @@ function exposeTile(m,x,y) {
     
         document.getElementById("time").style.display = "block";
 
-        
-        document.getElementById("3BVSec").style.display = show3BV ? "block" : "none";
+        let totalClicks = 0;
+        totalClicks += clicks.chord;
+        totalClicks += clicks.left;
+        totalClicks += clicks.right;
+        totalClicks += clicks.w_chord;
+        totalClicks += clicks.w_left;
+        totalClicks += clicks.w_right;
+
+        document.getElementById("3BVSec").style.display = show3BVSec ? "block" : "none";
         document.getElementById("3BVSec").innerText = "3BV/sec: " + (map3BV / ((elapsedTime - pausedTime) / 1000)).toFixed(2);
         
+        document.getElementById("CPS").style.display = showCPS ? "block" : "none";
+        document.getElementById("CPS").innerText = "CPS: " + (totalClicks / ((elapsedTime - pausedTime) / 1000)).toFixed(2);
+
         if ((elapsedTime - pausedTime) / 1000 < 60) {
             document.getElementById("time").innerText = "Time: " + timeToText((elapsedTime - pausedTime) / 1000);
         } else {
@@ -951,11 +973,14 @@ function draw(clear=false) {
                     }
                 }
 
+                let u = false;
                 if (!map[y][x].opened || (mapCreator && !mapRead)) {
                     if (((showMines || mapCreator) && !mapRead) && map[y][x].value == -1) {
                         ctx.fillStyle = "rgba(200,0,0,0.3)";
+                        u = true;
                     } else if (map[y][x].first) {
                         ctx.fillStyle = "rgba(0,200,0,0.3)";
+                        u = true;
                     }
                 } else {
                     if (map[y][x].value == -1) {
@@ -964,11 +989,11 @@ function draw(clear=false) {
                         if (map[y][x].flagged) {
                             ctx.fillStyle = "rgba(200,0,0,0.3)";
                         }
+                        u = true;
                     }
                 }
                 
-
-                ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin*2,squareSize - squareSize*margin*2);
+                if (u) ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin*2,squareSize - squareSize*margin*2);
                 
 
                 if (map[y][x].opened || (mapCreator && !mapRead)) {
@@ -998,7 +1023,7 @@ function draw(clear=false) {
                 } else {
                     if (analysis != "Off" && !mapRead) {
                         if (analysisMap[y][x].probability != null) {
-                            ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
+                            ctx.font = (squareSize / 4.4).toString() + "px monospace, monospace";
                             ctx.fillStyle = theme.probability_color;
                         
                             ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
@@ -1214,6 +1239,7 @@ function open(square) {
             }
             update();
             draw(true);
+            return true;
         }
     }
 }
@@ -1225,6 +1251,10 @@ function flag(square) {
         if (!map[square.y][square.x].opened) {
             console.log("flag",square);
             map[square.y][square.x].flagged = !map[square.y][square.x].flagged;
+
+            let nw = !map[square.y][square.x].flagged_changed;
+
+            map[square.y][square.x].flagged_changed = true;
             draw(true);
   
             let f = 0;
@@ -1239,6 +1269,11 @@ function flag(square) {
   
             flags = f;
             document.getElementById("flags").innerText = flags + "/" + numMines.toString();
+
+            if (map[square.y][square.x].value != -1) {
+                return false;
+            }
+            return nw;
         }
     }
 }
@@ -1253,19 +1288,23 @@ function chord(square) {
 
             if (f == map[square.y][square.x].value) {
                 console.log("chord",square);
+                let f=false;
                 for (let i=-1;i<=1;i++) {
                     for (let j=-1;j<=1;j++) {
                         if (i != 0 || j != 0) {
-                            if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y && !map[square.y+j][square.x+i].flagged) {
+                            if (square.x+i >= 0 && square.x+i < size_x && square.y+j >= 0 && square.y+j < size_y && !map[square.y+j][square.x+i].flagged && !map[square.y+j][square.x+i].opened) {
                                 exposeTile(map, square.x+i, square.y+j);
+                                f=true;
                             }
                         }
                     }
                 }
+                update();
+                draw(true);
+                return f;
             }
-            update();
-            draw(true);
         }
+        return false;
     }
 }
 var mouseTimeout;
@@ -1286,10 +1325,10 @@ canvas.addEventListener("mousedown", (e) => {
         if (square == null) return;
         if (mouseTimeout) clearTimeout(mouseTimeout);
         mouseTimeout = setTimeout(function() {
-            console.log(leftButtonDown, middleButtonDown, rightButtonDown);
-
             if (leftButtonDown && !rightButtonDown) {
-                if (!mapCreator || mapRead) open(square);
+                if (!mapCreator || mapRead) {
+                    if (open(square)) clicks.left += 1;
+                }
                 else {
                     if (square) {
                         if (map[square.y][square.x].value != -1) {
@@ -1328,11 +1367,17 @@ canvas.addEventListener("mousedown", (e) => {
                     }
                 }
             } else if (rightButtonDown && !leftButtonDown && inGame) {
-                if (!mapCreator || mapRead) flag(square);
+                if (!mapCreator || mapRead) {
+                    let f = flag(square);
+                    if (f) clicks.right += 1;
+                    else if (f == false) clicks.w_right += 1;
+                }
             } else if (leftButtonDown && rightButtonDown) {
                 if (!chording) return;
     
-                chord(square);
+                let c = chord(square);
+                if (c) clicks.chord += 1;
+                else if (c==false) clicks.w_chord += 1;
             }
     
             // update cursor
@@ -1341,7 +1386,6 @@ canvas.addEventListener("mousedown", (e) => {
             } else {
                 canvas.style.cursor = "default";
             }
-
         }, 1);
     }
 })
@@ -1370,7 +1414,9 @@ canvas.addEventListener("mouseup", (e) => {
 
         if (!(leftButtonDown && rightButtonDown)) {
             if (leftButtonDown && !rightButtonDown) {
-                if (!mapCreator || mapRead) open(square);
+                if (!mapCreator || mapRead) {
+                    if (open(square)) clicks.left += 1;
+                }
                 else {
                     if (square) {
                         if (map[square.y][square.x].value != -1) {
@@ -1409,7 +1455,11 @@ canvas.addEventListener("mouseup", (e) => {
                     }
                 }
             } else if (rightButtonDown && !leftButtonDown && inGame) {
-                if (!mapCreator || mapRead) flag(square);
+                if (!mapCreator || mapRead) {
+                    let f = flag(square);
+                    if (f) clicks.right += 1;
+                    else if (f == false) clicks.w_right += 1;
+                };
             }
 
             // update cursor
@@ -1426,7 +1476,9 @@ canvas.addEventListener("mouseup", (e) => {
 
             if (!chording) return;
 
-            chord(square);
+            let c = chord(square);
+            if (c) clicks.chord += 1;
+            else if (c==false) clicks.w_chord += 1;
 
             if (overSquare(canvasX,canvasY) && !map[overSquare(canvasX,canvasY).y][overSquare(canvasX,canvasY).x].opened) {
                 canvas.style.cursor = "pointer";
@@ -1523,7 +1575,11 @@ document.addEventListener("touchstart", (e) => {
                     let canvasY = (touchPos.y -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
                     let square = overSquare(canvasX, canvasY);
                     
-                    if (inGame && (!mapCreator || mapRead)) flag(square);
+                    if (inGame && (!mapCreator || mapRead)) {
+                        let f = flag(square);
+                        if (f) clicks.right += 1;
+                        else if (f == false) clicks.w_right += 1;
+                    }
                 }
             }, flagHold);
         }
@@ -1658,9 +1714,11 @@ canvas.addEventListener("touchend", (e) => {
                     if (square) {
                         if (!mapCreator || mapRead) {
                             if (!map[square.y][square.x].opened) {
-                                open(square);
+                                if (open(square)) clicks.left += 1;
                             } else {
-                                chord(square);
+                                let c = chord(square);
+                                if (c) clicks.chord += 1;
+                                else if (c==false) clicks.w_chord += 1;
                             }
                         } else {
                             if (square) {
@@ -2173,6 +2231,7 @@ document.getElementById("dailyIcon").addEventListener("click", (e) => {
         dailyCurrentWinStreak = isNaN(Number(localStorage.getItem("dailyCurrentWinStreak"))) || Number(localStorage.getItem("dailyCurrentWinStreak")) < 0 ? 0 : Number(localStorage.getItem("dailyCurrentWinStreak"));
     }
     console.log("LAST: " + last.toISOString().split('T')[0]);
+    console.log("lastDaily", lastDaily)
     console.log(dailyCurrentWinStreak);
 
     console.log(todayPlayed);
@@ -2182,7 +2241,6 @@ document.getElementById("dailyIcon").addEventListener("click", (e) => {
     if (dailycode != null && !daily) {
         clearInterval(interval);
 
-        todayPlayed = lastDaily == d;
         oldSizeX = size_x;
         oldSizeY = size_y;
         oldNumMines = numMines;

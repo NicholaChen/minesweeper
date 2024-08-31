@@ -18,11 +18,11 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
     - `Custom`
         - `Map size` - Size of map (width x height). `5x5-99x99` `Default: 10x10`
         - `Number of mines` - Number of mines in map. `1-50% of squares in map (max 1000)` `Default: 15`
- - `Infinite lives` - Makes opening mines not end game. `Off/On` `Default: Off`
  - `Mine randomness` - Changes how random the mines are generated. `No guess/Easy/Normal` `Default: Normal`
     - `No guess` - Mines are generated such that the game can be solved without guessing.
     - `Easy` - Mines can be placed anywhere except the first opened square and its adjacent squares.
     - `Normal` - Mines can be placed anywhere except the first opened square.
+ - `Infinite lives` - Makes opening mines not end game. `Off/On` `Default: Off`
 ### Controls
  - `Register clicks` - Selects if mouse clicks are registered when the mouse button is released up or as soon as the mouse button is pressed down. `On mouse up/On mouse down` `Default: On mouse down`
  - `Chording` - Select if chording is enabled. Info about chording in **How to play?** `Off/On` `Default: On`
@@ -44,6 +44,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
         - `Share theme` - Creates and copies a shareable link with the current custom theme.
 ### Advanced
  - `Show 3BV/sec on win screen` - Shows your 3BV/sec stat after winning a game. `Off/On` `Default: Off`
+ - `Show CPS on win screen` - Shows your CPS stat after winning a game. `Off/On` `Default: Off`
  - `Show all mines` - Shows the location of all mines. `Off/On` `Default: Off`
  - `Analysis` - Analyzes the probability of mines at a square. Advanced is more computationally intensive. `Off/Simple/Advanced` `Default: Off`
  - `Map creator`- Mode that allows the ability to create custom maps. Opening squares now places mines. `Off/On` `Default: Off`

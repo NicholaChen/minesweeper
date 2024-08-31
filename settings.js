@@ -718,31 +718,59 @@ document.getElementById("shareTheme").addEventListener("click", (e) => {
     }, settingsMessageDuration);
 });
 
-if (show3BV) {
-    document.getElementById("show3BVOff").classList.add("unselected");
+if (show3BVSec) {
+    document.getElementById("show3BVSecOff").classList.add("unselected");
 } else {
-    document.getElementById("show3BVOn").classList.add("unselected");
+    document.getElementById("show3BVSecOn").classList.add("unselected");
 }
 
 
-document.getElementById("show3BVOff").addEventListener("click", (e) => {
-    document.getElementById("show3BVOff").classList.remove("unselected");
-    document.getElementById("show3BVOn").classList.add("unselected");
+document.getElementById("show3BVSecOff").addEventListener("click", (e) => {
+    document.getElementById("show3BVSecOff").classList.remove("unselected");
+    document.getElementById("show3BVSecOn").classList.add("unselected");
 
-    show3BV = false;
+    show3BVSec = false;
     document.getElementById("3BVSec").style.display = "none";
 
-    localStorage.setItem("show3BV", show3BV);
+    localStorage.setItem("show3BVSec", show3BVSec);
 });
 
-document.getElementById("show3BVOn").addEventListener("click", (e) => {
-    document.getElementById("show3BVOn").classList.remove("unselected");
-    document.getElementById("show3BVOff").classList.add("unselected");
+document.getElementById("show3BVSecOn").addEventListener("click", (e) => {
+    document.getElementById("show3BVSecOn").classList.remove("unselected");
+    document.getElementById("show3BVSecOff").classList.add("unselected");
 
-    show3BV = true;
+    show3BVSec = true;
     document.getElementById("3BVSec").style.display = "block";
 
-    localStorage.setItem("show3BV", show3BV);
+    localStorage.setItem("show3BVSec", show3BVSec);
+});
+
+
+if (showCPS) {
+    document.getElementById("showCPSOff").classList.add("unselected");
+} else {
+    document.getElementById("showCPSOn").classList.add("unselected");
+}
+
+
+document.getElementById("showCPSOff").addEventListener("click", (e) => {
+    document.getElementById("showCPSOff").classList.remove("unselected");
+    document.getElementById("showCPSOn").classList.add("unselected");
+
+    shwoCPS = false;
+    document.getElementById("CPS").style.display = "none";
+
+    localStorage.setItem("shwoCPS", shwoCPS);
+});
+
+document.getElementById("showCPSOn").addEventListener("click", (e) => {
+    document.getElementById("showCPSOn").classList.remove("unselected");
+    document.getElementById("showCPSOff").classList.add("unselected");
+
+    shwoCPS = true;
+    document.getElementById("CPS").style.display = "block";
+
+    localStorage.setItem("shwoCPS", shwoCPS);
 });
 
 
@@ -1037,11 +1065,13 @@ function resetAppearance() {
 }
 
 function resetAdvanced() {
-    show3BV = false;
+    show3BVSec = false;
+    showCPS = false;
     showMines = false;
     analysis = "Off";
     mapCreator = false;
     document.getElementById("3BVSec").style.display = "none";
+    document.getElementById("CPS").style.display = "none";
 
     map3BV = threeBV();
     inGame= true;
@@ -1056,15 +1086,19 @@ function resetAdvanced() {
     document.getElementById("analysisSimple").classList.add("unselected");
     document.getElementById("analysisAdvanced").classList.add("unselected");
 
-    document.getElementById("show3BVOn").classList.add("unselected");
-    document.getElementById("show3BVOff").classList.remove("unselected");
+    document.getElementById("show3BVSecOn").classList.add("unselected");
+    document.getElementById("show3BVSecOff").classList.remove("unselected");
+
+    document.getElementById("showCPSOn").classList.add("unselected");
+    document.getElementById("showCPSOff").classList.remove("unselected");
 
     document.getElementById("mapCreatorOn").classList.add("unselected");
     document.getElementById("mapCreatorOff").classList.remove("unselected");
 
     document.getElementById("mapCreatorTop").style.display = "none";
 
-    localStorage.setItem("show3BV", show3BV);
+    localStorage.setItem("show3BVSec", show3BVSec);
+    localStorage.setItem("showCPS", showCPS);
     localStorage.setItem("showMines", showMines);
     localStorage.setItem("analysis", analysis);
     localStorage.setItem("mapCreator", mapCreator);
