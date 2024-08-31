@@ -826,7 +826,17 @@ function exposeTile(m,x,y) {
             document.getElementById("playCustomAgainButton").style.display = "inline";
         }
 
+
         if (daily) {
+            document.getElementById("notCounted").style.display = "none";
+
+            hours += elapsedTime - pausedTime;
+            wins += 1;
+            currentWinStreak += 1;
+            gamesPlayed += 1;
+            
+            updateStatsAllGames();
+
             document.getElementById("playAgainButton").innerText = "Exit daily map";
             document.getElementById("playCustomAgainButton").style.display = "inline";
             
@@ -911,12 +921,40 @@ function draw(clear=false) {
             if (!paused) {
                 if (!map[y][x].opened || (mapCreator && !mapRead)) {
                     ctx.fillStyle = theme.unopened;
+                } else {
+                    ctx.fillStyle = theme.opened;
+                }
 
+                
+                ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin*2,squareSize - squareSize*margin*2);
+                
+                if (!map[y][x].opened) {
+                    if (theme.key == "classic") {
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.beginPath();
+                        ctx.moveTo(startx+x*squareSize,starty+y*squareSize);
+                        ctx.lineTo(startx+x*squareSize,starty+y*squareSize + squareSize);
+                        ctx.lineTo(startx+x*squareSize + squareSize,starty+y*squareSize);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        ctx.fillStyle = "#767676";
+                        ctx.beginPath();
+                        ctx.moveTo(startx+x*squareSize + squareSize,starty+y*squareSize + squareSize);
+                        ctx.lineTo(startx+x*squareSize,starty+y*squareSize + squareSize);
+                        ctx.lineTo(startx+x*squareSize + squareSize,starty+y*squareSize);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        ctx.fillStyle = theme.unopened;
+                        ctx.fillRect(startx+x*squareSize + squareSize*0.11,starty+y*squareSize + squareSize*0.11,squareSize - squareSize*0.11*2,squareSize - squareSize*0.11*2);
+                    }
+                }
+
+                if (!map[y][x].opened || (mapCreator && !mapRead)) {
                     if (((showMines || mapCreator) && !mapRead) && map[y][x].value == -1) {
                         ctx.fillStyle = "rgba(200,0,0,0.3)";
-                    }
-
-                    if (map[y][x].first) {
+                    } else if (map[y][x].first) {
                         ctx.fillStyle = "rgba(0,200,0,0.3)";
                     }
                 } else {
@@ -926,15 +964,13 @@ function draw(clear=false) {
                         if (map[y][x].flagged) {
                             ctx.fillStyle = "rgba(200,0,0,0.3)";
                         }
-                    } else {
-                        ctx.fillStyle = theme.opened;
                     }
                 }
-
                 
 
-                ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin,squareSize - squareSize*margin);
+                ctx.fillRect(startx+x*squareSize + squareSize*margin,starty+y*squareSize + squareSize*margin,squareSize - squareSize*margin*2,squareSize - squareSize*margin*2);
                 
+
                 if (map[y][x].opened || (mapCreator && !mapRead)) {
                     if (map[y][x].value > 0) {
                         ctx.font = "bold "+ (squareSize / 1.4).toString() + "px monospace, monospace";
@@ -966,17 +1002,18 @@ function draw(clear=false) {
                             ctx.fillStyle = theme.probability_color;
                         
                             ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+                            if (analysisMap[y][x].probability == 1) {
+                                ctx.fillStyle = "rgba(200,0,0,0.9)";
+                            }
+                            if (analysisMap[y][x].probability == 0) {
+                                ctx.fillStyle = "rgba(0,200,0,0.7)";
+                            }
+                            ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
+
                         }
                     }
                 }
-                if (analysis != "Off" && !mapRead) {
-                    if (analysisMap[y][x].probability != null) {
-                        ctx.font = (squareSize / 4).toString() + "px monospace, monospace";
-                        ctx.fillStyle = theme.probability_color;
-                    
-                        ctx.fillText((analysisMap[y][x].probability * 100).toFixed(1) + "%", startx+x*squareSize + squareSize/2, starty+y*squareSize + squareSize/2);
-                    }
-                }
+
                 if (map[y][x].flagged) {
                     ctx.strokeStyle = theme.flag_stem;
                     ctx.fillStyle = theme.flag;
@@ -1161,7 +1198,7 @@ function open(square) {
                 document.getElementById("clickAnywhere").style.display = "none";
                 pausedTime = 0;
                 generate(numMines, square.x, square.y);
-                update();
+
                 first = false;
                 inGame = true;
 
@@ -2072,7 +2109,7 @@ document.getElementById("resetMap").addEventListener("click", (e) => {
     document.getElementById("flags").innerText = "0/" + numMines.toString();
     
     update();
-    draw();
+    draw(true);
 });
 
 

@@ -92,7 +92,7 @@ var themes = {
         six_color: "#008080",
         seven_color: "#000000",
         eight_color: "#808080",
-        probability_color: "#666666",
+        probability_color: "#000000",
         flag: "#FF0000",
         flag_stem: "#FF0000"
     },
