@@ -1169,28 +1169,28 @@ document.getElementById("exitCustomMap").addEventListener("click", (e) => {
         difficulty = oldDifficulty;
     }
     refreshMap();
-    if (mapRead) {
-        daily = false;
 
-        for (let i = 0; i < size_y; i++) {
-            for (let j = 0; j < size_x; j++) {
-                if (isNaN(map[i][j].value)) map[i][j].value = 0;
-                if (map[i][j].flagged) map[i][j].flagged = false;
-                if (map[i][j].opened) map[i][j].opened = false;
-            }
+    daily = false;
+
+    for (let i = 0; i < size_y; i++) {
+        for (let j = 0; j < size_x; j++) {
+            if (isNaN(map[i][j].value)) map[i][j].value = 0;
+            if (map[i][j].flagged) map[i][j].flagged = false;
+            if (map[i][j].opened) map[i][j].opened = false;
         }
-
-        if (mapCreator) {
-            document.getElementById("mapCreatorTop").style.display = "block";
-        }
-        inGame = false;
-        mapCustomMade = true;
-
-        mapRead = false;
-
-        clearInterval(interval);
-        refreshMap();
     }
+
+    if (mapCreator) {
+        document.getElementById("mapCreatorTop").style.display = "block";
+    }
+    inGame = false;
+    mapCustomMade = true;
+
+    mapRead = false;
+
+    clearInterval(interval);
+    refreshMap();
+
 
 
     document.getElementById("gameEnd").style.display = "none";
