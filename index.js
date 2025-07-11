@@ -1,7 +1,6 @@
-const VERSION = "1.11.4";
+const VERSION = "1.12.1";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
-
 
 fetch("https://api.github.com/repos/nicholachen/minesweeper/releases/tags/"+"v"+VERSION).then((response) => response.json()).then((json) => {
     if (json.html_url == null) {
@@ -89,7 +88,6 @@ var statsShortcut = localStorage.getItem("statsShortcut") ?? "A";
 var settingsShortcut = localStorage.getItem("settingsShortcut") ?? "S";
 
 var flagHold = isNaN(Number(localStorage.getItem("flagHold"))) || Number(localStorage.getItem("flagHold")) < 50 ?  250 : Number(localStorage.getItem("flagHold"));
-var easyPanZoom = localStorage.getItem("easyPanZoom") == "true";
 
 
 var showTimer = localStorage.getItem("showTimer") != "false";
@@ -315,7 +313,6 @@ function resize(entries) {
     draw();
 }
 
-
 const resizeObserver = new ResizeObserver(resize);
 resizeObserver.observe(canvas, { box: 'content-box' });
 
@@ -356,7 +353,7 @@ function refreshMap(playCustomAgain=false) {
             }
         }
     }
-
+    mapCustomMade = mapCreator || playCustomAgain;
     clicks = {
         chord: 0,
         left: 0,
@@ -387,11 +384,20 @@ function refreshMap(playCustomAgain=false) {
         document.getElementById("clickAnywhere").style.display = "none";
     }
 
+    if (mapCustomMade && (!mapCreator || mapRead) && !daily) {
+        document.getElementById("customMapTop").style.display = "block";
+    } else {
+        document.getElementById("customMapTop").style.display = "none";
+    }
+
     if (daily) {
         document.getElementById("clickAnywhereText").innerText = "Click the green square to begin";
+        document.getElementById("dailyTop").style.display = "block";
     } else {
         document.getElementById("clickAnywhereText").innerText = "Click any square to begin";
+        document.getElementById("dailyTop").style.display = "none";
     }
+
     document.getElementById("notCounted").style.display = "none";
     
     if (difficulty != "Custom" && !mapRead) {
@@ -406,7 +412,7 @@ function refreshMap(playCustomAgain=false) {
             size_y = large;
         }
     } 
-    if (daily) {
+    if (daily) {  
         let large = Math.max(size_x, size_y);
         let small = Math.min(size_x, size_y);
 
@@ -441,7 +447,7 @@ function refreshMap(playCustomAgain=false) {
     }
     
     first = true;
-    mapCustomMade = mapCreator || playCustomAgain;
+    
 
     flags = 0;
     if (!mapCreator || mapRead) {
@@ -1083,12 +1089,79 @@ function overSquare(canvasX,canvasY) { // gets the square under the canvas at po
 }
 
 document.getElementById("gameEnd").addEventListener("click", (e) => {
-    refreshMap();
-    
-    document.getElementById("gameEnd").style.display = "none";
+    if (mapCustomMade || mapRead || daily) {
+        refreshMap(true);
+
+        document.getElementById("gameEnd").style.display = "none";
+    } else {
+        refreshMap();
+        if (mapRead) {
+            daily = false;
+
+            for (let i = 0; i < size_y; i++) {
+                for (let j = 0; j < size_x; j++) {
+                    if (isNaN(map[i][j].value)) map[i][j].value = 0;
+                    if (map[i][j].flagged) map[i][j].flagged = false;
+                    if (map[i][j].opened) map[i][j].opened = false;
+                }
+            }
+
+            if (mapCreator) {
+                document.getElementById("mapCreatorTop").style.display = "block";
+            }
+            inGame = false;
+            mapCustomMade = true;
+
+            mapRead = false;
+
+            clearInterval(interval);
+            refreshMap();
+        }
+
+
+        document.getElementById("gameEnd").style.display = "none";
+    }
 })
 
 document.getElementById("playAgainButton").addEventListener("click", (e) => {
+    history.pushState(null, 'Minesweeper', 'https://nicholachen.github.io/minesweeper/');
+    if (mapCustomMade | mapRead) {
+        numMines = oldNumMines;
+        size_x = oldSizeX;
+        size_y = oldSizeY;
+        difficulty = oldDifficulty;
+    }
+    refreshMap();
+    if (mapRead) {
+        daily = false;
+
+        for (let i = 0; i < size_y; i++) {
+            for (let j = 0; j < size_x; j++) {
+                if (isNaN(map[i][j].value)) map[i][j].value = 0;
+                if (map[i][j].flagged) map[i][j].flagged = false;
+                if (map[i][j].opened) map[i][j].opened = false;
+            }
+        }
+
+        if (mapCreator) {
+            document.getElementById("mapCreatorTop").style.display = "block";
+        }
+        inGame = false;
+        mapCustomMade = true;
+
+        mapRead = false;
+
+        clearInterval(interval);
+        refreshMap();
+    }
+
+
+    document.getElementById("gameEnd").style.display = "none";
+});
+
+document.getElementById("exitCustomMap").addEventListener("click", (e) => {
+    history.pushState(null, 'Minesweeper', 'https://nicholachen.github.io/minesweeper/');
+    
     if (mapCustomMade | mapRead) {
         numMines = oldNumMines;
         size_x = oldSizeX;
@@ -1597,24 +1670,20 @@ document.addEventListener("touchstart", (e) => {
 
 canvas.addEventListener("touchstart", (e) => {
     if (e.touches.length == 1) {
-        if (panning || easyPanZoom) {
-            let canvasX = e.touches[0].clientX * window.devicePixelRatio;
-            let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+        let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+        let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            lastTouch = {x: canvasX, y: canvasY};
-            camStart = {x: cam_x, y: cam_y};
-        }
+        lastTouch = {x: canvasX, y: canvasY};
+        camStart = {x: cam_x, y: cam_y};
     } else if (e.touches.length == 2) {
-        if (panning || easyPanZoom) {
-            let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
-            let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+        let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
+        let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
-            let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+        let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
+        let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            lastTouch0 = {x: canvasX0, y: canvasY0};
-            lastTouch1 = {x: canvasX1, y: canvasY1};
-        }
+        lastTouch0 = {x: canvasX0, y: canvasY0};
+        lastTouch1 = {x: canvasX1, y: canvasY1};
     }
 }, {passive:true});
 
@@ -1639,7 +1708,7 @@ canvas.addEventListener("touchmove", (e) => {
             draw(true);
 
             lastTouch = {x: canvasX, y: canvasY};
-        } else if (easyPanZoom) {
+        } else {
             let canvasX = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
@@ -1657,7 +1726,7 @@ canvas.addEventListener("touchmove", (e) => {
             lastTouch = {x: canvasX, y: canvasY};
         }
     } else if (e.touches.length == 2) {
-        if (panning || easyPanZoom) {
+        if (panning) {
             moved = true;
             let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
             let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
@@ -1678,6 +1747,15 @@ canvas.addEventListener("touchmove", (e) => {
             cam_x -= (c1.x - c0.x) * scale;
             cam_y -= (c1.y - c0.y) * scale;
 
+            let lastTouchX = (lastTouch0.x + lastTouch1.x) / 2;
+            let lastTouchY = (lastTouch0.y + lastTouch1.y) / 2;
+
+            c1 = PosFromCanvasPos(canvasX, canvasY);
+            let c2 = PosFromCanvasPos(lastTouchX, lastTouchY);
+
+            cam_x -= (c1.x - c2.x) * scale;
+            cam_y -= (c1.y - c2.y) * scale;
+
             lastTouch0 = {x: canvasX0, y: canvasY0};
             lastTouch1 = {x: canvasX1, y: canvasY1};
 
@@ -1689,16 +1767,15 @@ canvas.addEventListener("touchmove", (e) => {
 
 canvas.addEventListener("touchend", (e) => {
     e.preventDefault();
-    if (panning || easyPanZoom) {
-        if (e.touches.length == 0) {
-            notOneTouch = false;
-        } else if (e.touches.length == 1) {
-            let canvasX = e.touches[0].clientX * window.devicePixelRatio;
-            let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+    if (e.touches.length == 0) {
+        notOneTouch = false;
+    } else if (e.touches.length == 1) {
+        let canvasX = e.touches[0].clientX * window.devicePixelRatio;
+        let canvasY = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            lastTouch = {x: canvasX, y: canvasY};
-        }
+        lastTouch = {x: canvasX, y: canvasY};
     }
+
     if (!panning) {
         if (e.touches.length == 0) {
             if (!notOneTouch && !moved) {
@@ -1929,6 +2006,22 @@ document.getElementById("settingsButton").addEventListener("click", (e) => {
         document.getElementById("keybindsScreen").style.display = "none";
 
         if (inGame) pause();
+
+        if(window.matchMedia("(any-hover:none)").matches) {
+            Array.from(document.getElementsByClassName("desktop")).forEach((el) => {
+                el.style.display = "none";
+            });
+            Array.from(document.getElementsByClassName("mobile")).forEach((el) => {
+                el.style.display = "flex";
+            });
+        } else {
+            Array.from(document.getElementsByClassName("desktop")).forEach((el) => {
+                el.style.display = "flex";
+            });
+            Array.from(document.getElementsByClassName("mobile")).forEach((el) => {
+                el.style.display = "none";
+            });
+        }
     }
 });
 
@@ -2085,6 +2178,22 @@ document.addEventListener('keydown', function(e) {
             document.getElementById("keybindsScreen").style.display = "none";
     
             if (inGame) pause();
+
+            if(window.matchMedia("(any-hover:none)").matches) {
+                Array.from(document.getElementsByClassName("desktop")).forEach((el) => {
+                    el.style.display = "none";
+                });
+                Array.from(document.getElementsByClassName("mobile")).forEach((el) => {
+                    el.style.display = "flex";
+                });
+            } else {
+                Array.from(document.getElementsByClassName("desktop")).forEach((el) => {
+                    el.style.display = "flex";
+                });
+                Array.from(document.getElementsByClassName("mobile")).forEach((el) => {
+                    el.style.display = "none";
+                });
+            }
         }
     }
 });
@@ -2304,6 +2413,39 @@ document.getElementById("dailyIcon").addEventListener("click", (e) => {
     }
 });
 
+
+document.getElementById("exitDailyMap").addEventListener("click", (e) => {
+    numMines = oldNumMines;
+    size_x = oldSizeX;
+    size_y = oldSizeY;
+    difficulty = oldDifficulty;
+
+
+    daily = false;
+
+    for (let i = 0; i < size_y; i++) {
+        for (let j = 0; j < size_x; j++) {
+            if (isNaN(map[i][j].value)) map[i][j].value = 0;
+            if (map[i][j].flagged) map[i][j].flagged = false;
+            if (map[i][j].opened) map[i][j].opened = false;
+        }
+    }
+
+    if (mapCreator) {
+        document.getElementById("mapCreatorTop").style.display = "block";
+    }
+    inGame = false;
+    mapCustomMade = true;
+
+    mapRead = false;
+
+    clearInterval(interval);
+    refreshMap();
+    
+
+    document.getElementById("gameEnd").style.display = "none";
+});
+
 // for (let i=0;i<10000;i++) {
 //     for (let i = 0; i < size_y; i++) {
 //         for (let j = 0; j < size_x; j++) {
@@ -2343,11 +2485,11 @@ document.getElementById("dailyIcon").addEventListener("click", (e) => {
  X favicon
  X Infinite lives
  X settings page doesn't reset game
- ~ Stats page for each difficulty
+ X Stats page for each difficulty
  - Show only mobile settings
  X Zoom and pan for mobile
  - Cool new gamemodes
  X Drop shadow for "floating" buttons
- - Daily puzzle
+ X Daily puzzle
  - Login/account system
 */

@@ -397,6 +397,27 @@ function analyze(map_, a, simple=false, max) {
 
         if (analysisDebugVerbose && analysisDebug) console.timeEnd("calculation");
     }
+    console.log(analysisMap_);
+    // Assign probabilities to non-border, unopened squares
+    let totalProbAssigned = 0;
+    let nonBorderUnopened = [];
+    for (let y = 0; y < size_y; y++) {
+        for (let x = 0; x < size_x; x++) {
+            if (analysisMap_[y][x].probability == null) {
+                nonBorderUnopened.push({ x, y });
+            } else {
+                totalProbAssigned += analysisMap_[y][x].probability;
+            }
+        }
+    }
+    let minesLeft = numMines - totalProbAssigned;
+    let unknownLeft = nonBorderUnopened.length;
+    let prob = unknownLeft > 0 ? minesLeft / unknownLeft : 0;
+    for (let i = 0; i < nonBorderUnopened.length; i++) {
+        let { x, y } = nonBorderUnopened[i];
+        analysisMap_[y][x].probability = prob;
+    }
+
     if (analysisDebug) console.timeEnd('analyze');
     return analysisMap_;
     //for (let i=0;i<border_squares.length;i++) {

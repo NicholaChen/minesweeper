@@ -390,33 +390,6 @@ document.getElementById("saveFlagHold").addEventListener("click", (e) => {
 });
 
 
-
-if (easyPanZoom) {
-    document.getElementById("easyPanZoomOff").classList.add("unselected");
-} else {
-    document.getElementById("easyPanZoomOn").classList.add("unselected");
-}
-
-document.getElementById("easyPanZoomOff").addEventListener("click", (e) => {
-    document.getElementById("easyPanZoomOff").classList.remove("unselected");
-    document.getElementById("easyPanZoomOn").classList.add("unselected");
-
-    easyPanZoom = false;
-
-    localStorage.setItem("easyPanZoom", easyPanZoom);
-});
-
-document.getElementById("easyPanZoomOn").addEventListener("click", (e) => {
-    document.getElementById("easyPanZoomOn").classList.remove("unselected");
-    document.getElementById("easyPanZoomOff").classList.add("unselected");
-
-    easyPanZoom = true;
-
-    localStorage.setItem("easyPanZoom", easyPanZoom);
-});
-
-
-
 if (showTimer) {
     document.getElementById("showTimerOff").classList.add("unselected");
 } else {

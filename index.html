@@ -76,6 +76,16 @@
                         <p id="topText" style="color: --text-color; display: none;">Share link copied.</p>
                     </div>
                 </div>
+                <div id="customMapTop" style="margin: 8px; position: absolute; display: none">
+                    <button id="exitCustomMap" title="Share map" style="box-shadow: 0px 0px 18px 0 #00000040;">
+                        Exit custom map
+                    </button>
+                </div>
+                <div id="dailyTop" style="margin: 8px; position: absolute; display: none">
+                    <button id="exitDailyMap" title="Share map" style="box-shadow: 0px 0px 18px 0 #00000040;">
+                        Exit daily map
+                    </button>
+                </div>
             </div>
             
             <div style="flex-grow: 1; position: relative; margin: 0; touch-action: none;" id="game">
@@ -248,7 +258,7 @@
                     <h2 style="display: inline;">Controls</h2>
                     <button class="none" style="float: right;" title="Reset" id="resetControlsSettings"><i class="fa-solid fa-rotate-left"></i></button>
                 </div>
-                <div class="settingsDiv">
+                <div class="settingsDiv desktop">
                     <h3>Register clicks</h2>
                     <div>
                         <button style="margin: 0 8px 0 0;" id="onMouseDownOff">On mouse up</button>
@@ -262,50 +272,43 @@
                         <button id="chordingOn">On</button>
                     </div>
                 </div>
-                <div class="settingsDiv">
+                <div class="settingsDiv desktop">
                     <h3>Pause/unpause shortcut</h2>
                     <div>
                         <button class="keybind" id="pauseShortcut"></button>
                     </div>
                 </div>
-                <div class="settingsDiv">
+                <div class="settingsDiv desktop">
                     <h3>Restart shortcut</h2>
                     <div>
                         <button class="keybind" id="restartShortcut"></button>
                     </div>
                 </div>
-                <div class="settingsDiv">
+                <div class="settingsDiv desktop">
                     <h3>Pan and zoom shortcut</h2>
                     <div>
                         <button class="keybind" id="panZoomShortcut"></button>
                     </div>
                 </div>
-                <div class="settingsDiv">
+                <div class="settingsDiv desktop">
                     <h3>Stats shortcut</h2>
                     <div>
                         <button class="keybind" id="statsShortcut"></button>
                     </div>
                 </div>
-                <div class="settingsDiv">
+                <div class="settingsDiv desktop">
                     <h3>Settings shortcut</h2>
                     <div>
                         <button class="keybind" id="settingsShortcut"></button>
                     </div>
                 </div>
-                <div class="settingsDiv">
+                <div class="settingsDiv mobile">
                     <h3>Mobile hold duration to flag (ms)</h3>
                     <div>
                         <input type="text" id="flagHold"/>
                         <button class="saveSettings" id="saveFlagHold">
                             <i class="fa-solid fa-floppy-disk"></i>
                         </button>
-                    </div>
-                </div>
-                <div class="settingsDiv">
-                    <h3>Mobile easy pan/zoom</h3>
-                    <div>
-                        <button style="margin: 0 8px 0 0;" id="easyPanZoomOff">Off</button>
-                        <button id="easyPanZoomOn">On</button>
                     </div>
                 </div>
                 <p style="text-align: center; display: none;" id="invalidControls"></p>
