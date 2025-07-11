@@ -28,7 +28,7 @@ Supports chording (revealing all 8 adjacent squares when the number of adjacent 
  - `Chording` - Select if chording is enabled. Info about chording in **How to play?** `Off/On` `Default: On`
  - `Pause/unpause shortcut` - Selects keyboard shortcut to pause and unpause game. `Default: SPACE`
  - `Restart shortcut` - Selects keyboard shortcut to restart game. `Default: ESC`
- - `Pan and zoom shortcut` - Selects keybaord shortcut to toggle pan and zoo mode. `Default: Z`
+ - `Pan and zoom shortcut` - Selects keybaord shortcut to toggle pan and zoom mode. `Default: Z`
  - `Stats shortcut` - Selects keybaord shortcut open and close the stats page. `Default: A`
  - `Settings shortcut` - Selects keybaord shortcut open and close the settings page. `Default: S`
  - `Mobile hold duration to flag` - Minimum time in ms needed to tap and hold on mobile in order to flag a square. `>=50` `Default: 250`

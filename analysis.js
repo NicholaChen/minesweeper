@@ -397,8 +397,7 @@ function analyze(map_, a, simple=false, max) {
 
         if (analysisDebugVerbose && analysisDebug) console.timeEnd("calculation");
     }
-    console.log(analysisMap_);
-    // Assign probabilities to non-border, unopened squares
+    // Assign probabilities to unopened squares
     let totalProbAssigned = 0;
     let nonBorderUnopened = [];
     for (let y = 0; y < size_y; y++) {
