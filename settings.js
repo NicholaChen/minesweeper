@@ -730,20 +730,20 @@ document.getElementById("showCPSOff").addEventListener("click", (e) => {
     document.getElementById("showCPSOff").classList.remove("unselected");
     document.getElementById("showCPSOn").classList.add("unselected");
 
-    shwoCPS = false;
+    showCPS = false;
     document.getElementById("CPS").style.display = "none";
 
-    localStorage.setItem("shwoCPS", shwoCPS);
+    localStorage.setItem("showCPS", showCPS);
 });
 
 document.getElementById("showCPSOn").addEventListener("click", (e) => {
     document.getElementById("showCPSOn").classList.remove("unselected");
     document.getElementById("showCPSOff").classList.add("unselected");
 
-    shwoCPS = true;
+    showCPS = true;
     document.getElementById("CPS").style.display = "block";
 
-    localStorage.setItem("shwoCPS", shwoCPS);
+    localStorage.setItem("showCPS", showCPS);
 });
 
 
