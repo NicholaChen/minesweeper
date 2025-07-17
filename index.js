@@ -1,4 +1,4 @@
-const VERSION = "1.12.2";
+const VERSION = "1.12.3";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -1726,42 +1726,40 @@ canvas.addEventListener("touchmove", (e) => {
             lastTouch = {x: canvasX, y: canvasY};
         }
     } else if (e.touches.length == 2) {
-        if (panning) {
-            moved = true;
-            let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
-            let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+        moved = true;
+        let canvasX0 = e.touches[0].clientX * window.devicePixelRatio;
+        let canvasY0 = (e.touches[0].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
 
-            let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
-            let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
-            
-            
-            let canvasX = (canvasX0 + canvasX1) / 2;
-            let canvasY = (canvasY0 + canvasY1) / 2;
+        let canvasX1 = e.touches[1].clientX * window.devicePixelRatio;
+        let canvasY1 = (e.touches[1].clientY -  document.getElementById("top").clientHeight) * window.devicePixelRatio;
+        
+        
+        let canvasX = (canvasX0 + canvasX1) / 2;
+        let canvasY = (canvasY0 + canvasY1) / 2;
 
-            let c0 = PosFromCanvasPos(canvasX, canvasY);
+        let c0 = PosFromCanvasPos(canvasX, canvasY);
 
-            scale *= Math.sqrt(Math.pow(canvasX0-canvasX1, 2) + Math.pow(canvasY0-canvasY1, 2)) / Math.sqrt(Math.pow(lastTouch0.x-lastTouch1.x, 2) + Math.pow(lastTouch0.y-lastTouch1.y,2));
+        scale *= Math.sqrt(Math.pow(canvasX0-canvasX1, 2) + Math.pow(canvasY0-canvasY1, 2)) / Math.sqrt(Math.pow(lastTouch0.x-lastTouch1.x, 2) + Math.pow(lastTouch0.y-lastTouch1.y,2));
 
-            let c1 = PosFromCanvasPos(canvasX, canvasY);
+        let c1 = PosFromCanvasPos(canvasX, canvasY);
 
-            cam_x -= (c1.x - c0.x) * scale;
-            cam_y -= (c1.y - c0.y) * scale;
+        cam_x -= (c1.x - c0.x) * scale;
+        cam_y -= (c1.y - c0.y) * scale;
 
-            let lastTouchX = (lastTouch0.x + lastTouch1.x) / 2;
-            let lastTouchY = (lastTouch0.y + lastTouch1.y) / 2;
+        let lastTouchX = (lastTouch0.x + lastTouch1.x) / 2;
+        let lastTouchY = (lastTouch0.y + lastTouch1.y) / 2;
 
-            c1 = PosFromCanvasPos(canvasX, canvasY);
-            let c2 = PosFromCanvasPos(lastTouchX, lastTouchY);
+        c1 = PosFromCanvasPos(canvasX, canvasY);
+        let c2 = PosFromCanvasPos(lastTouchX, lastTouchY);
 
-            cam_x -= (c1.x - c2.x) * scale;
-            cam_y -= (c1.y - c2.y) * scale;
+        cam_x -= (c1.x - c2.x) * scale;
+        cam_y -= (c1.y - c2.y) * scale;
 
-            lastTouch0 = {x: canvasX0, y: canvasY0};
-            lastTouch1 = {x: canvasX1, y: canvasY1};
+        lastTouch0 = {x: canvasX0, y: canvasY0};
+        lastTouch1 = {x: canvasX1, y: canvasY1};
 
-            viewChanged();
-            draw(true);
-        }
+        viewChanged();
+        draw(true);
     }
 }, {passive:true})
 
@@ -2201,8 +2199,8 @@ document.addEventListener('keydown', function(e) {
 
 window.addEventListener('blur', function() {
     if (inGame && document.getElementById("clickAnywhere").style.display != "flex" && (!mapCreator || mapRead)) {
-        //pause();
-        //lastPause = true;
+        pause();
+        lastPause = true;
     }
 });
 
@@ -2486,7 +2484,7 @@ document.getElementById("exitDailyMap").addEventListener("click", (e) => {
  X Infinite lives
  X settings page doesn't reset game
  X Stats page for each difficulty
- - Show only mobile settings
+ ~ Show only mobile settings
  X Zoom and pan for mobile
  - Cool new gamemodes
  X Drop shadow for "floating" buttons

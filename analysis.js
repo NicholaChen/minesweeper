@@ -414,7 +414,7 @@ function analyze(map_, a, simple=false, max) {
     let prob = unknownLeft > 0 ? minesLeft / unknownLeft : 0;
     for (let i = 0; i < nonBorderUnopened.length; i++) {
         let { x, y } = nonBorderUnopened[i];
-        analysisMap_[y][x].probability = prob;
+        analysisMap_[y][x].probability = Math.round(prob * 100000) / 100000;;
     }
 
     if (analysisDebug) console.timeEnd('analyze');
