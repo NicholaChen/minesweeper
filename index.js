@@ -404,13 +404,34 @@ function refreshMap(playCustomAgain=false) {
         let large = Math.max(size_x, size_y);
         let small = Math.min(size_x, size_y);
 
+        let rotate = false
         if (canvas.width > canvas.height) {
-            size_x = large;
-            size_y = small;
+            if (size_x != large) {
+                rotate = true;
+            }
         } else {
-            size_x = small;
-            size_y = large;
+            if (size_x != small) {
+                rotate = true;
+            }
         }
+
+        if (rotate) {
+            let m = [];
+            for (let i = 0; i < size_x; i++) {
+                m[i] = [];
+                for (let j = 0; j < size_y; j++) {
+                    m[i][j] = map[j][i];
+                }
+            }
+    
+            map = m;
+
+            let old_x = size_x
+            let old_y = size_y
+
+            size_x = old_y;
+            size_y = old_x;
+        };
     } 
     if (daily) {  
         let large = Math.max(size_x, size_y);
