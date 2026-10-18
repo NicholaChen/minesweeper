@@ -1,4 +1,4 @@
-const VERSION = "1.12.3";
+const VERSION = "1.12.4";
 document.getElementById("logoVersion").innerText = "v" + VERSION;
 document.getElementById("versionFooter").innerText = "v" + VERSION;
 
@@ -1145,7 +1145,7 @@ document.getElementById("gameEnd").addEventListener("click", (e) => {
 })
 
 document.getElementById("playAgainButton").addEventListener("click", (e) => {
-    history.pushState(null, 'Minesweeper', 'https://nicholachen.github.io/minesweeper/');
+    history.pushState(null, 'Minesweeper', document.location.origin + '/minesweeper/');
     if (mapCustomMade | mapRead) {
         numMines = oldNumMines;
         size_x = oldSizeX;
@@ -1181,7 +1181,7 @@ document.getElementById("playAgainButton").addEventListener("click", (e) => {
 });
 
 document.getElementById("exitCustomMap").addEventListener("click", (e) => {
-    history.pushState(null, 'Minesweeper', 'https://nicholachen.github.io/minesweeper/');
+    history.pushState(null, 'Minesweeper', document.location.origin + '/minesweeper/');
     
     if (mapCustomMade | mapRead) {
         numMines = oldNumMines;
