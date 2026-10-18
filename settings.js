@@ -1150,14 +1150,14 @@ document.getElementById("saveImportedSettings").addEventListener("click", (e) =>
         }
     }
 
-    history.pushState(null, 'Minesweeper', 'https://nicholachen.github.io/minesweeper/');
+    history.pushState(null, 'Minesweeper', document.location.origin + '/minesweeper/');
 
     document.getElementById("saveImportedSettings").style.display = "none";
     document.getElementById("cancelImportedSettings").style.display = "none";
 });
 
 document.getElementById("cancelImportedSettings").addEventListener("click", (e) => {
-    history.pushState(null, 'Minesweeper', 'https://nicholachen.github.io/minesweeper/');
+    history.pushState(null, 'Minesweeper', document.location.origin + '/minesweeper/');
 
     document.getElementById("saveImportedSettings").style.display = "none";
     document.getElementById("cancelImportedSettings").style.display = "none";
